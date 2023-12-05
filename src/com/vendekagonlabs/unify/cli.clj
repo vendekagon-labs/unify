@@ -13,7 +13,7 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.cli
   (:require [clojure.tools.logging :as log]
-            [com.vendekagonlabs.unify.db.backend :as candel]
+            [com.vendekagonlabs.unify.db.backend :as backend]
             [clojure.tools.cli :as tools.cli]
             [clojure.string :as str]
             [clojure.pprint :refer [pprint]]
@@ -49,10 +49,9 @@
         options-summary
         ""
         "Task:"
-        "  request-db        Creates a new candel database. Specify the name of the database with --database"
-        "  list-dbs          Lists information about all currently running databases."
-        "  delete-db         Deletes the database (empty or branch)."
-        "                    Requires --database arg."
+        "  request-db        Creates a new Unify database. Specify the name of the database with --database"
+        "  list-dbs          Lists information about all current databases."
+        "  delete-db         Deletes the database (empty or branch) specified by --database"
         "  prepare           Uses an import config file to generate all data needed to run an import."
         "                    Requires --import-config and --working-directory args."
         "  diff              Generates all changes required to update an existing dataset to match the target."
@@ -64,7 +63,7 @@
         "                    Requires --working-directory and --database arguments when working with branch databases."
         "  crosscheck-reference   Checks all reference data files for potential upsert collisions."
         "                         Requires --database and --working-directory args."
-        "  schema-version    Prints the schema version supported by unify"
+        "  schema-version    Prints the schema version supported by Unify"
         ""]
        (str/join \newline)))
 
@@ -72,6 +71,7 @@
   [[nil "--import-config     IMPORT-CONFIG" "Import Config edn file (required for prepare)"]
    [nil "--working-directory IMPORT-WORKING-DIRECTORY"
         "Directory where prepared data goes, transact uses data prepare puts here."]
+   [nil "--schema-directory IMPORT-SCHEMA-DIRECTORY"]
    [nil "--tx-batch-size     TX-BLOCK-SIZE" "Datomic transaction batch size"
     :default 50
     :parse-fn #(Integer/parseInt %)
@@ -103,7 +103,7 @@
   [{:keys [database] :as args}]
   (if database
     (try
-      (let [result (candel/request-db database)]
+      (let [result (backend/request-db database)]
         (if (:error result)
           (do
             (println "Error requesting database" database)
@@ -114,7 +114,7 @@
             (println "Request successful, created database" (:db-name result))))
         :success)
       (catch Exception e
-        (exit 1 (str "Error encountered creating candel database " database "\n"
+        (exit 1 (str "Error encountered creating Unify database " database "\n"
                      (when-let [err-data (ex-data e)]
                        (text/->unifyty-string (dissoc err-data :message)))
                      \newline
@@ -123,7 +123,7 @@
 
 
 (defn list-dbs [_]
-  (let [result (candel/list-dbs)]
+  (let [result (backend/list-dbs)]
     (when (:error result)
       (exit 1 (str "Error: " result)))
     (doseq [db result]
@@ -132,7 +132,7 @@
 (defn delete-db
   [{:keys [database]}]
   (if database
-    (let [result (candel/delete-db database)]
+    (let [result (backend/delete-db database)]
       (if (:success result)
         (println "Database " database " has been deleted.")
         (do
@@ -342,19 +342,3 @@
             (exit 0 (str "Task: " task " completed."))))))
     (catch Throwable t
       (cli.error-handling/report-and-exit t))))
-
-(comment
-  (-main "request-db" "--database" "mt-test3")
-
-  (-main "delete-db" "--database" "mt-test3")
-
-  (def val-args (validate-args '("request-db" "--database" "mt-test3")))
-  (def val-args (validate-args '("list-dbs")))
-
-  (def parsed-args (parse-task-args val-args))
-
-  (request-db (merge parsed-args (:options parsed-args)))
-
-  (def val-args (validate-args '("delete-db" "--database" "mt-test3")))
-  (def parsed-args (parse-task-args val-args))
-  (delete-db (merge parsed-args (:options parsed-args))))
