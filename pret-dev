@@ -1,3 +1,0 @@
-#!/bin/bash
-echo "Running pret in dev mode against prod v1 environment."
-clj -J-Xss4m -J-server -J-XX:+UseG1GC -J-XX:MaxGCPauseMillis=50 -M -m com.vendekagonlabs.pret.cli $*
