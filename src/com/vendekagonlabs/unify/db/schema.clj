@@ -14,14 +14,26 @@
 (ns com.vendekagonlabs.unify.db.schema
   (:require [clojure.java.io :as io]
             [com.vendekagonlabs.unify.util.io :as util.io]
+            [clojure.string :as str]
             [com.vendekagonlabs.unify.db.indexes :as indexes]
             [com.vendekagonlabs.unify.db.query :as dq]
             [clojure.set :as set]))
 
-(defn base-schema [] (util.io/read-edn-file (io/resource "schema/schema.edn")))
-(defn enums [] (util.io/read-edn-file (io/resource "schema/enums.edn")))
-(defn metamodel [] (util.io/read-edn-file (io/resource "schema/metamodel.edn")))
-(defn unify-meta [] (util.io/read-edn-file (io/resource "schema/unify-meta.edn")))
+
+(defn read-import-schema [schema-dir fname]
+  (let [fpath (io/file schema-dir fname)]
+    (util.io/read-edn-file fpath)))
+
+(defn base-schema [schema-dir]
+  (read-import-schema schema-dir "schema.edn"))
+(defn enums [schema-dir]
+  (read-import-schema schema-dir "enums.edn"))
+(defn metamodel [schema-dir]
+  (read-import-schema schema-dir "metamodel.edn"))
+(defn unify-meta []
+  (-> "schema/unify-meta.edn"
+      (io/resource)
+      (util.io/read-edn-file)))
 
 ;; for metamodel inference backing, etc.
 (def cached (clojure.java.io/resource "cached-schema.edn"))
@@ -31,32 +43,32 @@
     :with ?e
     :where [?e :db/ident ?i]])
 
-(def schema-txes
-  ;; this is an ordered set of all schema transactions required to bring database up to date
-  ;; txes will be applied in order, conditionally, if transacting schema would change the
-  ;; result of the probing query.
-  ;; Queries are starting out simplistic, we can adjust based on how schema actually evolves.
-  [{:name :base-schema
-    :query new-ident-q
-    :tx-data (base-schema)}
-   {:name :enums
-    :query new-ident-q
-    :tx-data (enums)}
-   {:name :metamodel-attr
-    :query new-ident-q
-    :tx-data (first (metamodel))}
-   {:name :metamodel-entities
-    :query '[:find (count ?k)
-             :where [?k :kind/name]]
-    :tx-data (second (metamodel))}
-   {:name :metamodel-refs
-    :query '[:find (count ?p)
-             :with ?c
-             :where [?p :ref/to ?c]]
-    :tx-data (last  (metamodel))}
-   {:name :com.vendekagonlabs.unify.import.tx-data/metadata
-    :query new-ident-q
-    :tx-data (unify-meta)}])
+(defn schema-txes
+  "Returns an ordered set of all schema transactions."
+  [schema-dir]
+  (let [read-schema-file (partial read-import-schema schema-dir)
+        metamodel-edn (read-schema-file "metamodel.edn")]
+    [{:name :base-schema
+      :query new-ident-q
+      :tx-data (read-schema-file "schema.edn")}
+     {:name :enums
+      :query new-ident-q
+      :tx-data (read-schema-file "enums.edn")}
+     {:name :metamodel-attr
+      :query new-ident-q
+      :tx-data (first metamodel-edn)}
+     {:name :metamodel-entities
+      :query '[:find (count ?k)
+               :where [?k :kind/name]]
+      :tx-data (second metamodel-edn)}
+     {:name :metamodel-refs
+      :query '[:find (count ?p)
+               :with ?c
+               :where [?p :ref/to ?c]]
+      :tx-data (last  metamodel-edn)}
+     {:name :com.vendekagonlabs.unify.import.tx-data/metadata
+      :query new-ident-q
+      :tx-data (unify-meta)}]))
 
 (defn cache
   "Write schema to resources (wrapped in vec for eagerness, readability)"

@@ -23,6 +23,7 @@
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.cli.error-handling :as cli.error-handling :refer [exit]]
             [com.vendekagonlabs.unify.db :as db]
+            [com.vendekagonlabs.unify.db.schema.cache :as cache]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.util.release :as release])
   (:gen-class)
@@ -100,7 +101,8 @@
   (println (str "schema version:" (schema/version))))
 
 (defn request-db
-  [{:keys [database] :as args}]
+  [{:keys [database
+           schema-directory] :as args}]
   (if database
     (try
       (let [result (backend/request-db database)]
@@ -110,7 +112,7 @@
             (pprint result))
           (let [db-info (db/fetch-info database)
                 uri (:uri db-info)]
-            (db/init uri)
+            (db/init uri :schema-directory schema-directory)
             (println "Request successful, created database" (:db-name result))))
         :success)
       (catch Exception e
@@ -141,7 +143,10 @@
     (exit 1 (str "ERROR: requires --database argument"))))
 
 (defn prepare
-  [{:keys [import-cfg-file target-dir resume overwrite continue-on-error] :as ctx}]
+  [{:keys [import-cfg-file target-dir resume overwrite
+           schema-directory continue-on-error] :as ctx}]
+  (when-not schema-directory
+    (exit 1 (str "ERROR: prepare requires --schema-directory argument.")))
   (when continue-on-error
     (println "Set to attempt to continue when prepare encounters errors. Will report all errors at end and in logs."))
   (when-not (and import-cfg-file
@@ -159,6 +164,7 @@
              (println "Working directory exists, *overwrite* is deleting:" target-dir)
              overwrite)
     (util.io/delete-recursively target-dir))
+  (cache/encache schema-directory)
   (import/prepare-import ctx))
 
 

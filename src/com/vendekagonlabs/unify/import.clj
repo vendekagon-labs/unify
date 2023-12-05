@@ -69,9 +69,10 @@
            resume
            skip-annotations
            disable-remote-calls
+           schema-directory
            update
            diff-suffix]}]
-  (let [ensured-datomic-config (db/ensure-db datomic-uri)
+  (let [ensured-datomic-config (db/ensure-db schema-directory datomic-uri)
         tx-result-map (tx-data/transact-import-data! target-dir
                                                      ensured-datomic-config
                                                      ;; TODO this shouldn't be
@@ -134,9 +135,9 @@
   "Checks all reference data in the tx-data dir of target-dir to see if it asserts anything
   about unique reference ids that differs from what's already in the database. Returns list
   of differences (if any)."
-  [{:keys [target-dir datomic-uri]}]
+  [{:keys [target-dir datomic-uri schema-directory]}]
   (let [_tx-data-dir (str target-dir "/" "tx-data")
-        ensured-cfg (db/ensure-db datomic-uri)
+        ensured-cfg (db/ensure-db schema-directory datomic-uri)
         ref-files (conventions/ref-tx-data-filenames target-dir)]
     (mapcat (partial upsert-coord/report-upserts ensured-cfg) ref-files)))
 

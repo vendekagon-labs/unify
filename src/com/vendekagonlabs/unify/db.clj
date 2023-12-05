@@ -83,10 +83,9 @@
      expected))
 
 
-(defn apply-schema [datomic-uri]
-  (let [conn (d/connect datomic-uri)
-        schema-work schema/schema-txes]
-    (doseq [raw-tx schema-work]
+(defn apply-schema [schema-directory datomic-uri]
+  (let [conn (d/connect datomic-uri)]
+    (doseq [raw-tx (schema/schema-txes schema-directory)]
       ;; if a schema attr is not indexed, we add index true. this allows us to keep
       ;; schema edn in resources datomic impl agnostic while optimizing on-prem queries.
       (let [tx (update-in raw-tx [:tx-data]
@@ -111,14 +110,17 @@
 
 (defn init
   "Loads all base schema, enums, and metamodel into database if necessary."
-  [datomic-uri & {:keys [skip-bootstrap seed-data-dir include-proprietary]}]
+  [datomic-uri & {:keys [skip-bootstrap
+                         schema-directory
+                         seed-data-dir
+                         include-proprietary]}]
   (let [_ (d/create-database datomic-uri)
         _ (do
             (log/info "Database created."))
         ;; db isn't ready yet if it hasn't been created, this timeout seems sufficient
         conn (d/connect datomic-uri)
         _ (log/info "Connected to database")]
-    (apply-schema datomic-uri)
+    (apply-schema schema-directory datomic-uri)
     (when-not skip-bootstrap
       (doseq [dataset (if-not include-proprietary
                         (bootstrap.data/open-datasets)
@@ -165,7 +167,7 @@
 (defn ensure-db
   "Returns map with schema included as a key, will throw at Datomic call level if
   unable to connect to database. Will also throw if versions are incompatible."
-  [datomic-uri]
+  [schema-directory datomic-uri]
   (let [version-outcome (compare-schema-version datomic-uri)]
     (cond
       (= version-outcome :identical)
@@ -173,7 +175,8 @@
 
       (= version-outcome :compatible)
       (do (log/info "Compatible schema installed, applying necessary updates.")
-          (init datomic-uri :skip-bootstrap true)
+          (init datomic-uri :skip-bootstrap true
+                            :schema-directory schema-directory)
           datomic-uri)
 
       (= version-outcome :incompatible)
