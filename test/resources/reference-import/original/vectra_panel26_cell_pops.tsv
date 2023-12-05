@@ -1,0 +1,9 @@
+uniquePopulationName	parentPopulation	cell.type	positive.markers
+B cell	Ungated	B cell	
+CD3	Ungated	alpha-beta T cell	
+NK	Ungated	natural killer cell	
+NK > GzmB+	NK	natural killer cell	GzmB+
+CD3 > GzmB+	CD3	alpha-beta T cell	GzmB+
+tumor	Ungated	pancreatic ductal cell	
+NK > iNOShi	tumor	natural killer cell	iNOShi
+Ungated			

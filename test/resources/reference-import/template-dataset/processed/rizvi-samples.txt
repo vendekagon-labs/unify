@@ -1,0 +1,69 @@
+subject.id	sample.id	type	specimen	site	primary	regimen	timepoint
+AL4602	AL4602_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+AL4602	AL4602_T	T	tumor-FFPE	Pleura	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+AU5884	AU5884_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+AU5884	AU5884_T	T	tumor-Frozen	Lung	Primary	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+BL3403	BL3403_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+BL3403	BL3403_T	T	tumor-FFPE	Pleura	Met	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+CA9903	CA9903_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+CA9903	CA9903_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+CU9061	CU9061_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+CU9061	CU9061_T	T	tumor-FFPE	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+DI6359	DI6359_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+DI6359	DI6359_T	T	tumor-FFPE	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+DM123062	DM123062_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+DM123062	DM123062_T	T	tumor-FFPE	Liver	Met	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+FR9547	FR9547_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+FR9547	FR9547_T	T	tumor-FFPE	Soft Tissue	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+GR0134	GR0134_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+GR0134	GR0134_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+GR4788	GR4788_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+GR4788	GR4788_T	T	tumor-Frozen	Bronchus	Met	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+HE3202	HE3202_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+HE3202	HE3202_T	T	tumor-FFPE	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+JB112852	JB112852_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+JB112852	JB112852_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+KA3947	KA3947_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+KA3947	KA3947_T	T	tumor-Frozen	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+LO3793	LO3793_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+LO3793	LO3793_T	T	tumor-FFPE	Lung	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+LO5004	LO5004_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+LO5004	LO5004_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+M4945	M4945_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+M4945	M4945_T	T	tumor-FFPE	Soft Tissue	Met	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+MA7027	MA7027_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+MA7027	MA7027_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+NI9507	NI9507_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+NI9507	NI9507_T	T	tumor-Frozen	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+R7495	R7495_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+R7495	R7495_T	T	tumor-FFPE	Liver	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+RH090935	RH090935_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+RH090935	RH090935_T	T	tumor-FFPE	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+RI1933	RI1933_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+RI1933	RI1933_T	T	tumor-FFPE	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+RO3338	RO3338_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+RO3338	RO3338_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SA9755	SA9755_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SA9755	SA9755_T	T	tumor-FFPE	Adrenal	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SB010944	SB010944_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SB010944	SB010944_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SC0899	SC0899_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SC0899	SC0899_T	T	tumor-Frozen	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+SC6470	SC6470_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+SC6470	SC6470_T	T	tumor-Frozen	Lung	Met	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+SR070761	SR070761_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+SR070761	SR070761_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-2wk	Pembrolizumab-2wk/baseline
+TU0428	TU0428_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+TU0428	TU0428_T	T	tumor-FFPE	Lung	Primary	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+VA1330	VA1330_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+VA1330	VA1330_T	T	tumor-Frozen	Lung	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+VA7859	VA7859_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+VA7859	VA7859_T	T	tumor-Frozen	Lung	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+WA7899	WA7899_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+WA7899	WA7899_T	T	tumor-FFPE	Lung	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+Y2087	Y2087_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+Y2087	Y2087_T	T	tumor-FFPE	Pleura	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+ZA6505	ZA6505_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+ZA6505	ZA6505_T	T	tumor-FFPE	Liver	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+ZA6965	ZA6965_N	N	blood-Frozen	Blood	N/A	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline
+ZA6965	ZA6965_T	T	tumor-FFPE	Lymph Node	Met	Pembrolizumab-3wk	Pembrolizumab-3wk/baseline

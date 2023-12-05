@@ -1,0 +1,31 @@
+<configuration>
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>log/pret.log</file>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %-5level %msg [logger=%logger] [thread=%thread]%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %-5level %msg [logger=%logger] [thread=%thread]%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="FILE" />
+    <appender-ref ref="STDOUT" />
+  </root>
+
+  <logger name="datomic.domain" level="WARN" />
+  <logger name="datomic.process-monitor" level="WARN" />
+  <logger name="datomic.peer" level="WARN" />
+  <logger name="datomic.db" level="ERROR"/>
+  <logger name="datomic.common" level="ERROR" />
+  <logger name="org.apache.activemq.artemis.core.client" level="ERROR" />
+
+</configuration>

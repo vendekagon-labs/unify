@@ -1,0 +1,126 @@
+"name"	"cell.type"	"positive.epitopes"
+"CD16- NK cells"	"CD16-negative, CD56-bright natural killer cell"	NA
+"CD16+CD56mid NK"	"CD16-positive, CD56-dim natural killer cell"	NA
+"Memory B cells"	"memory B cell"	NA
+"Naive B cells"	"naive B cell"	NA
+"Plasmablast"	"plasmablast"	NA
+"NK cells"	"natural killer cell"	NA
+"NKT"	"mature NK T cell"	NA
+"TCRgd+ T cells"	"mature gamma-delta T cell"	NA
+"TCRgd+ T cells > CD25+"	"mature gamma-delta T cell"	"IL2RA"
+"TCRgd+ T cells > CD38+"	"mature gamma-delta T cell"	"CD38"
+"TCRgd+ T cells > Ki-67+"	"mature gamma-delta T cell"	"KI67"
+"TCRgd+ T cells > PD-1+"	"mature gamma-delta T cell"	"PDCD1"
+"TCRgd+ T cells > HLADR+"	"mature gamma-delta T cell"	"DRA"
+"TCRgd+ T cells > Ki67+CD38+"	"mature gamma-delta T cell"	"KI67,CD38"
+"TCRgd+ T cells > Ki67+HLADR+"	"mature gamma-delta T cell"	"KI67,DRA"
+"TCRgd+ T cells > Ki67+Tbet+"	"mature gamma-delta T cell"	"KI67,DRA"
+"TCRgd+ T cells > Tbet+"	"mature gamma-delta T cell"	"TBX21"
+"Treg > CD25+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"IL2RA"
+"Treg > CD38+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"CD38"
+"Treg > Ki-67+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"KI67"
+"Treg > PD-1+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"PDCD1"
+"Treg > HLADR+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"DRA"
+"Treg > Ki67+CD38+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"KI67,CD38"
+"Treg > Ki67+HLADR+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"KI67,DRA"
+"Treg > Ki67+Tbet+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"KI67,DRA"
+"Treg > Tbet+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"TBX21"
+"mDC"	"myeloid dendritic cell"	NA
+"DC1"	"myeloid dendritic cell"	NA
+"DC2"	"CD141-positive myeloid dendritic cell"	NA
+"pDC"	"plasmacytoid dendritic cell"	NA
+"Non-classical Monocytes"	"CD14-low, CD16-positive monocyte"	NA
+"Intermediate Monocytes"	"CD14-positive, CD16-low monocyte"	NA
+"Classical Monocytes"	"CD14-positive, CD16-negative classical monocyte"	NA
+"basophil"	"basophil"	NA
+"CD8 CM (EJW)"	"central memory CD8-positive, alpha-beta T cell"	NA
+"CD8 CM (EJW) > Ki-67+"	"central memory CD8-positive, alpha-beta T cell"	"KI67"
+"CD8 EM1 (EJW)"	"effector memory CD8-positive, alpha-beta T cell"	NA
+"CD8 EM1 (EJW) > Ki-67+"	"effector memory CD8-positive, alpha-beta T cell"	"KI67"
+"CD8 EM2 (EJW)"	"effector memory CD8-positive, alpha-beta T cell"	NA
+"CD8 EM2 (EJW) > Ki-67+"	"effector memory CD8-positive, alpha-beta T cell"	"KI67"
+"CD8 TEMRA (EJW)"	"effector memory CD8-positive, alpha-beta T cell, terminally differentiated"	NA
+"CD8 TEMRA (EJW) > Ki-67+"	"effector memory CD8-positive, alpha-beta T cell, terminally differentiated"	"KI67"
+"CD8 Naive (EJW)"	"naive thymus-derived CD8-positive, alpha-beta T cell"	NA
+"CD8 Naive (EJW) > Ki-67+"	"naive thymus-derived CD8-positive, alpha-beta T cell"	"KI67"
+"Th CM (EJW)"	"central memory CD4-positive, alpha-beta T cell"	NA
+"Th CM (EJW) > Ki-67+"	"central memory CD4-positive, alpha-beta T cell"	"KI67"
+"Th EM1 (EJW)"	"effector memory CD4-positive, alpha-beta T cell"	NA
+"Th EM1 (EJW) > Ki-67+"	"effector memory CD4-positive, alpha-beta T cell"	"KI67"
+"Th EM2 (EJW)"	"effector memory CD4-positive, alpha-beta T cell"	NA
+"Th EM2 (EJW) > Ki-67+"	"effector memory CD4-positive, alpha-beta T cell"	"KI67"
+"Th TEMRA (EJW)"	"effector CD4-positive, alpha-beta T cell"	NA
+"Th TEMRA (EJW) > Ki-67+"	"effector CD4-positive, alpha-beta T cell"	"KI67"
+"Th Naive (EJW)"	"naive thymus-derived CD4-positive, alpha-beta T cell"	NA
+"Th Naive (EJW) > Ki-67+"	"naive thymus-derived CD4-positive, alpha-beta T cell"	"KI67"
+"Th EM2 (EJW) > CD38+"	"effector memory CD4-positive, alpha-beta T cell"	"CD38"
+"Th CM (EJW) > CD38+"	"central memory CD4-positive, alpha-beta T cell"	"CD38"
+"Th EM1 (EJW) > CD38+"	"effector memory CD4-positive, alpha-beta T cell"	"CD38"
+"Th Naive (EJW) > CD38+"	"naive thymus-derived CD4-positive, alpha-beta T cell"	"CD38"
+"CD8 EM2 (EJW) > CD38+"	"effector memory CD8-positive, alpha-beta T cell"	"CD38"
+"CD8 CM (EJW) > CD38+"	"central memory CD8-positive, alpha-beta T cell"	"CD38"
+"CD8 EM1 (EJW) > CD38+"	"effector memory CD8-positive, alpha-beta T cell"	"CD38"
+"CD8 Naive (EJW) > CD38+"	"naive thymus-derived CD8-positive, alpha-beta T cell"	"CD38"
+"CD8 TEMRA (EJW) > CD38+"	"effector memory CD8-positive, alpha-beta T cell, terminally differentiated"	"CD38"
+"Th TEMRA (EJW) > CD38+"	"effector CD4-positive, alpha-beta T cell"	"CD38"
+"Th EM2 (EJW) > CD154+"	"effector memory CD4-positive, alpha-beta T cell"	"CD40L"
+"Th CM (EJW) > CD154+"	"central memory CD4-positive, alpha-beta T cell"	"CD40L"
+"Th EM1 (EJW) > CD154+"	"effector memory CD4-positive, alpha-beta T cell"	"CD40L"
+"Treg > CD154+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"CD40L"
+"Th Naive (EJW) > CD154+"	"naive thymus-derived CD4-positive, alpha-beta T cell"	"CD40L"
+"Th TEMRA (EJW) > CD154+"	"effector CD4-positive, alpha-beta T cell"	"CD40L"
+"CD8 TEMRA (EJW) > CD154+"	"central memory CD8-positive, alpha-beta T cell"	"CD40L"
+"CD8 EM2 (EJW) > CD154+"	"effector memory CD8-positive, alpha-beta T cell"	"CD40L"
+"CD8 CM (EJW) > CD154+"	"naive thymus-derived CD8-positive, alpha-beta T cell"	"CD40L"
+"CD8 EM1 (EJW) > CD154+"	"effector memory CD8-positive, alpha-beta T cell"	"CD40L"
+"CD8 Naive (EJW) > CD154+"	"effector CD4-positive, alpha-beta T cell"	"CD40L"
+"Treg > HLA-DR+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"DRA"
+"Th EM2 (EJW) > HLA-DR+"	"effector memory CD4-positive, alpha-beta T cell"	"DRA"
+"Th CM (EJW) > HLA-DR+"	"central memory CD4-positive, alpha-beta T cell"	"DRA"
+"Th EM1 (EJW) > HLA-DR+"	"effector memory CD4-positive, alpha-beta T cell"	"DRA"
+"Th Naive (EJW) > HLA-DR+"	"naive thymus-derived CD4-positive, alpha-beta T cell"	"DRA"
+"Th TEMRA (EJW) > HLA-DR+"	"effector CD4-positive, alpha-beta T cell"	"DRA"
+"CD8 TEMRA (EJW) > HLA-DR+"	"effector memory CD8-positive, alpha-beta T cell, terminally differentiated"	"DRA"
+"CD8 EM2 (EJW) > HLA-DR+"	"effector memory CD8-positive, alpha-beta T cell"	"DRA"
+"CD8 CM (EJW) > HLA-DR+"	"central memory CD8-positive, alpha-beta T cell"	"DRA"
+"CD8 EM1 (EJW) > HLA-DR+"	"effector memory CD8-positive, alpha-beta T cell"	"DRA"
+"CD8 Naive (EJW) > HLA-DR+"	"naive thymus-derived CD8-positive, alpha-beta T cell"	"DRA"
+"Treg > PDL-1+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"PD1L1"
+"Th EM2 (EJW) > PDL-1+"	"effector memory CD4-positive, alpha-beta T cell"	"PD1L1"
+"Th CM (EJW) > PDL-1+"	"central memory CD4-positive, alpha-beta T cell"	"PD1L1"
+"Th EM1 (EJW) > PDL-1+"	"effector memory CD4-positive, alpha-beta T cell"	"PD1L1"
+"Th Naive (EJW) > PDL-1+"	"naive thymus-derived CD4-positive, alpha-beta T cell"	"PD1L1"
+"Th TEMRA (EJW) > PDL-1+"	"effector CD4-positive, alpha-beta T cell"	"PD1L1"
+"CD8 TEMRA (EJW) > PDL-1+"	"effector memory CD8-positive, alpha-beta T cell, terminally differentiated"	"PD1L1"
+"CD8 EM2 (EJW) > PDL-1+"	"effector memory CD8-positive, alpha-beta T cell"	"PD1L1"
+"CD8 CM (EJW) > PDL-1+"	"central memory CD8-positive, alpha-beta T cell"	"PD1L1"
+"CD8 EM1 (EJW) > PDL-1+"	"effector memory CD8-positive, alpha-beta T cell"	"PD1L1"
+"CD8 Naive (EJW) > PDL-1+"	"naive thymus-derived CD8-positive, alpha-beta T cell"	"PD1L1"
+"Treg > Tbet+"	"CD4-positive, CD25-positive, alpha-beta regulatory T cell"	"TBX21"
+"Th EM2 (EJW) > Tbet+"	"effector memory CD4-positive, alpha-beta T cell"	"TBX21"
+"Th CM (EJW) > Tbet+"	"central memory CD4-positive, alpha-beta T cell"	"TBX21"
+"Th EM1 (EJW) > Tbet+"	"effector memory CD4-positive, alpha-beta T cell"	"TBX21"
+"Th Naive (EJW) > Tbet+"	"naive thymus-derived CD4-positive, alpha-beta T cell"	"TBX21"
+"Th TEMRA (EJW) > Tbet+"	"effector CD4-positive, alpha-beta T cell"	"TBX21"
+"CD8 TEMRA (EJW) > Tbet+"	"effector memory CD8-positive, alpha-beta T cell, terminally differentiated"	"TBX21"
+"CD8 EM2 (EJW) > Tbet+"	"effector memory CD8-positive, alpha-beta T cell"	"TBX21"
+"CD8 CM (EJW) > Tbet+"	"central memory CD8-positive, alpha-beta T cell"	"TBX21"
+"CD8 EM1 (EJW) > Tbet+"	"effector memory CD8-positive, alpha-beta T cell"	"TBX21"
+"CD8 Naive (EJW) > Tbet+"	"naive thymus-derived CD8-positive, alpha-beta T cell"	"TBX21"
+"pDC > CD33+"	"plasmacytoid dendritic cell"	"CD33"
+"mDC > CD33+"	"myeloid dendritic cell"	"CD33"
+"pDC > CD40+"	"plasmacytoid dendritic cell"	"TNR5"
+"mDC > CD40+"	"myeloid dendritic cell"	"TNR5"
+"pDC > CD86+"	"plasmacytoid dendritic cell"	"CD86"
+"mDC > CD86+"	"myeloid dendritic cell"	"CD86"
+"Memory B cells > CD40+"	"memory B cell"	"TNR5"
+"Naive B cells > CD40+"	"naive B cell"	"TNR5"
+"Plasmablast > CD40+"	"plasmablast"	"TNR5"
+"Memory B cells > CD86+"	"memory B cell"	"CD86"
+"Naive B cells > CD86+"	"naive B cell"	"CD86"
+"Plasmablast > CD86+"	"plasmablast"	"CD86"
+"Memory B cells > HLA-DR+"	"memory B cell"	"DRA"
+"Naive B cells > HLA-DR+"	"naive B cell"	"DRA"
+"Plasmablast > HLA-DR+"	"plasmablast"	"DRA"
+"Live DNA+"	"mononuclear cell"	NA
+"CD16-"	"mononuclear cell"	NA

@@ -1,0 +1,402 @@
+;; Import Config:
+
+{; The top-level :unify/import section gives information about your data import
+ ; Generally all keys that begin with :unify/ are specific commands for telling unify what to do with your data or config
+ :unify/import       {:user     "your-user-name"
+                      :mappings "mappings.edn"}
+
+ ; The top-level :dataset section contains all the data included in your dataset (excluding reference data such as variants)
+ :dataset            {; The data below is literal data - it will be input into the database as is. So the name of the dataset will be "dataset name", etc.
+                      ; This is as opposed to data that is input from a file -- see below for many examples of this.
+                      :name                      "template-dataset-10"
+                      :description               "Description of your dataset, ie title of paper, title of clinical trial, or description of conglomerate dataset"
+                      :doi                       "10.1126/science.aaa1348"
+                      :url                       "http://science.sciencemag.org/content/suppl/2015/03/11/science.aaa1348.DC1"
+
+                      ; Each assay run on your dataset has its own assay map
+                      :assays                    [; This first assay entity is an example of a Whole Exome Sequencing dataset
+                                                  {:name             "WES"
+                                                   :technology       :assay.technology/WES
+                                                   :description      "whole exome sequencing"
+
+                                                   ; Measurement sets can be used to separate different experimental conditions, different panels run on your samples,
+                                                   ; different analyses run on the same set of assay data, or any other groupings of measurements
+                                                   :measurement-sets [; This measurement set consists of somatic variant measurements
+                                                                      {:name         "variant-set-1"
+                                                                       :measurements [{; To load in data from input files, we use the :unify/input-file key
+                                                                                       ; Note that the input file can be specified with a relative path (relative to the config.edn location), or an absolute path
+                                                                                       :unify/input-file "processed/variant_measurements.txt"
+
+                                                                                       ; The sample and variant attributes are mapped directly from columns in the file
+                                                                                       :sample           "sample.id"
+                                                                                       :variant          "var.id"
+
+                                                                                       ; The rest of the attributes are in "melted" or "dynamic" format and are mapped with :unify/variables
+                                                                                       ; the syntax below means that your file has a column called "variable" with 3 possible categorical values "t.depth", "n.depth" and "vaf"
+                                                                                       ; that specify the type of the measurement contained in the "value" column
+                                                                                       :unify/variable   "variable"
+                                                                                       :unify/value      "value"
+                                                                                       :unify/variables  {"t.depth" :measurement/t-depth
+                                                                                                          "n.depth" :measurement/n-depth
+                                                                                                          "vaf"     :measurement/vaf}}]}
+                                                                          ; Note that it would be totally fine to have these variables mapped directly to columns, if you had that file format instead
+
+
+
+                                                                      ; To input another set of measurements also from WES, use another measurement-set
+                                                                      ; This could be variants called with another pipeline, or on a different set of samples, or other
+                                                                      {:name         "another set of variants"
+                                                                       ; You can use a series of files as input if you specify them as a glob, like below:
+                                                                       :measurements [{:unify/input-file #glob["processed/" "variant_meas_*.tsv"]
+                                                                                       ; The :unify/na key tells unify what to treat as NA in the input file.
+                                                                                       ; Attributes containing an NA will be ignored and not input into CANDEL
+                                                                                       :unify/na         ""
+                                                                                       ; The :unify/omit-if-na key tells unify which attributes to, if they are NA, remove the entire entity from the data import. This is usually applicable to measurements.
+                                                                                       :unify/omit-if-na [:measurement/t-depth
+                                                                                                          :measurement/n-depth
+                                                                                                          :measurement/t-ref-count
+                                                                                                          :measurement/t-alt-count
+                                                                                                          :measurement/n-ref-count
+                                                                                                          :measurement/n-alt-count]
+                                                                                       :sample           "Tumor_Sample_Barcode"
+                                                                                       :variant          "var.id"
+                                                                                       :unify/variable   "variable"
+                                                                                       :unify/value      "value"
+                                                                                       :unify/variables  {"t_depth"     :measurement/t-depth
+                                                                                                          "n_depth"     :measurement/n-depth
+                                                                                                          "t_ref_count" :measurement/t-ref-count
+                                                                                                          "t_alt_count" :measurement/t-alt-count
+                                                                                                          "n_ref_count" :measurement/n-ref-count
+                                                                                                          "n_alt_count" :measurement/n-alt-count}}]}
+
+
+                                                                      ; This measurement-set consists of copy number variation measurements run on the same samples as the above variants
+                                                                      ; TODO: Fix this at some point in time when not blocking CANDEL ops. After fixing HGNC identifiers in the reference
+                                                                      ;       data there are now some failures here.
+                                                                      #_{:name         "copy number variations"
+                                                                         :measurements [{:unify/input-file             #glob["processed/" "cnv_meas_*.tsv"]
+                                                                                         :unify/na                     ""
+                                                                                         :sample                       "barcode"
+
+                                                                                         ; You can namespace attributes, or not - it's up to you. So :cnv and :measurement/cnv both work equally well.
+                                                                                         :measurement/cnv              "gc.id"
+                                                                                         :measurement/segment-mean-lrr "Segment_Mean"
+                                                                                         :measurement/a-allele-cn      "cn"}]}]}
+
+
+
+                                                  ; Certain clinical lab values are represented as measurements. The example below demonstrates LDH values measured by ELISA
+                                                  {:name             "LDH"
+                                                   :technology       :assay.technology/ELISA
+                                                   :description      "LDH measurement at baseline"
+                                                   :measurement-sets [{:name         "clinical LDH measurements"
+                                                                       :measurements {:unify/input-file  "processed/ldh_meas_and_samples.txt"
+                                                                                      :unify/na          "NA"
+                                                                                      :unify/omit-if-na  [:measurement/ng-mL]
+                                                                                      :sample            "sample.id"
+                                                                                      :measurement/ng-mL "LDH @ Baseline"
+                                                                                      ; The :unify/constants key allows you to specify an attribute that is constant across all entities in the input file
+                                                                                      ; Here that means that every measurement in the LDH input file is targeting the LDHA protein
+                                                                                      :unify/constants   {:measurement/epitope "LDHA"}}}]}
+
+
+
+                                                  ; This is an example of measurements from the Nanostring gene expression assay
+                                                  {:name             "nanostring"
+                                                   :technology       :assay.technology/nanostring
+                                                   :description      "gene expr via nanostring"
+                                                   :measurement-sets [{:name         "baseline"
+                                                                       :measurements [{:unify/input-file "processed/nanostring.txt"
+                                                                                       :gene-product     "variable"
+                                                                                       :sample           "sample"
+                                                                                       :nanostring-count "value"}]}]}
+
+
+
+                                                  ; This is an example of simple clonality results from TCR sequencing
+                                                  {:name             "TCRseq"
+                                                   :technology       :assay.technology/TCR-seq
+                                                   :description      "TCR sequencing"
+                                                   :measurement-sets [{:name         "Baseline TCR clonality measurements"
+                                                                       :measurements [{:unify/input-file "processed/tcr_clonality.txt"
+                                                                                       :sample           "sample"
+                                                                                       :tcr-clonality    "Clonality"}]}]}
+
+                                                  ; Below is an example of how we represent cytometry data, including defining cell populations both from gating and clustering
+                                                  {:name             "CyTOF"
+                                                   :technology       :assay.technology/mass-cytometry
+                                                   :description      "CyTOF analysis performed at Primity Bio"
+                                                   :measurement-sets [{:name             "Spitzer gated"
+                                                                       :cell-populations [{:unify/input-file "processed/cell_populations_Spitzer.txt"
+                                                                                           :unify/na         "NA"
+                                                                                           :cell-type        "cell.type"
+                                                                                           :unify/constants  {:from-clustering false}
+                                                                                           :positive-markers {:unify/many-delimiter ","
+                                                                                                              :unify/many-variable  "positive.epitopes"}
+                                                                                           :name             "name"}]
+                                                                       :measurements     [{:unify/input-file "processed/cytof_measurements_eventCount_Spitzer.txt"
+                                                                                           :unify/na         "NA"
+                                                                                           :unify/omit-if-na [:measurement/cell-count
+                                                                                                              :measurement/leukocyte-count
+                                                                                                              :measurement/percent-of-leukocytes]
+                                                                                           :sample           "sample"
+                                                                                           :cell-population  "uniquePopulationName"
+                                                                                           :unify/variable   "variable"
+                                                                                           :unify/value      "value"
+                                                                                           :unify/variables  {"eventCount"                :measurement/cell-count
+                                                                                                              "normalization.measurement" :measurement/leukocyte-count
+                                                                                                              "normalized.measurement"    :measurement/percent-of-leukocytes}}
+                                                                                          {:unify/input-file     "processed/cytof_measurements_median_Spitzer.txt"
+                                                                                           :unify/na             "NA"
+                                                                                           :unify/omit-if-na     [:measurement/median-channel-value]
+                                                                                           :sample               "sample"
+                                                                                           :cell-population      "uniquePopulationName"
+                                                                                           :epitope              "epitope"
+                                                                                           :median-channel-value "median"}]}
+
+
+                                                                      {:name             "Spitzer clustered"
+                                                                       :description      "All data pooled together and clustered with grappolo"
+                                                                       :cell-populations [{:unify/input-file "processed/cell_populations_cluster_Spitzer.txt"
+                                                                                           :name             "cluster.id"
+                                                                                           :unify/constants  {:from-clustering true}}]
+                                                                       :measurements     [{:unify/input-file "processed/cytof_measurements_clusters_Spitzer.txt"
+                                                                                           :unify/na         "NA"
+                                                                                           :unify/omit-if-na [:measurement/median-channel-value
+                                                                                                              :measurement/percent-of-leukocytes]
+                                                                                           :sample           "sample"
+                                                                                           :cell-population  "cluster.id"
+                                                                                           :epitope          "epitope"
+                                                                                           :unify/variable   "variable"
+                                                                                           :unify/value      "value"
+                                                                                           :unify/variables  {"median-channel-value" :measurement/median-channel-value
+                                                                                                              "popsize"              :measurement/percent-of-leukocytes}}]}]}]
+
+
+
+
+
+
+
+
+
+
+
+                      ; We are now out of the :dataset/assays section of the map and back to the top level of the dataset map
+                      ; This section creates entities for all samples in the dataset. Note that the :sample/id attributes
+                      ; are used to identify samples that are pointed to by :measurement/sample. Therefore the files
+                      ; contained here need to contain all the IDs that are referenced from the measurements files
+                      :samples                   [{; This input file will have one line per sample
+                                                   :unify/input-file  "processed/rizvi-samples.txt"
+
+                                                   :id                "sample.id"
+                                                   :subject           "subject.id"
+                                                   :timepoint         "timepoint"
+                                                   :specimen          "specimen"
+                                                   ; For definitions of each attribute, as well as valid enum values, refer to the schema viewer (link in unify README.md)
+                                                   :type              "type"
+                                                   :metastasis        "primary"
+                                                   :gdc-anatomic-site "site"}
+
+                                                  ; This 2nd map is for another set of samples from the same patients as above.
+                                                  ; These samples were baseline samples for LDH measurement.
+                                                  ; We made up sample IDs for them and we insert known information such as sample type and specimen.
+                                                  {:unify/input-file "processed/ldh_meas_and_samples.txt"
+                                                   :id               "sample.id"
+                                                   :subject          "Patient ID"
+                                                   :unify/constants  {:type      :sample.type/normal
+                                                                      :specimen  :sample.specimen/whole-blood
+                                                                      :timepoint "baseline"}}
+
+
+                                                  ;This 3rd map is for another file of samples, from another source
+                                                  {:unify/input-file "processed/tcga-samples.tsv"
+                                                   :unify/na         ""
+                                                   :id               "barcode"
+                                                   :subject          "subject.id"
+                                                   :type             "sample/type"
+                                                   :metastasis       "sample/metastatic"
+                                                   :recurrence       "sample/recurring"
+                                                   :timepoint        "timepoint"
+                                                   :unify/constants  {:specimen :sample.specimen/fresh-frozen}}]
+
+
+                      ; The subjects map contains information about each subject. Each patient in the dataset should be represented as one subject entity.
+                      :subjects                  [{; The file here will have one line per subject
+                                                   :unify/input-file "processed/rizvi-subjects.txt"
+                                                   :id               "subject.id"
+                                                   ; You will likely need a mapping for gender values since they are enums in CANDEL
+                                                   :sex              "gender"
+                                                   ; Note that the disease is a pointer to the disease reference entity, so disease names will need to match :disease/preferred-name values
+                                                   ; You can get a list of valid disease names with wick::get_diseases() on your provisioned database
+                                                   #_:meddra-disease  #_"disease"
+                                                   :smoker           "smoker"
+                                                   :age              "age"
+                                                   :HLA-A-type       {:unify/many-variable  "hlaA"
+                                                                      :unify/many-delimiter ","}
+                                                   :HLA-B-type       {:unify/many-variable  "hlaB"
+                                                                      :unify/many-delimiter ","}
+                                                   :HLA-C-type       {:unify/many-variable  "hlaC"
+                                                                      :unify/many-delimiter ","}
+                                                   ; The following map specifies the links between subjects and their therapy or therapies. Each subject can have 0, 1, or many therapies.
+                                                   ; The therapy entity links subjects to treatment-regimens (see below) which are things like arms of clinical trials, which many subjects are on.
+                                                   ; The wick package contains helper functions to generate all this data for the simple case in which each subject has only a single therapy
+                                                   :therapies        {; This input file will have one line per subject-therapy combination
+                                                                      :unify/input-file  "processed/rizvi-therapies.txt"
+                                                                      ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
+                                                                      ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
+                                                                      :treatment-regimen "regimen"
+                                                                      :line              "line"
+                                                                      ; We use :unify/constants here to indicate the :therapy/order attribute, which is 1 for all therapies in this particular dataset (because here each subject has only one therapy)
+                                                                      :unify/constants   {:order 1}
+                                                                      :unify/reverse     {:unify/rev-variable "subject.id"
+                                                                                          :unify/rev-attr     :subject/therapies}}}
+
+                                                  {:unify/input-file "processed/tcga-subjects.tsv"
+                                                   :unify/na         ""
+                                                   :id               "subject.id"
+                                                   #_:meddra-disease         #_"disease"}]
+
+
+                      ; clinical-observations hold the equivalent of measurements, but for subjects instead of samples
+                      ; clinical-observations will store clinical data such as BMI and response, and capture the timepoint at which they are measured
+                      :clinical-observation-sets [{:name                  "recist-and-dcb-all-timepoints"
+                                                   :clinical-observations [{:unify/input-file "processed/rizvi-clinical_observations.txt"
+                                                                            :subject          "subject.id"
+                                                                            :timepoint        "timepoint"
+                                                                            :unify/variable   "variable"
+                                                                            :unify/value      "value"
+                                                                            :unify/variables  {"recist" :clinical-observation/recist
+                                                                                               "dcb"    :clinical-observation/dcb}}]}]
+
+
+
+                      ; The treatment-regimens are entities that capture general treatment patterns, ie aPD-1 at 1 mg/kg in 3 week cycles
+                      ; Each treatment regimen may or may not be linked to a clinical trial
+                      ; Subjects are linked to treatment-regimen(s) through the therapy entity (see above)
+                      :treatment-regimens        [{:name           "Pembrolizumab-3wk"
+                                                   :clinical-trial {:nct-number "NCT01295827"}
+                                                   :drug-regimens  {:drug         "PEMBROLIZUMAB"
+                                                                    :cycle-length 21}}
+                                                  {:name           "Pembrolizumab-2wk"
+                                                   :clinical-trial {:nct-number "NCT01295827"} ; Note that this will point to the same trial I created above
+                                                   :drug-regimens  {:drug         "PEMBROLIZUMAB"
+                                                                    :cycle-length 14}}]
+
+                      ; Timepoints are very important entities. Each timepoint is one element on a timeline that your whole dataset follows.
+                      ; Laying out the timepoints in your dataset may be one of the first things you do.
+                      ; Both samples and clinical-observations are linked to timepoints, which are critical for downstream analysis.
+                      ; NOTE - in this example, we have timepoints hard-coded in the config file. However, it is equally valid to enter timepoints in a file and set
+                      ; up the config to read the file and map the columns to attributes, using the :unify/input-file directive as was done with the measurement examples above
+                      :timepoints                [{; The "type" attribute maps a timepoint to a set list of time concepts, like "baseline" or "on-treatment", for easy grouping later
+                                                   :type              :timepoint.type/baseline
+                                                   ; Timepoints may be tied to a specific treatment-regimen or may be general
+                                                   :treatment-regimen "Pembrolizumab-3wk"
+                                                   ; If timepoints are tied to a specific treatment-regimen, then the relative-order attribute orders them relative to one another
+                                                   :relative-order    1
+                                                   ; Each timepoint needs to have an ID that is unique within the dataset.
+                                                   ; If the timepoint is attached to a treatment-regimen, the timepoint ID should begin with the treatment-regimen name followed by / and then some identifier
+                                                   :id                "Pembrolizumab-3wk/baseline"}
+                                                  {:type              :timepoint.type/eos
+                                                   :treatment-regimen "Pembrolizumab-3wk"
+                                                   :relative-order    2
+                                                   :id                "Pembrolizumab-3wk/eos"}
+                                                  {:type              :timepoint.type/baseline
+                                                   :treatment-regimen "Pembrolizumab-2wk"
+                                                   :relative-order    1
+                                                   :id                "Pembrolizumab-2wk/baseline"}
+                                                  {:type              :timepoint.type/eos
+                                                   :treatment-regimen "Pembrolizumab-2wk"
+                                                   :relative-order    2
+                                                   :id                "Pembrolizumab-2wk/eos"}
+                                                  ; This last timepoint is one that is not associated with any treatment-regimen
+                                                  ; This often occurs if you have samples and you don't know the treatment information
+                                                  ; Or if you have timepoints in between treatment regimens
+                                                  {:type :timepoint.type/baseline
+                                                   :id   "baseline"}]}
+
+
+
+
+
+
+ ; At the top level of the map, after :dataset, we input any additional reference data we need to add with this import
+ ; Only some reference types are allowed to be created on input: genomic coordinates, variants, and CNV are some common ones
+
+ ; Adding reference genomic-coordinates is probably necessary if your dataset has variants, CNV, or any other measurement not tied only to individual genes
+ :genomic-coordinate [{:unify/input-file "processed/genomic_coords.txt"
+                       :contig           "chrom"
+                       :start            "start"
+                       :end              "end"
+                       :strand           "strand"
+                       :assembly         "assembly"
+                       :id               "gc.id"}
+                      {:unify/input-file #glob["processed/" "gc_ref_*.tsv"]
+                       :unify/na         ""
+                       :contig           "Chromosome"
+                       :start            "Start_Position"
+                       :end              "End_Position"
+                       :strand           "Strand"
+                       :assembly         "NCBI_Build"
+                       :id               "gc.id"}]
+
+ ; Adding reference variants is probably necessary if your dataset contains variant measurements
+ :variant            [{:unify/input-file    "processed/variants.txt"
+                       :id                  "var.id"
+                       :genomic-coordinates "gc.id"
+                       :gene                "hugo"
+                       :ref-allele          "ref"
+                       :alt-allele          "alt"}
+
+                      ; Just like with other maps above, you can input multiple maps
+                      ; and each map can come from many files if they are structured in the same way
+                      {:unify/input-file    #glob["processed/" "variant_ref_*.tsv"]
+                       :unify/na            ""
+                       :id                  "var.id"
+                       :genomic-coordinates "gc.id"
+                       :unify/variable      "variable"
+                       :unify/value         "value"
+                       :unify/variables     {; The :variant entity has a large number of attributes, which may or may not be present in your file depending on your variant calling pipeline or what type of annotation you ran
+                                             ; If your variant is already present in CANDEL, it may already have these fields filled
+                                             ; And unify will know that this is the same variant with the :variant/id field
+                                             "Hugo_Symbol"            :variant/gene
+                                             "Variant_Classification" :variant/classification
+                                             "Variant_Type"           :variant/type
+                                             "Reference_Allele"       :variant/ref-allele
+                                             "Tumor_Seq_Allele2"      :variant/alt-allele
+                                             "dbSNP_RS"               :variant/dbSNP
+                                             "HGVSc"                  :variant/HGVSc
+                                             "HGVSp_Short"            :variant/HGVSp
+                                             "Feature_type"           :variant/feature-type
+                                             "PUBMED"                 :variant/publication
+                                             "IMPACT"                 :variant/impact
+                                             "ExAC_AF"                :variant/exac-af
+                                             "ExAC_AF_Adj"            :variant/exac-af-adj
+                                             "ExAC_AF_AFR"            :variant/exac-afr
+                                             "ExAC_AF_AMR"            :variant/exac-amr
+                                             "ExAC_AF_EAS"            :variant/exac-eas
+                                             "ExAC_AF_FIN"            :variant/exac-fin
+                                             "ExAC_AF_NFE"            :variant/exac-nfe
+                                             "ExAC_AF_OTH"            :variant/exac-oth
+                                             "ExAC_AF_SAS"            :variant/exac-sas
+                                             "CONTEXT"                :variant/context
+                                             "COSMIC"                 :variant/cosmic}}]
+
+ ; If your dataset contains CNV measurements you will likely need to insert CNV reference entities as well
+ :cnv                {:unify/input-file    #glob["processed/" "cnv_ref_fixed*.tsv"]
+                      :unify/na            ""
+                      :genomic-coordinates "gc.id"
+                      :id                  "gc.id"
+
+                      ; When you have an attribute that can have many values (a "cardinality many" attribute), you can enter the
+                      ; values all in one column, with values separated by a delimeter like a semicolon, and use the following syntax to specify that
+                      :genes               {:unify/many-delimiter ";"
+                                            :unify/many-variable  "Genes"}}
+ ;; TODO: uncomment out when ref ordering bug fixed
+ ;; If you haven't installed a proprietary WHO Drug reference dataset, you can
+ ;; define all drug names referred to in treatment data here.
+ #_:drug            #_[{:unify/input-file "processed/drugs.tsv"
+                        :preferred-name   "name"}]
+ :clinical-trial     {:nct-number "NCT01295827"
+                      :other-ids  "KEYNOTE-001"
+                      :name-long  "Study of Pembrolizumab (MK-3475) in Participants With Progressive Locally Advanced or Metastatic Carcinoma, Melanoma, or Non-small Cell Lung Carcinoma"}}

@@ -1,0 +1,121 @@
+"USUBJID"	"TRGRPID"	"TRLNKID"	"TRTESTCD"	"TRTEST"	"TRORRES"	"TRORRESU"	"TRMETHOD"	"VISIT"	"TRDTC"	"TRDY"	"NewTargetLesion"	"NewNonTargetLesion"
+"840-100100-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	42	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-001"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-2.38	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	41	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-001"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-19.05	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	34	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-001"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-28.57	"%"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100100-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	30	"mm"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	24	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	25	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	30	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	37.5	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	33	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	37.5	"%"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100100-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	33	"mm"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100100-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	32	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-003"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-25	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	24	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-003"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-43.75	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	18	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	121	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-004"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-26.45	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	89	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-004"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-28.1	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	87	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100100-005"	NA	NA	"SUMDIAM"	"Sum of Diameter"	61	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-005"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-32.79	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-005"	NA	NA	"SUMDIAM"	"Sum of Diameter"	41	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-006"	NA	NA	"SUMDIAM"	"Sum of Diameter"	40	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-006"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	0	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-006"	NA	NA	"SUMDIAM"	"Sum of Diameter"	40	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-007"	NA	NA	"SUMDIAM"	"Sum of Diameter"	31	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-007"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	16.13	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-007"	NA	NA	"SUMDIAM"	"Sum of Diameter"	36	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	25	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100100-008"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-36	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100100-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	16	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100200-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	89	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100200-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-2.25	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100200-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	87	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100200-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-15.73	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100200-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	75	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	190	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-35.26	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	123	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-48.42	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	98	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-48.95	"%"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100200-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	97	"mm"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100200-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	10	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100200-004"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-30	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100200-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	7	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100300-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	114	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100400-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	85	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100400-001"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-29.41	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	60	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-001"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-55.29	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100400-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	38	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100400-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	31	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100400-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	0	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	31	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-9.68	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100400-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	28	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100400-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	33	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100400-003"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-12.12	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-003"	NA	NA	"SUMDIAM"	"Sum of Diameter"	29	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	36	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100400-004"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-36.11	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-004"	NA	NA	"SUMDIAM"	"Sum of Diameter"	23	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100400-005"	NA	NA	"SUMDIAM"	"Sum of Diameter"	54	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	46.9	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-001"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-1.92	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	46	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	75.7	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-23.65	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	57.8	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-30.25	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	52.8	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-15.32	"%"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	64.1	"mm"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-19.42	"%"	NA	"tumor-assessment-4"	NA	NA	NA	NA
+"840-100500-002"	NA	NA	"SUMDIAM"	"Sum of Diameter"	61	"mm"	NA	"tumor-assessment-4"	NA	NA	NA	NA
+"840-100500-005"	NA	NA	"SUMDIAM"	"Sum of Diameter"	30.2	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-005"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	15.89	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-005"	NA	NA	"SUMDIAM"	"Sum of Diameter"	35	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-005"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-10.26	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-005"	NA	NA	"SUMDIAM"	"Sum of Diameter"	27.1	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	93.3	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-26.05	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	69	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-50.59	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	46.1	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-57.23	"%"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	39.9	"mm"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-61.52	"%"	NA	"tumor-assessment-4"	NA	NA	NA	NA
+"840-100500-008"	NA	NA	"SUMDIAM"	"Sum of Diameter"	35.9	"mm"	NA	"tumor-assessment-4"	NA	NA	NA	NA
+"840-100500-009"	NA	NA	"SUMDIAM"	"Sum of Diameter"	103.5	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-009"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-34.3	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-009"	NA	NA	"SUMDIAM"	"Sum of Diameter"	68	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-009"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-41.06	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-009"	NA	NA	"SUMDIAM"	"Sum of Diameter"	61	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"SUMDIAM"	"Sum of Diameter"	71.6	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-16.34	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"SUMDIAM"	"Sum of Diameter"	59.9	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-28.77	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"SUMDIAM"	"Sum of Diameter"	51	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-31.84	"%"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"SUMDIAM"	"Sum of Diameter"	48.8	"mm"	NA	"tumor-assessment-3"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-42.32	"%"	NA	"tumor-assessment-4"	NA	NA	NA	NA
+"840-100500-010"	NA	NA	"SUMDIAM"	"Sum of Diameter"	41.3	"mm"	NA	"tumor-assessment-4"	NA	NA	NA	NA
+"840-100500-011"	NA	NA	"SUMDIAM"	"Sum of Diameter"	77.6	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-012"	NA	NA	"SUMDIAM"	"Sum of Diameter"	107.1	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-012"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-15.78	"%"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-012"	NA	NA	"SUMDIAM"	"Sum of Diameter"	90.2	"mm"	NA	"tumor-assessment-1"	NA	NA	NA	NA
+"840-100500-012"	NA	NA	"PCBSD"	"Percent Change Baseline in Sum of Diam"	-33.43	"%"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-012"	NA	NA	"SUMDIAM"	"Sum of Diameter"	71.3	"mm"	NA	"tumor-assessment-2"	NA	NA	NA	NA
+"840-100500-013"	NA	NA	"SUMDIAM"	"Sum of Diameter"	139.3	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-014"	NA	NA	"SUMDIAM"	"Sum of Diameter"	142.6	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-015"	NA	NA	"SUMDIAM"	"Sum of Diameter"	208.3	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100500-016"	NA	NA	"SUMDIAM"	"Sum of Diameter"	39.5	"mm"	NA	"screening"	NA	NA	NA	NA
+"840-100600-001"	NA	NA	"SUMDIAM"	"Sum of Diameter"	10.5	"mm"	NA	"screening"	NA	NA	NA	NA

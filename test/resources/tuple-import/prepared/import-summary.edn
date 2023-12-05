@@ -1,0 +1,14 @@
+[{:job
+  {:pret/node-kind :nanostring-signature,
+   :pret/input-file
+   "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt",
+   :nanostring-signature/name "signature",
+   :nanostring-signature/xgenes ["gene" "value"],
+   :pret/node-ctx [:nanostring-signature],
+   :pret/out-file-prefix "pret-ref-0001-"},
+  :in-filename
+  #object[java.io.File 0x7f49b44b "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt"],
+  :out-filename
+  "/misc/repos/pici/pret/test/resources/tuple-import/prepared/pret-ref-0001-nanostring-weighted-signatures.txt-955b953c-5671-5b26-a159-1aed937c292f.edn",
+  :line-count 9,
+  :import/elapsed-time 43}]

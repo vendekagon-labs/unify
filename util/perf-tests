@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Running pret performance test."
+clojure -J-Xss4m -J-server -J-XX:+UseG1GC -J-XX:MaxGCPauseMillis=50 -Mperf -m org.candelbio.pret.performance.measurements

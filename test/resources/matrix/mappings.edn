@@ -1,0 +1,10 @@
+{:unify/mappings  {:enum/sex       {:subject.sex/female ["F"]
+                                    :subject.sex/male   ["M"]}
+                   :enum/race      {:subject.race/white            ["White"]
+                                    :subject.race/african-american ["Black or African American"]
+                                    :subject.race/asian            ["Asian"]}
+                   :enum/ethnicity {:subject.ethnicity/not-hispanic ["Not Hispanic or Latino"]}}
+
+ :unify/variables {:subject/race      :enum/race
+                   :subject/ethnicity :enum/ethnicity
+                   :subject/sex       :enum/sex}}

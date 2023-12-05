@@ -1,0 +1,8 @@
+signature	gene	value
+IO360/myeloid	ITGAM	0.3
+IO360/myeloid	TLR4	0.4
+IO360/Mast cells	MS4A2	0.80
+IO360/Mast cells	CPA3	0.81
+IO360/Mast cells	HDC	0.82
+IO360/CD8 T cells	CD8A	0.90
+IO360/CD8 T cells	CD8B	0.95

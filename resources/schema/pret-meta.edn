@@ -1,0 +1,16 @@
+[{:db/ident         :pret.annotation/entity
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Entity to which this annotation refers."}
+ {:db/ident         :pret.annotation/filename
+  :db/valueType     :db.type/string
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Filename where entity was sourced from."}
+ {:db/ident         :pret.annotation/line-number
+  :db/valueType     :db.type/long
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "The line number in the file that this entity was sourced from"}
+ {:db/ident         :pret.import/most-recent
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "The most recent import to alter this entity."}]

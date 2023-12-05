@@ -1,0 +1,31 @@
+USUBJID	AGE	SEX	RACE	ETHNIC	TRTACD
+840-100100-001	73	M	White	Not Hispanic or Latino	B1
+840-100100-002	67	F	White	Not Hispanic or Latino	B2
+840-100100-003	69	F	White	Not Hispanic or Latino	B2
+840-100100-004	54	M	Black or African American	Not Hispanic or Latino	B2
+840-100100-005	61	F	White	Not Hispanic or Latino	C1
+840-100100-006	64	M	White	Not Hispanic or Latino	B2
+840-100100-007	60	M	White	Not Hispanic or Latino	B2
+840-100100-008	55	F	Black or African American	Not Hispanic or Latino	C2
+840-100200-002	61	M	White	Not Hispanic or Latino	B2
+840-100200-003	66	M	White	Not Hispanic or Latino	C1
+840-100200-004	64	M	White	Not Hispanic or Latino	C2
+840-100300-003	39	M	White	Not Hispanic or Latino	C2
+840-100400-001	69	M	Asian	Not Hispanic or Latino	C1
+840-100400-002	69	M	White	Not Hispanic or Latino	C1
+840-100400-003	71	F	White	Not Hispanic or Latino	C2
+840-100400-004	62	M	White	Not Hispanic or Latino	C2
+840-100400-005	60	M	White	Not Hispanic or Latino	C2
+840-100500-001	64	F	White	Not Hispanic or Latino	B1
+840-100500-002	66	F	White	Not Hispanic or Latino	B1
+840-100500-005	52	M	White	Not Hispanic or Latino	B1
+840-100500-008	73	F	White	Not Hispanic or Latino	B1
+840-100500-009	69	F	White	Not Hispanic or Latino	B1
+840-100500-010	66	F	White	Not Hispanic or Latino	B1
+840-100500-011	71	M	White	Not Hispanic or Latino	C1
+840-100500-012	77	F	White	Not Hispanic or Latino	C1
+840-100500-013	76	M	White	Not Hispanic or Latino	B2
+840-100500-014	79	F	White	Not Hispanic or Latino	C1
+840-100500-015	67	M	White	Not Hispanic or Latino	C1
+840-100500-016	58	F	White	Not Hispanic or Latino	C2
+840-100600-001	68	F	Asian	Not Hispanic or Latino	C2

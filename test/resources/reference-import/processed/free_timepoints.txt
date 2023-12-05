@@ -1,0 +1,7 @@
+id	TYPE
+tumor-assessment-1	:timepoint/tumor-assessment
+tumor-assessment-2	:timepoint/tumor-assessment
+tumor-assessment-3	:timepoint/tumor-assessment
+tumor-assessment-4	:timepoint/tumor-assessment
+screening	:timepoint/baseline
+EOS	:timepoint/eos

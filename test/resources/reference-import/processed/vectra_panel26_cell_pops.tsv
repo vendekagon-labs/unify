@@ -1,0 +1,9 @@
+"uniquePopulationName"	"parentPopulation"	"cell.type"	"positive.markers"
+"B cell"	"Ungated"	"B cell"	NA
+"CD3"	"Ungated"	"alpha-beta T cell"	NA
+"NK"	"Ungated"	"natural killer cell"	NA
+"NK > GzmB+"	"NK"	"natural killer cell"	"GzmB+"
+"CD3 > GzmB+"	"CD3"	"alpha-beta T cell"	"GzmB+"
+"tumor"	"Ungated"	"pancreatic ductal cell"	NA
+"NK > iNOShi"	"tumor"	"natural killer cell"	"iNOShi"
+"Ungated"	NA	NA	NA

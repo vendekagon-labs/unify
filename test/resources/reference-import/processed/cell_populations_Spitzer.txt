@@ -1,0 +1,57 @@
+name	cell.type	positive.epitopes
+NK cells	natural killer cell	NA
+NK cells > Ki-67+	natural killer cell	KI67
+CSMB	class switched memory B cell	NA
+IgD+CD27-	naive B cell	NA
+NCSMB	unswitched memory B cell	NA
+Plasmablast	plasmablast	NA
+CD4 T Cells	CD4-positive, alpha-beta T cell	NA
+CD4 T Cells > CD25+	CD4-positive, alpha-beta T cell	IL2RA
+CD4 T Cells > CD38+	CD4-positive, alpha-beta T cell	CD38
+CD4 T Cells > CM	central memory CD4-positive, alpha-beta T cell	NA
+CD4 T Cells > CM > CD25+	central memory CD4-positive, alpha-beta T cell	IL2RA
+CD4 T Cells > CM > CD38+	central memory CD4-positive, alpha-beta T cell	CD38
+CD4 T Cells > CM > Ki-67+	central memory CD4-positive, alpha-beta T cell	KI67
+CD4 T Cells > CM > PD-1+	central memory CD4-positive, alpha-beta T cell	PDCD1
+CD4 T Cells > EM	effector memory CD4-positive, alpha-beta T cell	NA
+CD4 T Cells > EM > CD25+	effector memory CD4-positive, alpha-beta T cell	IL2RA
+CD4 T Cells > EM > CD38+	effector memory CD4-positive, alpha-beta T cell	CD38
+CD4 T Cells > EM > Ki-67+	effector memory CD4-positive, alpha-beta T cell	KI67
+CD4 T Cells > EM > PD-1+	effector memory CD4-positive, alpha-beta T cell	PDCD1
+CD4 T Cells > Ki-67+	CD4-positive, alpha-beta T cell	KI67
+CD4 T Cells > Naive	naive thymus-derived CD8-positive, alpha-beta T cell	NA
+CD4 T Cells > Naive > CD25+	naive thymus-derived CD8-positive, alpha-beta T cell	IL2RA
+CD4 T Cells > Naive > CD38+	naive thymus-derived CD8-positive, alpha-beta T cell	CD38
+CD4 T Cells > Naive > Ki-67+	naive thymus-derived CD8-positive, alpha-beta T cell	KI67
+CD4 T Cells > Naive > PD-1+	naive thymus-derived CD8-positive, alpha-beta T cell	PDCD1
+CD4 T Cells > PD-1+	CD4-positive, alpha-beta T cell	PDCD1
+Tregs	CD4-positive, CD25-positive, alpha-beta regulatory T cell	NA
+Tregs > CD25+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	IL2RA
+Tregs > CD38+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	CD38
+Tregs > Ki-67+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	KI67
+Tregs > PD-1+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	PDCD1
+CD8  T Cells	CD8-positive, alpha-beta T cell	NA
+CD8  T Cells > CD25+	CD8-positive, alpha-beta T cell	IL2RA
+CD8  T Cells > CD38+	CD8-positive, alpha-beta T cell	CD38
+CD8  T Cells > CM	central memory CD8-positive, alpha-beta T cell	NA
+CD8  T Cells > CM > CD25+	central memory CD8-positive, alpha-beta T cell	IL2RA
+CD8  T Cells > CM > CD38+	central memory CD8-positive, alpha-beta T cell	CD38
+CD8  T Cells > CM > Ki-67+	central memory CD8-positive, alpha-beta T cell	KI67
+CD8  T Cells > CM > PD-1+	central memory CD8-positive, alpha-beta T cell	PDCD1
+CD8  T Cells > EM	effector memory CD8-positive, alpha-beta T cell	NA
+CD8  T Cells > EM > CD25+	effector memory CD8-positive, alpha-beta T cell	IL2RA
+CD8  T Cells > EM > CD38+	effector memory CD8-positive, alpha-beta T cell	CD38
+CD8  T Cells > EM > Ki-67+	effector memory CD8-positive, alpha-beta T cell	KI67
+CD8  T Cells > EM > PD-1+	effector memory CD8-positive, alpha-beta T cell	PDCD1
+CD8  T Cells > Ki-67+	CD8-positive, alpha-beta T cell	KI67
+CD8  T Cells > Naive	naive thymus-derived CD8-positive, alpha-beta T cell	NA
+CD8  T Cells > Naive > CD25+	naive thymus-derived CD8-positive, alpha-beta T cell	IL2RA
+CD8  T Cells > Naive > CD38+	naive thymus-derived CD8-positive, alpha-beta T cell	CD38
+CD8  T Cells > Naive > Ki-67+	naive thymus-derived CD8-positive, alpha-beta T cell	KI67
+CD8  T Cells > Naive > PD-1+	naive thymus-derived CD8-positive, alpha-beta T cell	PDCD1
+CD8  T Cells > PD-1+	CD8-positive, alpha-beta T cell	PDCD1
+TEMRA	effector memory CD8-positive, alpha-beta T cell, terminally differentiated	NA
+TEMRA > CD25+	effector memory CD8-positive, alpha-beta T cell, terminally differentiated	IL2RA
+TEMRA > CD38+	effector memory CD8-positive, alpha-beta T cell, terminally differentiated	CD38
+TEMRA > Ki-67+	effector memory CD8-positive, alpha-beta T cell, terminally differentiated	KI67
+TEMRA > PD-1+	effector memory CD8-positive, alpha-beta T cell, terminally differentiated	PDCD1

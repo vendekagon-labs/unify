@@ -1,0 +1,18 @@
+subjectId	specimenId	specimen	timepoint
+840-100100-001	881FP01	Tissue Blocks	screening
+840-100500-010	879FP01	Tissue Slides	screening
+840-100500-010	879FP01	Tissue Blocks	screening
+840-100200-003	886FP01	Tissue Slides	screening
+840-100400-002	SSW17-01474	Tissue Slides	screening
+840-100500-009	880FP01	Tissue Blocks	screening
+840-100100-006	1763FP02	Tissue Slides	screening
+840-100500-012	878FP01	Tissue Slides	screening
+840-100400-001	1199FP01	Tissue Blocks	screening
+840-100400-003	2111FP02	Tissue Slides	screening
+840-100500-008	4FP01	Tissue Blocks	screening
+840-100200-002	3323FP04	Tissue Blocks	screening
+840-100100-003	1766FP01	Tissue Slides	screening
+840-100100-007	1764FP01	Tissue Slides	screening
+840-100500-014	2113	Tissue Blocks	screening
+840-100100-002	2109FP01	Tissue Slides	screening
+840-100500-005	2FP02	Tissue Slides	screening

@@ -1,0 +1,20 @@
+{:deploy-region :us-east-1
+ :data-db-uri "datomic:ddb://us-east-1/cdel-test-tcga/"
+ :prod-db-name "cdel-prod-internal"
+ :candelabra-db-uri "datomic:ddb://us-east-1/cdel-test-tcga/user-admin-3"
+ :candelabra-endpoint "https://cdel-candelabra.us-east-1.elasticbeanstalk.com"
+ :batch-bucket "cdel-batch-jobs"
+ :backup-bucket "cdel-prod-datomic-backups"
+ :dataset-bucket "pret-staging-tx-data-bucket"
+ :release-bucket "cdel-software-releases"
+ :ops-bucket     "cdel-db-ops"
+ :db-ready-notification-arn "arn:aws:sns:us-east-1:733151965047:cdel-db-ready"
+ :worker {:pacing 3000
+          :timeout-hours 12}
+ :instance {:db-name "cdel"
+            :password "pici"
+            :datomic-uri "datomic:dev://localhost:4334/"}
+ :datomic-uri "datomic:dev://localhost:4334/test-batch5?password=pici"
+ :datasets ["rizvi-import-1"]
+ :notify-users ["user@pici.org"]
+ :admin-email "benkamphaus@cognitect.com"}

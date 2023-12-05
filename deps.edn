@@ -1,0 +1,49 @@
+{:deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        com.cognitect/anomalies {:mvn/version "0.1.12"}
+        com.cognitect.aws/endpoints {:mvn/version "1.1.11.969"}
+        com.cognitect.aws/sns       {:mvn/version "697.2.391.0"}
+        com.datomic/peer {:mvn/version "1.0.6735"
+                          :exclusions [org.slf4j/jul-to-slf4j org.slf4j/slf4j-nop]}
+        com.cognitect.aws/api       {:mvn/version "0.8.505"}
+        com.cognitect.aws/s3        {:mvn/version "811.2.858.0"}
+        org.clojure/data.csv {:mvn/version "1.0.0"}
+        clj-http/clj-http {:mvn/version "3.10.0"}
+        org.clojure/core.async {:mvn/version "1.6.681"}
+        org.clojure/tools.logging {:mvn/version "0.4.1"}
+        ch.qos.logback/logback-classic {:mvn/version "1.2.3"}
+        org.clojure/tools.cli {:mvn/version "1.0.206"}
+        benkamphaus/contextual {:git/url "https://github.com/benkamphaus/contextual.git"
+                                :sha "b36cd30c167106e9bd2c6dbac3c75e4f58bb181a"
+                                :exclusions [org.clojure/clojurescript]}
+        ;; match clojure AWS api lib
+        org.clojure/data.xml {:mvn/version "0.2.0-alpha6"}
+        org.clojure/data.zip {:mvn/version "1.0.0"}
+        com.jcraft/jsch {:mvn/version "0.1.55"}
+        com.amazonaws/aws-java-sdk-dynamodb {:mvn/version "1.12.5"
+                                             :exclusions [com.fasterxml.jackson.core/com.fasterxml.jackson.core]}
+        com.amazonaws/aws-java-sdk-ec2 {:mvn/version "1.11.427"}
+        com.amazonaws/aws-java-sdk-s3 {:mvn/version "1.11.427"}
+        com.amazonaws/aws-java-sdk-resourcegroupstaggingapi {:mvn/version"1.11.427"}
+        org.clojure/spec-alpha2 {:git/url "https://github.com/clojure/spec-alpha2.git"
+                                 :sha "106da669223a0232a0556e8cba5b4c2b0d7e6e99"}
+        io.forward/yaml {:mvn/version "1.0.11"}}
+
+ :paths ["src" "resources"]
+ :aliases {:dev {:extra-paths ["dev" "test"]
+                 :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}}}
+           :repl-server {:exec-fn clojure.core.server/start-server
+                         :extra-paths ["dev" "test"]
+                         :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}} 
+                         :exec-args {:name "repl-server"
+                                     :port 5555
+                                     :accept clojure.core.server/repl
+                                     :server-daemon false}}
+           :test {:extra-paths ["test" "dev"]
+                  :extra-deps {com.cognitect/test-runner {:git/url "git@github.com:cognitect-labs/test-runner.git"
+                                                          :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
+                  :main-opts ["-m" "cognitect.test-runner"]}
+           :depstar
+             {:extra-deps
+               {seancorfield/depstar {:mvn/version "0.1.6"}}
+              :main-opts ["-m" "hf.depstar.uberjar"]}
+           :verbose {:verbose true}}}

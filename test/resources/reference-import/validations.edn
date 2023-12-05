@@ -1,0 +1,78 @@
+{:rules       [[(all-therapies ?t ?x)
+                [?t :subject/therapies ?x]]
+               [(regimens-by-observation ?o ?r-name)
+                [?o :clinical-observation/subject ?s]
+                [?s :subject/therapies ?t]
+                [?t :therapy/treatment-regimen ?r]
+                [?r :treatment-regimen/name ?r-name]]]
+
+ :validations [{:name    :subject-count
+                :query   [:find (count ?s)
+                          :where
+                          [_ :dataset/subjects ?s]]
+                :allowed [[30]]}
+               ;; matches example-data/samples.txt record count
+               {:name    :import-exists
+                :query   [:find ?dname
+                          :where
+                          [?i :import/name ?dname]]
+                :allowed [["pici0002-import1"]]}
+               {:name    :all-import-txes--annotated
+                :query   [:find (count ?tx)
+                          :where
+                          [?i :import/name "pici0002-import1"]
+                          [?tx :import/import ?i]]
+                :allowed [[182]]}
+               {:name    :sample-count
+                :query   [:find (count ?s)
+                          :where
+                          [?s :sample/id]]
+                :allowed [[500]]}
+               ;; both added in bootstrap + added in ref data, maybe
+               ;; a better query would only capture parts added in ref data?
+               {:name    :genomic-coordinate-count
+                :query   [:find (count ?c)
+                          :where
+                          [?c :genomic-coordinate/id]]
+                :allowed [[41646]]}
+               {:name    :therapies-count
+                :query   [:find (count ?x)
+                          :where
+                          [?t :subject/therapies ?x]]
+                :allowed [[30]]}
+               {:name    :therapies-count-via-rule
+                :query   [:find (count ?x)
+                          :where
+                          (all-therapies ?t ?x)]
+                :allowed [[30]]}
+               {:name    :observations-per-regimen
+                :query   [:find ?r-name (count ?o)
+                          :where
+                          [_ :dataset/clinical-observation-sets ?oset]
+                          [?oset :clinical-observation-set/clinical-observations ?o]
+                          (regimens-by-observation ?o ?r-name)]
+                :allowed [["B1" 74]
+                          ["B2" 47]
+                          ["C1" 46]
+                          ["C2" 28]]}
+               {:name    :uid-resolution-agreement
+                :query   [:find (count ?meas-value)
+                          :where
+                          [?d :dataset/name ?dataset-name]
+                          [?d :dataset/assays ?a]
+                          [?a :assay/technology :technology/mass-cytometry]
+                          [?a :assay/name "CyTOF"]
+                          [?a :assay/measurement-sets ?e]
+                          [?e :measurement-set/name ?cond-name]
+                          [?e :measurement-set/measurements ?m]
+                          [?m :measurement/cell-count ?meas-value]
+                          [?m :measurement/sample ?s]
+                          [?m :measurement/cell-population ?c]
+                          [?c :cell-population/name "CD4 T Cells > CD38+"]
+                          [?s :sample/id ?sample-id]]
+                :allowed [[60]]}
+               {:name    :cnv-w-gc-as-id
+                :query   [:find (count ?cnv)
+                          :where
+                          [?cnv :cnv/id]]
+                :allowed [[2]]}]}

@@ -1,0 +1,660 @@
+[
+ ;; Metamodel attributes:
+
+ [{:db/ident         :kind/name
+   :db/valueType     :db.type/keyword
+   :db/unique        :db.unique/identity
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Name of a kind of entity in the system"}
+
+  {:db/ident         :kind/attr
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Distinguishing attribute of this kind of entity, must be a domain schema attribute"}
+
+  {:db/ident         :kind/context-id
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Locally identifying attribute, must be a domain schema attribute"}
+
+  {:db/ident         :kind/parent
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           ":kind/name of the parent (containing) entity"}
+
+  {:db/ident         :kind/need-uid
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "attr name that stores the synthetic UID for this kind of entity"}
+
+  {:db/ident         :kind/synthetic-attr-name
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Target name of the attribute that holds the synthesized value"}
+
+  ;; infer matrix blob kind from presence of storage key, data type
+  {:db/ident         :kind.matrix-blob/storage-key-attribute
+   :db/valueType     :db.type/ref
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Indicates which attribute for the matrix blob entity in question is used to store the
+                      backing file."}
+
+  {:db/ident         :kind.matrix-blob/data-type-attribute
+   :db/valueType     :db.type/ref
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Indicates which attribute for the matrix blob entity in question is used to store the data
+                      type attribute."}
+
+
+  ;; Synthetic Attribute Components are ordered via a Datomic component
+  ;;
+  {:db/ident         :kind/synthetic-attr-components
+   :db/valueType     :db.type/ref
+   :db/cardinality   :db.cardinality/many
+   :db/isComponent   true
+   :db/doc           "Describes the attribute components of the synthesized attribute values."}
+
+  {:db/ident         :kind.synthetic-attr-components/idx
+   :db/valueType     :db.type/long
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "The order that a component appears in the synthesized value"}
+
+  {:db/ident         :kind.sythetic-attr-components/name
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "Target name of the component attribute used to synthesize the value"}
+
+
+  {:db/ident         :kind/allow-create-on-import
+   :db/valueType     :db.type/boolean
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "tag indicating that this particular ref data can be created during an import"}
+
+  {:db/ident         :kind/ref-data
+   :db/valueType     :db.type/boolean
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "tag indicating that this kind of entity is ref-data"}
+
+  {:db/ident         :ref/from
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "source of a ref attribute, must be a :kind/name"}
+
+  {:db/ident         :ref/to
+   :db/valueType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "target of a ref attribute, must be a :kind/name"}
+
+  ;; Similar to :db/tupleTypes but allows kinds
+  {:db/ident         :ref/tuple-types
+   :db/valueType     :db.type/tuple
+   :db/tupleType     :db.type/keyword
+   :db/cardinality   :db.cardinality/one
+   :db/doc           "vector of tuple element types for a tuple attribute, each element is either a kind keyword or a primitive type keyword"}]
+
+ ;; Entity metadata:
+
+ [{:kind/name        :dataset
+   :kind/attr        :dataset/name
+   :kind/context-id  :dataset/name}
+
+  {:kind/name        :assay
+   :kind/attr        :assay/name
+   :kind/context-id  :assay/name
+   :kind/need-uid    :assay/uid
+   :kind/parent      :dataset}
+
+  {:kind/name        :clinical-observation-set
+   :kind/attr        :clinical-observation-set/name
+   :kind/context-id  :clinical-observation-set/name
+   :kind/parent      :dataset
+   :kind/need-uid    :clinical-observation-set/uid}
+
+  {:kind/name        :measurement-set
+   :kind/attr        :measurement-set/name
+   :kind/context-id  :measurement-set/name
+   :kind/parent      :assay
+   :kind/need-uid    :measurement-set/uid}
+
+  {:kind/name        :tcr
+   :kind/attr        :tcr/id
+   :kind/context-id  :tcr/id
+   :kind/parent      :measurement-set
+   :kind/need-uid    :tcr/uid}
+
+  {:kind/name        :cell-population
+   :kind/attr        :cell-population/name
+   :kind/context-id  :cell-population/name
+   :kind/parent      :measurement-set
+   :kind/need-uid    :cell-population/uid}
+
+  {:kind/name        :single-cell
+   :kind/attr        :single-cell/id
+   :kind/context-id  :single-cell/id
+   :kind/parent      :measurement-set
+   :kind/need-uid    :single-cell/uid}
+
+  {:kind/name        :otu
+   :kind/attr        :otu/id
+   :kind/context-id  :otu/id
+   :kind/parent      :measurement-set
+   :kind/need-uid    :otu/uid}
+
+  {:kind/name        :measurement
+   :kind/parent      :measurement-set
+   :kind/attr        :measurement/sample
+   :kind/context-id  :measurement/id
+   :kind/need-uid    :measurement/uid
+   :kind/synthetic-attr-name       :measurement/id
+   :kind/synthetic-attr-components [{:kind.synthetic-attr-components/idx 0
+                                     :kind.sythetic-attr-components/name :measurement/sample}
+                                    {:kind.synthetic-attr-components/idx 1
+                                     :kind.sythetic-attr-components/name :measurement/region-of-interest}
+                                    {:kind.synthetic-attr-components/idx 2
+                                     :kind.sythetic-attr-components/name :measurement/gene-product}
+                                    {:kind.synthetic-attr-components/idx 3
+                                     :kind.sythetic-attr-components/name :measurement/variant}
+                                    {:kind.synthetic-attr-components/idx 4
+                                     :kind.sythetic-attr-components/name :measurement/cnv}
+                                    {:kind.synthetic-attr-components/idx 5
+                                     :kind.sythetic-attr-components/name :measurement/epitope}
+                                    {:kind.synthetic-attr-components/idx 6
+                                     :kind.sythetic-attr-components/name :measurement/tcr}
+                                    {:kind.synthetic-attr-components/idx 7
+                                     :kind.sythetic-attr-components/name :measurement/cell-population}
+                                    {:kind.synthetic-attr-components/idx 8
+                                     :kind.sythetic-attr-components/name :measurement/atac-peak}
+                                    {:kind.synthetic-attr-components/idx 9
+                                     :kind.sythetic-attr-components/name :measurement/nanostring-signature}
+                                    {:kind.synthetic-attr-components/idx 10
+                                     :kind.sythetic-attr-components/name :measurement/otu}]}
+
+  {:kind/name       :measurement-matrix
+   :kind/parent     :measurement-set
+   :kind/attr       :measurement-matrix/name
+   :kind/context-id :measurement-matrix/name
+   :kind.matrix-blob/storage-key-attribute :measurement-matrix/backing-file
+   :kind.matrix-blob/data-type-attribute :measurement-matrix/measurement-type
+   :kind/need-uid   :measurement-matrix/uid}
+
+  {:kind/name        :sample
+   :kind/attr        :sample/id
+   :kind/parent      :dataset
+   :kind/context-id  :sample/id
+   :kind/need-uid    :sample/uid}
+
+  {:kind/name        :subject
+   :kind/attr        :subject/id
+   :kind/parent      :dataset
+   :kind/context-id  :subject/id
+   :kind/need-uid    :subject/uid}
+
+  {:kind/name        :clinical-observation
+   :kind/attr        :clinical-observation/subject
+   :kind/parent      :clinical-observation-set
+   :kind/need-uid    :clinical-observation/uid
+   :kind/context-id  :clinical-observation/id
+   :kind/synthetic-attr-name :clinical-observation/id
+   :kind/synthetic-attr-components [{:kind.synthetic-attr-components/idx 0
+                                     :kind.sythetic-attr-components/name :clinical-observation/subject}
+                                    {:kind.synthetic-attr-components/idx 1
+                                     :kind.sythetic-attr-components/name :clinical-observation/timepoint}
+                                    {:kind.synthetic-attr-components/idx 2
+                                     :kind.sythetic-attr-components/name :clinical-observation/study-day}]}
+
+  {:kind/name        :adverse-event
+   ;; NOTE: This :kind/attr should be revisited
+   ;; because this entity kind has a synthetic ID (no domain identity), there is
+   ;; no obvious option for :kind/attr. The choice of subject means the
+   ;; "ae must have a subject" validation is irrelevant, but without an external
+   ;; identifier, this is potentially the best we can do.
+   ;; Worth noting that this is the same situation with clinical-observation :kind/attr
+   :kind/attr        :adverse-event/subject
+   :kind/parent      :clinical-observation-set
+   :kind/need-uid    :adverse-event/uid
+   :kind/context-id  :adverse-event/id
+   :kind/synthetic-attr-name :adverse-event/id
+   :kind/synthetic-attr-components [{:kind.synthetic-attr-components/idx 0
+                                     :kind.sythetic-attr-components/name :adverse-event/subject}
+                                    {:kind.synthetic-attr-components/idx 1
+                                     :kind.sythetic-attr-components/name :adverse-event/timepoint}
+                                    {:kind.synthetic-attr-components/idx 2
+                                     :kind.sythetic-attr-components/name :adverse-event/meddra-adverse-event}
+                                    {:kind.synthetic-attr-components/idx 3
+                                     :kind.sythetic-attr-components/name :adverse-event/ctcae-grade}
+                                    {:kind.synthetic-attr-components/idx 4
+                                     :kind.sythetic-attr-components/name :adverse-event/verbatim-adverse-event}
+                                    {:kind.synthetic-attr-components/idx 5
+                                     :kind.sythetic-attr-components/name :adverse-event/ae-start-relative-day}
+                                    {:kind.synthetic-attr-components/idx 6
+                                     :kind.sythetic-attr-components/name :adverse-event/ae-causality}]}
+
+
+
+  {:kind/name        :timepoint
+   :kind/attr        :timepoint/id
+   :kind/parent      :dataset
+   :kind/context-id  :timepoint/id
+   :kind/need-uid    :timepoint/uid}
+
+  {:kind/name        :study-day
+   :kind/attr        :study-day/id
+   :kind/parent      :dataset
+   :kind/context-id  :study-day/id
+   :kind/need-uid    :study-day/uid}
+
+  {:kind/name        :treatment-regimen
+   :kind/attr        :treatment-regimen/name
+   :kind/context-id  :treatment-regimen/name
+   :kind/need-uid    :treatment-regimen/uid
+   :kind/parent      :dataset}
+
+  {:kind/name        :drug-regimen
+   :kind/attr        :drug-regimen/drug
+   :kind/parent      :treatment-regimen
+   :kind/context-id  :drug-regimen/id
+   :kind/need-uid    :drug-regimen/uid
+   :kind/synthetic-attr-name  :drug-regimen/id
+   :kind/synthetic-attr-components [{:kind.synthetic-attr-components/idx 0
+                                     :kind.sythetic-attr-components/name :drug-regimen/drug}
+                                    {:kind.synthetic-attr-components/idx 1
+                                     :kind.sythetic-attr-components/name :drug-regimen/cycle-length}]}
+
+  {:kind/name        :therapy
+   :kind/attr        :therapy/treatment-regimen
+   :kind/parent      :subject
+   :kind/context-id  :therapy/id
+   :kind/need-uid    :therapy/uid
+   :kind/synthetic-attr-name :therapy/id
+   :kind/synthetic-attr-components [{:kind.synthetic-attr-components/idx 0
+                                     :kind.sythetic-attr-components/name :subject/therapies}
+                                    {:kind.synthetic-attr-components/idx 1
+                                     :kind.sythetic-attr-components/name :therapy/treatment-regimen}]}
+
+
+  {:kind/name        :atac-peak
+   :kind/attr        :atac-peak/name
+   :kind/context-id  :atac-peak/name
+   :kind/parent      :measurement-set
+   :kind/need-uid    :atac-peak/uid}
+
+  {:kind/name        :gene
+   :kind/attr        :gene/hgnc-symbol
+   :kind/context-id  :gene/hgnc-symbol
+   :kind/ref-data    true}
+
+  {:kind/name        :protein
+   :kind/attr        :protein/uniprot-name
+   :kind/context-id  :protein/uniprot-name
+   :kind/ref-data    true}
+
+  {:kind/name        :epitope
+   :kind/attr        :epitope/id
+   :kind/context-id  :epitope/id
+   :kind/ref-data    true
+   :kind/allow-create-on-import true}
+
+  {:kind/name        :genomic-coordinate
+   :kind/attr        :genomic-coordinate/id
+   :kind/context-id  :genomic-coordinate/id
+   :kind/ref-data    true
+   :kind/allow-create-on-import true}
+
+  {:kind/name        :cnv
+   :kind/attr        :cnv/id
+   :kind/context-id  :cnv/id
+   :kind/allow-create-on-import true
+   :kind/ref-data    true}
+
+  {:kind/name        :variant
+   :kind/attr        :variant/id
+   :kind/context-id  :variant/id
+   :kind/ref-data    true
+   :kind/allow-create-on-import true}
+
+  {:kind/name        :neo-antigen
+   :kind/attr        :neo-antigen/mut-peptide
+   :kind/context-id  :neo-antigen/id
+   :kind/allow-create-on-import true
+   :kind/ref-data    true}
+
+  {:kind/name        :chr-acc-reg
+   :kind/attr        :chr-acc-reg/genomic-coordinates
+   :kind/context-id  :chr-acc-reg/genomic-coordinates
+   :kind/ref-data    true}
+
+  {:kind/name        :cell-type
+   :kind/attr        :cell-type/co-name
+   :kind/context-id  :cell-type/co-name
+   :kind/ref-data    true}
+
+  {:kind/name        :so-sequence-feature
+   :kind/attr        :so-sequence-feature/name
+   :kind/context-id  :so-sequence-feature/name
+   :kind/ref-data    true}
+
+  {:kind/name        :drug
+   :kind/attr        :drug/preferred-name
+   :kind/context-id  :drug/preferred-name
+   :kind/ref-data    true}
+
+  {:kind/name        :comorbidity
+   :kind/attr        :comorbidity/name
+   :kind/context-id  :comorbidity/name
+   :kind/ref-data    true}
+
+  {:kind/name        :meddra-disease
+   :kind/attr        :meddra-disease/preferred-name
+   :kind/context-id  :meddra-disease/preferred-name
+   :kind/ref-data    true}
+
+  {:kind/name        :gdc-anatomic-site
+   :kind/attr        :gdc-anatomic-site/name
+   :kind/context-id  :gdc-anatomic-site/name
+   :kind/ref-data    true}
+
+  {:kind/name        :gene-product
+   :kind/attr        :gene-product/id
+   :kind/context-id  :gene-product/id
+   :kind/ref-data    true}
+
+  {:kind/name        :nanostring-signature
+   :kind/attr        :nanostring-signature/name
+   :kind/context-id  :nanostring-signature/name
+   :kind/allow-create-on-import true
+   :kind/ref-data    true}
+
+  {:kind/name        :clinical-trial
+   :kind/attr        :clinical-trial/nct-number
+   :kind/context-id  :clinical-trial/nct-number
+   :kind/allow-create-on-import true
+   :kind/ref-data true}]
+
+ ; Reference meta-attributes:
+ [{:db/id    :dataset/samples
+   :ref/from :dataset
+   :ref/to   :sample}
+
+  {:db/id    :dataset/subjects
+   :ref/from :dataset
+   :ref/to   :subject}
+
+  {:db/id    :dataset/assays
+   :ref/from :dataset
+   :ref/to   :assay}
+
+  {:db/id    :dataset/treatment-regimens
+   :ref/from :dataset
+   :ref/to   :treatment-regimen}
+
+  {:db/id    :dataset/clinical-observation-sets
+   :ref/from :dataset
+   :ref/to   :clinical-observation-set}
+
+  {:db/id    :clinical-observation-set/clinical-observations
+   :ref/from :clinical-observation-set
+   :ref/to   :clinical-observation}
+
+  {:db/id    :clinical-observation-set/adverse-events
+   :ref/from :clinical-observation-set
+   :ref/to   :adverse-event}
+
+  {:db/id    :dataset/timepoints
+   :ref/from :dataset
+   :ref/to   :timepoint}
+
+  {:db/id    :dataset/study-days
+   :ref/from :dataset
+   :ref/to   :study-day}
+
+  {:db/id    :assay/measurement-sets
+   :ref/from :assay
+   :ref/to   :measurement-set}
+
+  {:db/id    :measurement-set/measurements
+   :ref/from :measurement-set
+   :ref/to   :measurement}
+
+  {:db/id    :measurement-set/measurement-matrices
+   :ref/from :measurement-set
+   :ref/to   :measurement-matrix}
+
+  {:db/id    :measurement-set/cell-populations
+   :ref/from :measurement-set
+   :ref/to   :cell-population}
+
+  {:db/id    :measurement-set/single-cells
+   :ref/from :measurement-set
+   :ref/to   :single-cell}
+
+  {:db/id :measurement-set/tcrs
+   :ref/from :measurement-set
+   :ref/to :tcr}
+
+  {:db/id    :measurement-set/otus
+   :ref/from :measurement-set
+   :ref/to   :otu}
+
+  {:db/id    :measurement-set/atac-peaks
+   :ref/from :measurement-set
+   :ref/to   :atac-peak}
+
+  {:db/id    :measurement/sample
+   :ref/from :measurement
+   :ref/to   :sample}
+
+  {:db/id    :measurement/gene-product
+   :ref/from :measurement
+   :ref/to   :gene-product}
+
+  {:db/id    :measurement/cnv
+   :ref/from :measurement
+   :ref/to   :cnv}
+
+  {:db/id    :measurement/epitope
+   :ref/from :measurement
+   :ref/to   :epitope}
+
+  {:db/id    :measurement/variant
+   :ref/from :measurement
+   :ref/to   :variant}
+
+  {:db/id    :measurement/tcr
+   :ref/from :measurement
+   :ref/to   :tcr}
+
+  {:db/id    :measurement/cell-population
+   :ref/from :measurement
+   :ref/to   :cell-population}
+
+  {:db/id    :measurement/otu
+   :ref/from :measurement
+   :ref/to   :otu}
+
+  {:db/id    :measurement/atac-peak
+   :ref/from :measurement
+   :ref/to   :atac-peak}
+
+  {:db/id    :measurement/nanostring-signature
+   :ref/from :measurement
+   :ref/to   :nanostring-signature}
+
+  {:db/id    :measurement-matrix/cell-populations
+   :ref/from :measurement-matrix
+   :ref/to   :cell-population}
+
+  {:db/id    :measurement-matrix/single-cells
+   :ref/from :measurement-matrix
+   :ref/to   :single-cell}
+
+  {:db/id    :measurement-matrix/gene-products
+   :ref/from :measurement-matrix
+   :ref/to   :gene-product}
+
+  {:db/id    :measurement-matrix/epitopes
+   :ref/from :measurement-matrix
+   :ref/to   :epitope}
+
+  {:db/id    :measurement-matrix/samples
+   :ref/from :measurement-matrix
+   :ref/to   :sample}
+
+  {:db/id    :sample/subject
+   :ref/from :sample
+   :ref/to   :subject}
+
+  {:db/id    :sample/timepoint
+   :ref/from :sample
+   :ref/to   :timepoint}
+
+  {:db/id    :sample/study-day
+   :ref/from :sample
+   :ref/to   :study-day}
+
+  {:db/id    :sample/gdc-anatomic-site
+   :ref/from :sample
+   :ref/to   :gdc-anatomic-site}
+
+  {:db/id    :clinical-observation/subject
+   :ref/from :clinical-observation
+   :ref/to   :subject}
+
+  {:db/id    :clinical-observation/metastasis-gdc-anatomic-sites
+   :ref/from :clinical-observation
+   :ref/to   :gdc-anatomic-site}
+
+  {:db/id    :adverse-event/subject
+   :ref/from :adverse-event
+   :ref/to   :subject}
+
+  {:db/id    :adverse-event/timepoint
+   :ref/from :adverse-event
+   :ref/to   :timepoint}
+
+  {:db/id    :adverse-event/study-day
+   :ref/from :adverse-event
+   :ref/to   :study-day}
+
+  {:db/id    :adverse-event/meddra-adverse-event
+   :ref/from :adverse-event
+   :ref/to   :meddra-disease}
+
+  {:db/id    :subject/comorbidities
+   :ref/from :subject
+   :ref/to   :comorbidity}
+
+  {:db/id    :subject/therapies
+   :ref/from :subject
+   :ref/to   :therapy}
+
+  {:db/id    :subject/meddra-disease
+   :ref/from :subject
+   :ref/to   :meddra-disease}
+
+  {:db/id    :therapy/treatment-regimen
+   :ref/from :therapy
+   :ref/to   :treatment-regimen}
+
+  {:db/id    :timepoint/treatment-regimen
+   :ref/from :timepoint
+   :ref/to   :treatment-regimen}
+
+  {:db/id    :clinical-observation/timepoint
+   :ref/from :clinical-observation
+   :ref/to   :timepoint}
+
+  {:db/id    :clinical-observation/study-day
+   :ref/from :clinical-observation
+   :ref/to   :study-day}
+
+  {:db/id    :treatment-regimen/drug-regimens
+   :ref/from :treatment-regimen
+   :ref/to   :drug-regimen}
+
+  {:db/id    :drug-regimen/drug
+   :ref/from :drug-regimen
+   :ref/to   :drug}
+
+  {:db/id    :treatment-regimen/clinical-trial
+   :ref/from :treatment-regimen
+   :ref/to   :clinical-trial}
+
+  {:db/id    :gene/genomic-coordinates
+   :ref/from :gene
+   :ref/to   :genomic-coordinate}
+
+  {:db/id    :variant/gene
+   :ref/from :variant
+   :ref/to   :gene}
+
+  {:db/id    :variant/genomic-coordinates
+   :ref/from :variant
+   :ref/to   :genomic-coordinate}
+
+  {:db/id    :variant/so-consequences
+   :ref/from :variant
+   :ref/to   :so-sequence-feature}
+
+  {:db/id    :variant/neo-antigens
+   :ref/from :variant
+   :ref/to   :neo-antigen}
+
+  {:db/id    :epitope/protein
+   :ref/from :epitope
+   :ref/to   :protein}
+
+  {:db/id    :protein/gene
+   :ref/from :protein
+   :ref/to   :gene}
+
+  {:db/id    :nanostring-signature/gene-weights
+   :ref/from :nanostring-signature
+   :ref/tuple-types [:gene :db.type/double]}
+
+  {:db/id    :cnv/genes
+   :ref/from :cnv
+   :ref/to   :gene}
+
+  {:db/id    :gene-product/gene
+   :ref/from :gene-product
+   :ref/to   :gene}
+
+  {:db/id    :cnv/genomic-coordinates
+   :ref/from :cnv
+   :ref/to   :genomic-coordinate}
+
+  {:db/id    :chr-acc-reg/genomic-coordinates
+   :ref/from :chr-acc-reg
+   :ref/to   :genomic-coordinate}
+
+  {:db/id    :cell-type/parents
+   :ref/from :cell-type
+   :ref/to   :cell-type}
+
+  {:db/id    :single-cell/cell-populations
+   :ref/from :single-cell
+   :ref/to   :cell-population}
+
+  {:db/id    :single-cell/sample
+   :ref/from :single-cell
+   :ref/to   :sample}
+
+  {:db/id    :cell-population/cell-type
+   :ref/from :cell-population
+   :ref/to   :cell-type}
+
+  {:db/id    :cell-population/parent
+   :ref/from :cell-population
+   :ref/to   :cell-population}
+
+  {:db/id    :cell-population/positive-markers
+   :ref/from :cell-population
+   :ref/to   :epitope}
+
+  {:db/id    :cell-population/negative-markers
+   :ref/from :cell-population
+   :ref/to   :epitope}
+
+  {:db/id    :atac-peak/genomic-coordinates
+   :ref/from :atac-peak
+   :ref/to   :genomic-coordinate}]]

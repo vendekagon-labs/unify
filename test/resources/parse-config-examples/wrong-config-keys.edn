@@ -1,0 +1,101 @@
+{:unify/import         {:user     "test-user"
+                        :mappings "example-data/roh-mappings.edn"}
+ :dataset              {:name                      "Roh2017"
+                        :description               "Integrated molecular analysis of tumor biopsies on sequential CTLA-4 and PD-1 blockade reveals markers of response and resistance"
+                        :doi                       "10.1126/scitranslmed.aah3560"
+                        :assays                    [{:id               "nanostring"
+                                                     :technology       :assay.technology/nanostring
+                                                     :description      "gene expr via nanostring"
+                                                     :measurement-sets [{:name         "baseline"
+                                                                         :measurements [{:unify/input-file "example-data/nanostring.txt"
+                                                                                         :gene             "variable"
+                                                                                         :sample           "sample"
+                                                                                         :nanostring-count "value"}]}]}
+
+                                                    {:name             "TCRseq"
+                                                     :technology       :assay.technology/TCR-seq
+                                                     :description      "TCR sequencing"
+                                                     :measurement-sets [{:exp-name     "baseline"
+                                                                         :measurements [{:unify/input-file "example-data/tcr_clonality.txt"
+                                                                                         :sample           "sample"
+                                                                                         :tcr-clonality    "Clonality"}]}]}]
+
+                        :clinical-observation-sets [{:name                  "all-clinical-observations"
+                                                     :clinical-observations [{:unify/input-file               "example-data/clinical_observations.txt"
+                                                                              :clinical-observation/subject   "Patient ID"
+                                                                              :clinical-observation/timepoint "timepoint"
+                                                                              :unify/variable                 "variable"
+                                                                              :unify/value                    "value"
+                                                                              :unify/variables                {"pd1_RECIST"       :clinical-observation/recist
+                                                                                                               "ctla-4_RECIST"    :clinical-observation/recist
+                                                                                                               "Overall Survival" :clinical-observation/os}}]}]
+
+                        :samples                   {:unify/input-file "example-data/samples.txt"
+                                                    :id               "sample"
+                                                    :subject          "patient"
+                                                    :timepoint        "time"
+                                                    :purity           "tumor_purity"
+                                                    :unify/constants  {:type     :sample.type/tumor
+                                                                       :specimen :sample.specimen/ffpe}}
+
+                        :subjects                  {:unify/input-file "example-data/subjects.txt"
+                                                    :id               "Patient ID"
+                                                    :sex              "Sex"
+                                                    :dead             "Dead (Y/N)"}
+
+                        :treatment-regimens        [{:name "Nivolumab"}
+                                                    {:name "Ipilimumab"}]
+
+                        :timepoints                [{:type :timepoint/baseline
+                                                     :id   "baseline"}
+                                                    {:type :timepoint/eos
+                                                     :id   "eos"}
+                                                    {:type              :timepoint/pre-treatment
+                                                     :treatment-regimen "Ipilimumab"
+                                                     :relative-order    1
+                                                     :id                "Ipilimumab/pre-treatment"}
+                                                    {:type              :timepoint/treatment
+                                                     :treatment-regimen "Ipilimumab"
+                                                     :relative-order    2
+                                                     :id                "Ipilimumab/treatment"}
+                                                    {:type              :timepoint/treatment
+                                                     :treatment-regimen "Ipilimumab"
+                                                     :relative-order    3
+                                                     :id                "Ipilimumab/post-treatment"}
+                                                    {:type              :timepoint/pre-treatment
+                                                     :treatment-regimen "Nivolumab"
+                                                     :relative-order    1
+                                                     :id                "Nivolumab/pre-treatment"}
+                                                    {:type              :timepoint/treatment
+                                                     :treatment-regimen "Nivolumab"
+                                                     :relative-order    2
+                                                     :id                "Nivolumab/treatment"}
+                                                    {:type              :timepoint/post-treatment
+                                                     :treatment-regimen "Nivolumab"
+                                                     :relative-order    3
+                                                     :id                "Nivolumab/post-treatment"}]
+
+                        :therapies                 {:unify/input-file  "processed/therapies.txt"
+                                                    :treatment-regimen "regimen"
+                                                    :line              "line"
+                                                    :unify/constants   {:order 1}
+                                                    :unify/reverse     {:unify/rev-variable "subject.id"
+                                                                        :unify/rev-attr     :subject/therapies}}}
+
+
+ :unify/reference-data {:genomic-coordinate {:unify/input-file "example-data/point_muts_indels_coord.txt"
+                                             :contig           "chrom"
+                                             :start            "start"
+                                             :final            "end"
+                                             :strand           "strand"
+                                             :assembly         "assembly"
+                                             :id               "id"}
+
+                        :variant            {:unify/input-file "example-data/point_muts_indels.txt"
+                                             :id               "id"
+                                             :coordinates      "coordinates"
+                                             :gene             "Hugo_Symbol"
+                                             :ref-allele       "ref_allele"
+                                             :alt-allele       "alt_allele"
+                                             :type             "Variant_Type"}}}
+

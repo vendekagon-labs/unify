@@ -1,0 +1,10 @@
+uniquePopulationName	parentPopulation	cell.type	positive.markers
+CD8	Ungated	CD8-positive, alpha-beta cytotoxic T cell	
+macrophage	Ungated	macrophage	
+CD8 > Ki67+	CD8	CD8-positive, alpha-beta cytotoxic T cell	Ki67+
+CD8 > PD-L1+	CD8	CD8-positive, alpha-beta cytotoxic T cell	PD-L1+
+tumor	Ungated	pancreatic ductal cell	
+tumor > PD-L1+	tumor	pancreatic ductal cell	PD-L1+
+Treg	Ungated	CD4-positive, CD25-positive, alpha-beta regulatory T cell	
+Treg > Ki67+	Treg	CD4-positive, CD25-positive, alpha-beta regulatory T cell	Ki67+
+Ungated			

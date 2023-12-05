@@ -1,0 +1,24 @@
+{:unify/mappings  {:enum/sample-specimen {:sample.specimen/ffpe   ["Tissue Slides" "Tissue Blocks"]
+                                          :sample.specimen/pbmc   ["PBMC"]
+                                          :sample.specimen/plasma ["PLASMA"]}
+                   :enum/recist          {:clinical-observation.recist/CR ["Complete Response"]
+                                          :clinical-observation.recist/PD ["Progressive Disease"]
+                                          :clinical-observation.recist/PR ["Partial Response"]
+                                          :clinical-observation.recist/SD ["Stable Disease"]}
+                   :enum/sex             {:subject.sex/female ["F"]
+                                          :subject.sex/male   ["M"]}
+                   :enum/container       {:sample.container/potassium-edta-tube ["PBMC EDTA" "Plasma EDTA"]
+                                          :sample.container/cpt-tube            ["PBMC CPT"]
+                                          :sample.container/streck-dna-tube     ["Circulating DNA"]}
+                   :enum/race            {:subject.race/white            ["White"]
+                                          :subject.race/african-american ["Black or African American"]
+                                          :subject.race/asian            ["Asian"]}
+
+                   :enum/ethnicity       {:subject.ethnicity/not-hispanic ["Not Hispanic or Latino"]}}
+
+ :unify/variables {:sample/specimen             :enum/sample-specimen
+                   :subject/race                :enum/race
+                   :subject/ethnicity           :enum/ethnicity
+                   :subject/sex                 :enum/sex
+                   :sample/container            :enum/container
+                   :clinical-observation/recist :enum/recist}}

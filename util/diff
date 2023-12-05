@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "Running diff"
+
+if [ "$JAVA_OPTS"  == "" ]; then
+    JAVA_OPTS='-Xms6g -Xmx6g -XX:+UseG1GC -XX:MaxGCPauseMillis=50'
+fi
+
+java -server -cp pret.jar $JAVA_OPTS clojure.main -m org.candelbio.pret.import.diff.cli "dev/schema-source.edn" $*

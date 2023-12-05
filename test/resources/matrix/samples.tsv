@@ -1,0 +1,97 @@
+subj.ids	samples	sex	age	race	ethnic
+SUBJ1	ICGC_0006	M	48	White	Not Hispanic or Latino
+SUBJ2	ICGC_0007	F	63	Asian	Not Hispanic or Latino
+SUBJ3	ICGC_0009	M	46	Black or African American	Not Hispanic or Latino
+SUBJ4	ICGC_0020	F	74	White	Not Hispanic or Latino
+SUBJ5	ICGC_0021	M	73	White	Not Hispanic or Latino
+SUBJ6	ICGC_0025	M	63	White	Not Hispanic or Latino
+SUBJ7	ICGC_0026	F	28	Asian	Not Hispanic or Latino
+SUBJ8	ICGC_0031	M	85	White	Not Hispanic or Latino
+SUBJ9	ICGC_0033	M	83	Asian	Not Hispanic or Latino
+SUBJ10	ICGC_0037	M	59	White	Not Hispanic or Latino
+SUBJ11	ICGC_0048	F	78	White	Not Hispanic or Latino
+SUBJ12	ICGC_0051	M	77	Black or African American	Not Hispanic or Latino
+SUBJ13	ICGC_0052	M	47	Asian	Not Hispanic or Latino
+SUBJ14	ICGC_0053	F	29	Asian	Not Hispanic or Latino
+SUBJ15	ICGC_0054	F	56	Black or African American	Not Hispanic or Latino
+SUBJ16	ICGC_0055	F	53	Asian	Not Hispanic or Latino
+SUBJ17	ICGC_0059	M	74	Black or African American	Not Hispanic or Latino
+SUBJ18	ICGC_0061	F	61	White	Not Hispanic or Latino
+SUBJ19	ICGC_0063	F	81	White	Not Hispanic or Latino
+SUBJ20	ICGC_0066	M	50	Black or African American	Not Hispanic or Latino
+SUBJ21	ICGC_0067	M	33	Black or African American	Not Hispanic or Latino
+SUBJ22	ICGC_0075	F	78	White	Not Hispanic or Latino
+SUBJ23	ICGC_0087	M	72	Black or African American	Not Hispanic or Latino
+SUBJ24	ICGC_0088	F	55	White	Not Hispanic or Latino
+SUBJ25	ICGC_0099	F	61	White	Not Hispanic or Latino
+SUBJ26	ICGC_0103	F	86	Asian	Not Hispanic or Latino
+SUBJ27	ICGC_0105	F	88	Asian	Not Hispanic or Latino
+SUBJ28	ICGC_0108	F	47	Black or African American	Not Hispanic or Latino
+SUBJ29	ICGC_0109	F	90	Asian	Not Hispanic or Latino
+SUBJ30	ICGC_0114	F	55	White	Not Hispanic or Latino
+SUBJ31	ICGC_0115	F	45	White	Not Hispanic or Latino
+SUBJ32	ICGC_0124	F	40	Asian	Not Hispanic or Latino
+SUBJ33	ICGC_0134	M	65	Asian	Not Hispanic or Latino
+SUBJ34	ICGC_0135	M	79	Asian	Not Hispanic or Latino
+SUBJ35	ICGC_0139	F	52	Asian	Not Hispanic or Latino
+SUBJ36	ICGC_0140	F	45	White	Not Hispanic or Latino
+SUBJ37	ICGC_0141	M	46	Asian	Not Hispanic or Latino
+SUBJ38	ICGC_0143	F	36	Black or African American	Not Hispanic or Latino
+SUBJ39	ICGC_0144	F	86	Black or African American	Not Hispanic or Latino
+SUBJ40	ICGC_0146	M	83	White	Not Hispanic or Latino
+SUBJ41	ICGC_0149	M	31	Black or African American	Not Hispanic or Latino
+SUBJ42	ICGC_0150	F	65	Asian	Not Hispanic or Latino
+SUBJ43	ICGC_0153	M	48	Black or African American	Not Hispanic or Latino
+SUBJ44	ICGC_0169	F	47	White	Not Hispanic or Latino
+SUBJ45	ICGC_0185	M	52	Asian	Not Hispanic or Latino
+SUBJ46	ICGC_0188	M	38	White	Not Hispanic or Latino
+SUBJ47	ICGC_0192	M	72	White	Not Hispanic or Latino
+SUBJ48	ICGC_0199	F	29	Asian	Not Hispanic or Latino
+SUBJ49	ICGC_0201	M	90	White	Not Hispanic or Latino
+SUBJ50	ICGC_0205	F	76	Asian	Not Hispanic or Latino
+SUBJ51	ICGC_0206	M	31	White	Not Hispanic or Latino
+SUBJ52	ICGC_0207	F	78	Black or African American	Not Hispanic or Latino
+SUBJ53	ICGC_0212	M	68	White	Not Hispanic or Latino
+SUBJ54	ICGC_0214	F	54	White	Not Hispanic or Latino
+SUBJ55	ICGC_0215	M	88	Asian	Not Hispanic or Latino
+SUBJ56	ICGC_0223	M	79	Black or African American	Not Hispanic or Latino
+SUBJ57	ICGC_0224	M	30	White	Not Hispanic or Latino
+SUBJ58	ICGC_0227	M	49	Asian	Not Hispanic or Latino
+SUBJ59	ICGC_0230	F	72	Asian	Not Hispanic or Latino
+SUBJ60	ICGC_0235	M	34	Black or African American	Not Hispanic or Latino
+SUBJ61	ICGC_0295	M	55	White	Not Hispanic or Latino
+SUBJ62	ICGC_0296	M	31	White	Not Hispanic or Latino
+SUBJ63	ICGC_0300	F	73	Asian	Not Hispanic or Latino
+SUBJ64	ICGC_0301	F	69	Asian	Not Hispanic or Latino
+SUBJ65	ICGC_0303	M	57	Black or African American	Not Hispanic or Latino
+SUBJ66	ICGC_0304	F	88	Asian	Not Hispanic or Latino
+SUBJ67	ICGC_0309	F	30	Asian	Not Hispanic or Latino
+SUBJ68	ICGC_0312	F	37	Asian	Not Hispanic or Latino
+SUBJ69	ICGC_0313	M	84	Black or African American	Not Hispanic or Latino
+SUBJ70	ICGC_0315	M	48	Asian	Not Hispanic or Latino
+SUBJ71	ICGC_0321	F	39	Black or African American	Not Hispanic or Latino
+SUBJ72	ICGC_0326	F	86	Asian	Not Hispanic or Latino
+SUBJ73	ICGC_0338	F	83	Black or African American	Not Hispanic or Latino
+SUBJ74	ICGC_0354	F	25	Asian	Not Hispanic or Latino
+SUBJ75	ICGC_0365	F	85	Asian	Not Hispanic or Latino
+SUBJ76	ICGC_0391	M	59	Asian	Not Hispanic or Latino
+SUBJ77	ICGC_0392	M	52	White	Not Hispanic or Latino
+SUBJ78	ICGC_0393	M	74	White	Not Hispanic or Latino
+SUBJ79	ICGC_0395	M	81	Black or African American	Not Hispanic or Latino
+SUBJ80	ICGC_0406	M	76	White	Not Hispanic or Latino
+SUBJ81	ICGC_0412	F	82	White	Not Hispanic or Latino
+SUBJ82	ICGC_0415	M	26	Asian	Not Hispanic or Latino
+SUBJ83	ICGC_0417	M	81	Asian	Not Hispanic or Latino
+SUBJ84	ICGC_0419	F	36	Asian	Not Hispanic or Latino
+SUBJ85	ICGC_0420	F	90	Black or African American	Not Hispanic or Latino
+SUBJ86	ICGC_0486	F	60	Black or African American	Not Hispanic or Latino
+SUBJ87	ICGC_0502	F	70	Black or African American	Not Hispanic or Latino
+SUBJ88	ICGC_0503	M	59	Asian	Not Hispanic or Latino
+SUBJ89	ICGC_0507	M	29	Asian	Not Hispanic or Latino
+SUBJ90	ICGC_0518	M	87	White	Not Hispanic or Latino
+SUBJ91	ICGC_0521	M	57	Black or African American	Not Hispanic or Latino
+SUBJ92	ICGC_0522	M	48	Asian	Not Hispanic or Latino
+SUBJ93	ICGC_0526	F	29	Black or African American	Not Hispanic or Latino
+SUBJ94	ICGC_0535	M	60	Asian	Not Hispanic or Latino
+SUBJ95	ICGC_0536	F	88	Asian	Not Hispanic or Latino
+SUBJ96	ICGC_0543	F	57	White	Not Hispanic or Latino

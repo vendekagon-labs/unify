@@ -1,0 +1,5 @@
+#:import{:user "test-user",
+         :schema-version "0.3.0",
+         :pret-version "0.2.161",
+         :name "tuple-import"}
+#:dataset{:name "tuplemania"}

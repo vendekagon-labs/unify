@@ -1,0 +1,10 @@
+{; The S3 bucket that contains the configuration for the current system
+ :configuration-bucket "pici-cdel-configuration"
+ ; The deploy region
+ :deploy-region :us-east-1
+ ; The system (i.e. the stack)
+ :system :prod-right
+ ; Whether to accept an insecure (i.e. self-signed) HTTPS certificate from candelabra
+ :insecure-https true 
+ ; The candelabra endpoint for this system
+ :candelabra-endpoint "https://pici-prod-right-candelabra.us-east-1.elasticbeanstalk.com"}

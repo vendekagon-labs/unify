@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Generate transaction files for reference data."
+
+if [ "$JAVA_OPTS"  == "" ]; then
+    JAVA_OPTS='-XX:+UseG1GC -XX:MaxGCPauseMillis=50'
+fi
+
+
+java -server -Xss4m -cp pret.jar $JAVA_OPTS clojure.main -m org.candelbio.pret.bootstrap.reference-data.cli $*

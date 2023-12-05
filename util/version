@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+VERSION_PREFIX=1.3
+SUFFIX="alpha"
+
+CWD="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REVISION=$(${CWD}/revision)
+VERSION=$VERSION_PREFIX.$REVISION-$SUFFIX
+
+echo $VERSION

@@ -1,0 +1,10 @@
+{:unify/import {:user     "test-user"
+                :mappings "mappings.edn"
+                :name     "tuple-import"}
+ :dataset      {:name "tuplemania"}
+ :nanostring-signature
+ {:unify/input-file "original/nanostring-weighted-signatures.txt"
+  :name             "signature"
+  :gene-weights     ["gene" "value"]}}
+
+
