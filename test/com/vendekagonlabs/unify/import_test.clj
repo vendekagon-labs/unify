@@ -20,35 +20,22 @@
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.util.io :as util.io]
-            [com.vendekagonlabs.unify.util.aws :as aws]
             [com.vendekagonlabs.unify.import :as import]
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 
 (def template-dir "test/resources/reference-import/template-dataset")
 
-(defn clone-template!
-  []
-  (sh "git" "clone" "git@github.com:CANDELbio/template-dataset.git"
-      :dir "test/resources/reference-import/"))
-
-(defn local-template []
-  (when-let [root-dir (System/getenv "CANDEL_TEST_DATA_DIR")]
-    (str root-dir "/template")))
-
-(defn ensure-template-dataset! []
-  (when-not (local-template)
-    (clone-template!)))
 
 (defn import-cfg-file []
-  (if-let [template-root (local-template)]
-    (str template-root "/config.edn")
-    "test/resources/reference-import/template-dataset/config.edn"))
+  (str template-dir "/config.edn"))
+
+(defn schema-directory []
+  (str template-dir "/schema"))
 
 (def dataset-name
   (memoize
     (fn []
-      (ensure-template-dataset!)
       (-> (import-cfg-file)
           (util.io/read-edn-file)
           (get-in [:dataset :name])))))
@@ -59,17 +46,15 @@
 (def tmp-dir "tmp-output")
 
 (defn setup []
-  (ensure-template-dataset!)
   (log/info "Initializing in-memory integration test db.")
-  (db/init datomic-uri)
-  ;; Temp fix for drug ordering issue with template dataset.
+  (db/init datomic-uri :schema-directory (schema-directory))
+  ;; TODO: Temp fix for drug ordering issue with template dataset.
   (let [conn (d/connect datomic-uri)]
     @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])))
 
 (defn teardown []
   (log/info "Ending integration test and deleting db.")
-  (d/delete-database datomic-uri)
-  (util.io/delete-recursively template-dir))
+  (d/delete-database datomic-uri))
 
 (deftest ^:integration sanity-test
   (try
@@ -78,6 +63,7 @@
                           {:target-dir           tmp-dir
                            :datomic-uri          datomic-uri
                            :import-cfg-file      (import-cfg-file)
+                           :schema-directory     (schema-directory)
                            :disable-remote-calls true
                            :tx-batch-size        50})]
       (testing "Import runs to completion without throwing."

@@ -164,7 +164,6 @@
              (println "Working directory exists, *overwrite* is deleting:" target-dir)
              overwrite)
     (util.io/delete-recursively target-dir))
-  (cache/encache schema-directory)
   (import/prepare-import ctx))
 
 

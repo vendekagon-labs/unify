@@ -18,6 +18,7 @@
             [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.db.schema :as db.schema]
+            [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
             [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
             [com.vendekagonlabs.unify.import.tx-data :as tx-data]
             [com.vendekagonlabs.unify.import.engine :as engine]
@@ -40,9 +41,11 @@
   "Create the txn data files from an import-config-file, datomic-config, and target-dir."
   [{:keys [target-dir
            import-cfg-file
+           schema-directory
            tx-batch-size
            resume
            continue-on-error]}]
+  (schema.cache/encache schema-directory)
   (let [import-config (util.io/read-edn-file import-cfg-file)
         config-root-dir (str (folder-of import-cfg-file) "/")
         schema (db.schema/get-metamodel-and-schema)

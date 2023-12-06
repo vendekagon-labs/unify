@@ -1,0 +1,89 @@
+[
+ ;; Metamodel attributes:
+ {:db/ident         :unify.kind/name
+  :db/valueType     :db.type/keyword
+  :db/unique        :db.unique/identity
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Name of a kind of entity in the system"}
+
+ {:db/ident         :unify.kind/attr
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Distinguishing attribute of this kind of entity, must be a domain schema attribute"}
+
+ {:db/ident         :unify.kind/context-id
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Locally identifying attribute, must be a domain schema attribute"}
+
+ {:db/ident         :unify.kind/parent
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           ":kind/name of the parent (containing) entity"}
+
+ {:db/ident         :unify.kind/need-uid
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "attr name that stores the synthetic UID for this kind of entity"}
+
+ {:db/ident         :unify.kind/synthetic-attr-name
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Target name of the attribute that holds the synthesized value"}
+
+ ;; infer matrix blob kind from presence of storage key, data type
+ {:db/ident         :unify.kind.matrix-blob/storage-key-attribute
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Indicates which attribute for the matrix blob entity in question is used to store the
+                     backing file."}
+
+ {:db/ident         :unify.kind.matrix-blob/data-type-attribute
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Indicates which attribute for the matrix blob entity in question is used to store the data
+                     type attribute."}
+
+ {:db/ident         :unify.kind/synthetic-attr-components
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/many
+  :db/isComponent   true
+  :db/doc           "Describes the attribute components of the synthesized attribute values."}
+
+ {:db/ident         :unify.kind.synthetic-attr-components/idx
+  :db/valueType     :db.type/long
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "The order that a component appears in the synthesized value"}
+
+ {:db/ident         :unify.kind.sythetic-attr-components/name
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Target name of the component attribute used to synthesize the value"}
+
+
+ {:db/ident         :unify.kind/allow-create-on-import
+  :db/valueType     :db.type/boolean
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "tag indicating that this particular ref data can be created during an import"}
+
+ {:db/ident         :unify.kind/ref-data
+  :db/valueType     :db.type/boolean
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "tag indicating that this kind of entity is ref-data"}
+
+ {:db/ident         :unify.ref/from
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "source of a ref attribute, must be a :kind/name"}
+
+ {:db/ident         :unify.ref/to
+  :db/valueType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "target of a ref attribute, must be a :kind/name"}
+
+ ;; Similar to :db/tupleTypes but allows kinds
+ {:db/ident         :unify.ref/tuple-types
+  :db/valueType     :db.type/tuple
+  :db/tupleType     :db.type/keyword
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "vector of tuple element types for a tuple attribute, each element is either a kind keyword or a primitive type keyword"}]

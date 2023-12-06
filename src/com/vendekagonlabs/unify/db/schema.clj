@@ -31,8 +31,7 @@
 (defn metamodel [schema-dir]
   (read-import-schema schema-dir "metamodel.edn"))
 (defn unify-meta []
-  (-> "schema/unify-meta.edn"
-      (io/resource)
+  (-> (io/resource "unify-schema.edn")
       (util.io/read-edn-file)))
 
 ;; for metamodel inference backing, etc.
