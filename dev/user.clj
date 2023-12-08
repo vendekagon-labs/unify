@@ -260,11 +260,13 @@
     (keep (fn [row]
             (let [gene-symbol (nth row 5)]
               (if (all-genes gene-symbol)
-                row)
-              (when-let [resolved-hgnc (get lookup gene-symbol variants-ds)]
-                (assoc row 5 resolved-hgnc))))
+                row
+                (when-let [resolved-hgnc (get lookup gene-symbol variants-ds)]
+                  (assoc row 5 resolved-hgnc)))))
          (rest variants-ds)))
   (take 10 fixed-variants)
+  (count fixed-variants)
+  (first fixed-variants)
   (count fixed-variants)
   (count (rest variants-ds))
   (make-tsv variants-fpath hdr fixed-variants))
