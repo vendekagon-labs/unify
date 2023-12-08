@@ -14,8 +14,6 @@
 (ns com.vendekagonlabs.unify.import-test
   (:require [clojure.test :refer :all]
             [clojure.tools.logging :as log]
-            [clojure.java.shell :refer [sh]]
-            [clojure.java.io :as io]
             [datomic.api :as d]
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.db :as db]
@@ -49,8 +47,8 @@
   (log/info "Initializing in-memory integration test db.")
   (db/init datomic-uri :schema-directory (schema-directory))
   ;; TODO: Temp fix for drug ordering issue with template dataset.
-  (let [conn (d/connect datomic-uri)]))
-    ;;@(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])))
+  (let [conn (d/connect datomic-uri)]
+    @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])))
 
 (defn teardown []
   (log/info "Ending integration test and deleting db.")

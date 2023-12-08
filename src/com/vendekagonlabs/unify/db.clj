@@ -153,8 +153,12 @@
   "Compares schema at datomic-uri to cached schema in unify URI. Returns a kw indicating whether
   or not the schema are :incompatible, :identical, or :compatible"
   [schema-directory datomic-uri]
-  (let [db-schema-map (-> datomic-uri version version->map)
-        unify-schema-map (-> (schema/version schema-directory) version->map)]
+  (let [db-schema-map (-> datomic-uri
+                          (version)
+                          (version->map))
+        unify-schema-map (-> schema-directory
+                             (schema/version)
+                             (version->map))]
     (cond
       (or (not= (:major db-schema-map) (:major unify-schema-map))
           (not= (:minor db-schema-map) (:minor unify-schema-map)))
@@ -241,4 +245,3 @@
        (sort-by
          :timestamp
          #(.before %2 %1))))
-

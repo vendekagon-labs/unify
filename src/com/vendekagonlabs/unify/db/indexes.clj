@@ -24,15 +24,15 @@
   (by-key schema :db/ident))
 
 (defn by-kind-name [schema]
-  (by-key schema :kind/name))
+  (by-key schema :unify.kind/name))
 
 (defn by-kind-attr [schema]
-  (->> (by-key schema :kind/attr)
+  (->> (by-key schema :unify.kind/attr)
        (map #(vec [(:db/ident (first %)) (second %)]))
        (into {})))
 
 (defn by-uid [schema]
-  (->> (by-key schema :kind/need-uid)
+  (->> (by-key schema :unify.kind/need-uid)
        (map #(vec [(:db/ident (first %)) (second %)]))
        (into {})))
 

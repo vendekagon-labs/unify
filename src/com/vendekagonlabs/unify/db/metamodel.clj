@@ -40,7 +40,7 @@
   "Returns a set of all kinds that this kind-name references."
   [[{:keys [:index/refs]}] kind-name]
   (reduce
-    (fn [coll {:keys [:ref/from :ref/to] :as m}]
+    (fn [coll {:keys [:unify.ref/from :unify.ref/to] :as m}]
       (if (= from kind-name)
         (conj coll to)
         coll))
@@ -57,13 +57,13 @@
   this is a reference to a kind entity."
   [schema ref-attr-ident]
   (let [ref-ent (get-ref schema ref-attr-ident)
-        ref-links (select-keys ref-ent [:ref/from :ref/to])]
+        ref-links (select-keys ref-ent [:unify.ref/from :unify.ref/to])]
     (not-empty ref-links)))
 
 (defn kind-parent
-  "Returns the :kind/name of the parent of the specified kind"
+  "Returns the :unify.kind/name of the parent of the specified kind"
   [schema kind-name]
-  (:kind/parent (kind-by-name schema kind-name)))
+  (:unify.kind/parent (kind-by-name schema kind-name)))
 
 (defn card-many?
   "Returns true if the provide attributes is :cardinality/many in the schema."
@@ -74,24 +74,24 @@
 (defn kind-context-id
   "Returns the context-id (locally identifying attribute) for the specified kind"
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:kind/context-id :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/context-id :db/ident]))
 
 (defn kind-attr
   "Returns the context-id (locally identifying attribute) for the specified kind"
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:kind/attr :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/attr :db/ident]))
 
 
 (defn ref-data?
   "Indicates whether the specified kind is reference data (cross-study data)"
   [schema kind-name]
-  (:kind/ref-data (kind-by-name schema kind-name)))
+  (:unify.kind/ref-data (kind-by-name schema kind-name)))
 
 (defn need-uid?
   "Returns the UID attribute name (as a kw) if this kind requires a generated UID,
   returns nil for kinds that don't require a UID"
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:kind/need-uid :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/need-uid :db/ident]))
 
 (def synthetic-sep
   "The character that seperates component values of a synthetic attribute."
@@ -101,19 +101,19 @@
   "Returns the target attribute name (as a kw) for the synthesized value if this kind
   requires a synthetic attribute. returns nil for kinds that don't require a synthetic attribute."
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:kind/synthetic-attr-name :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-attr-name :db/ident]))
 
 (defn synthetic-attr-components
   "Returns the vector of attribute names whose values are used to synthesize the synthetic
   attribute value."
   [schema kind-name]
-  (let [c (get-in (kind-by-name schema kind-name) [:kind/synthetic-attr-components])]
+  (let [c (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-attr-components])]
     (mapv
-      #(:kind.sythetic-attr-components/name %)
-      (sort-by :kind.synthetic-attr-components/idx c))))
+      #(:unify.kind.sythetic-attr-components/name %)
+      (sort-by :unify.kind.synthetic-attr-components/idx c))))
 
 (defn enum-ident?
-  "Returns true if the provide ident is in the enums index in the schema."
+  "Returns true if the provided ident is in the enums index in the schema."
   [[{:keys [index/enum-idents]}] ident]
   (enum-idents ident))
 
@@ -121,11 +121,11 @@
   "Returns true if the provided kind-name corresponds to a kind that permits
   creation of reference data during import"
   [schema kind-name]
-  (:kind/allow-create-on-import (kind-by-name schema kind-name)))
+  (:unify.kind/allow-create-on-import (kind-by-name schema kind-name)))
 
 (defn all-kind-names
   [schema]
-  (->> (keep :kind/name schema)
+  (->> (keep :unify.kind/name schema)
        (into #{}) (into [])))
 
 (defn allowed-ref-data
@@ -158,8 +158,8 @@
                (conj tree (kind-context-id schema child))))))
 
 (defn node-context->kind
-  "Find the :ref/to kind/name for the specified keyword-context list
-   'refs' should be a list of all ref attr maps that includes :ref/from and :ref/to
+  "Find the :unify.ref/to kind/name for the specified keyword-context list
+   'refs' should be a list of all ref attr maps that includes :unify.ref/from and :unify.ref/to
       as returned by meta/all-refs
     'kws-ctx' is an individual keyword-context-list for a given path within a map"
   [schema kws-ctx]
@@ -173,7 +173,7 @@
           parent-kw (keyword (name par) (name this-ent))
           parent-ent (get-ref schema parent-kw)]
       (if parent-ent
-        (:ref/to parent-ent)
+        (:unify.ref/to parent-ent)
         (throw
           (ex-info (str "No match in references for : " parent-kw)
                    {:parse/reference parent-kw}))))))
@@ -189,7 +189,7 @@
 
 (defn ref-dependencies
   [schema attr]
-  (ref-linked schema attr :ref/to :ref/from))
+  (ref-linked schema attr :unify.ref/to :unify.ref/from))
 
 (defn unique?
   "Returns true if the provided attr is :db.unique (value or identity) in the schema."
@@ -215,7 +215,7 @@
   "For a given kind name (non-ns keyword form), returns an attr present on that kind definition."
   [schema kind-name attr-kw]
   (let [{:keys [db/id]} (->> schema
-                             (filter #(= kind-name (:kind/name %)))
+                             (filter #(= kind-name (:unify.kind/name %)))
                              (first)
                              (attr-kw))]
     (eid->ident schema id)))
@@ -232,7 +232,7 @@
    for this entity kind as specified by kind-name in the metamodel, or nil if the
    kind-name does not have a matrix storage key specified."
   [schema kind-name]
-  (kind->attr schema kind-name :kind.matrix-blob/storage-key-attribute))
+  (kind->attr schema kind-name :unify.kind.matrix-blob/storage-key-attribute))
 
 
 (defn matrix-data-type-attr
@@ -240,7 +240,7 @@
    for this entity kind as specified by kind-name in the metamodel, or nil if the
    kind-name does not have a matrix storage key specified."
   [schema kind-name]
-  (kind->attr schema kind-name :kind.matrix-blob/data-type-attribute))
+  (kind->attr schema kind-name :unify.kind.matrix-blob/data-type-attribute))
 
 
 (comment

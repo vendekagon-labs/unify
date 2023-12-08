@@ -13,6 +13,7 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.db.schema
   (:require [clojure.java.io :as io]
+            [datomic.api :as d]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.string :as str]
             [com.vendekagonlabs.unify.db.indexes :as indexes]
@@ -61,12 +62,12 @@
       :tx-data (first metamodel-edn)}
      {:name :metamodel-entities
       :query '[:find (count ?k)
-               :where [?k :kind/name]]
+               :where [?k :unify.kind/name]]
       :tx-data (second metamodel-edn)}
      {:name :metamodel-refs
       :query '[:find (count ?p)
                :with ?c
-               :where [?p :ref/to ?c]]
+               :where [?p :unify.ref/to ?c]]
       :tx-data (last  metamodel-edn)}]))
 
 
@@ -80,11 +81,11 @@
   "Get all the entities representing the kinds in the system"
   [db]
   (flatten (dq/q+retry '[:find (pull ?e [*
-                                         {:kind/attr [:db/ident]}
-                                         {:kind/context-id [:db/ident]}
-                                         {:kind/need-uid [:db/ident]}
-                                         {:kind/synthetic-attr-name [:db/ident]}])
-                         :where [?e :kind/name]] db)))
+                                         {:unify.kind/attr [:db/ident]}
+                                         {:unify.kind/context-id [:db/ident]}
+                                         {:unify.kind/need-uid [:db/ident]}
+                                         {:unify.kind/synthetic-attr-name [:db/ident]}])
+                         :where [?e :unify.kind/name]] db)))
 
 (defn get-all-schema
   "Query database for installed attributes"
@@ -120,23 +121,27 @@
    (let [flat-schema (concat (map #(assoc % :db.install/_attribute true)
                                   (get-all-schema db))
                              (get-all-kind-data db))
+         unify-schema-metadata (-> (d/pull db [:unify.schema/version
+                                               :unify.schema/name] :unify.schema/metadata))
          core-indexes (indexes/all flat-schema)
          enums (get-non-attr-idents db)
-         indexes (assoc core-indexes :index/enum-idents enums)]
+         indexes (assoc core-indexes :index/enum-idents enums
+                                     :index/unify-schema-metadata unify-schema-metadata)]
      (concat [indexes] flat-schema)))
   ([]
    (util.io/read-edn-file cached)))
 
 (defn version
   ([]
-   (let [cached-schema (io/resource "cached-schema.edn")]))
+   (-> "cached-schema.edn"
+       (io/resource)
+       (util.io/read-edn-file)
+       (first)
+       (:index/unify-schema-metadata)
+       (:unify.schema/version)))
   ([schema-dir]
-   (->> (io/file schema-dir "enums.edn")
+   (->> (io/file schema-dir "schema.edn")
         (util.io/read-edn-file)
         (filter :unify.schema/version)
         (first)
         (:unify.schema/version))))
-
-(comment
-  (def cschem (io/resource "cached-schema.edn"))
-  (first cschem))

@@ -30,3 +30,6 @@
         db (d/db conn)
         updated-schema (schema/get-metamodel-and-schema db)]
     (schema/cache updated-schema)))
+
+(comment
+  (encache "test/resources/reference-import/template-dataset/schema"))

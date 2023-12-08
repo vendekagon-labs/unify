@@ -37,7 +37,7 @@
 ;;
 ;; This ordering is provided by leveraging the metamodel:
 ;;
-;; 1. Pull all refs by a given kind (ie. :ref/from :measurement)
+;; 1. Pull all refs by a given kind (ie. :unify.ref/from :measurement)
 ;; 2. Only use kind-name's that are part of the uid keys
 ;; 3. Count # of dependencies to 'terminating' kind in deps set
 ;;    Score for kind is max of all counts.

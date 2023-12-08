@@ -328,7 +328,7 @@
                           (if (na-val-set raw-value)
                             :unify/missing-value
                             (resolve-mapping-value mapping attribute-name raw-value)))
-         ref-dir (if rev-ref :ref/from :ref/to)]
+         ref-dir (if rev-ref :unify.ref/from :unify.ref/to)]
      (if-let [ref (metamodel/kind-ref? schema attribute-name)]
        (if (= resolved-value :unify/missing-value)
          resolved-value
@@ -462,7 +462,7 @@
   (when-let [tuple-entries (seq (filter tuple-entry? job))]
     (->> tuple-entries
          (map (fn [[attr col-names]]
-                (let [tuple-types (get-in schema [0 :index/idents attr :ref/tuple-types])
+                (let [tuple-types (get-in schema [0 :index/idents attr :unify.ref/tuple-types])
 
                       raw-values (mapv #(get raw-entity %) col-names)
                       _ (when-not (= (count tuple-types)
