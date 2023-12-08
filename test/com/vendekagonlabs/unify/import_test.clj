@@ -79,15 +79,14 @@
     (catch Exception e
       (log/error "Test threw during import attempt "
                  :message (.getMessage e)
-                 :ex-data (text/->unifyty-string (ex-data e)))
+                 :ex-data (text/->pretty-string (ex-data e)))
       (throw e))
     (finally
       (try
-        (util.io/delete-recursively tmp-dir)
         (teardown)
+        (util.io/delete-recursively tmp-dir)
         (catch Exception e
           (log/error (.getMessage e)))))))
-
 
 
 (comment
