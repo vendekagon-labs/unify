@@ -16,7 +16,7 @@
             [clojure.edn :as edn]
             [clojure.java.shell :refer [sh]]
             [clojure.string :as s]
-            [com.vendekagonlabs.unify.util.text :refer [->unifyty-string]]
+            [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
             [clojure.java.io :as io]))
 
 (defn delete-recursively [fname]
@@ -65,7 +65,7 @@
   (make-parents f)
   (spit f (if (string? data)
             data
-            (->unifyty-string data))))
+            (->pretty-string data))))
 
 
 (defn glob

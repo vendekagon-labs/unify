@@ -13,7 +13,6 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import
   (:require [com.vendekagonlabs.unify.util.io :as util.io]
-            [clojure.java.io :as io]
             [cognitect.anomalies :as anomalies]
             [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db :as db]
@@ -22,11 +21,10 @@
             [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
             [com.vendekagonlabs.unify.import.tx-data :as tx-data]
             [com.vendekagonlabs.unify.import.engine :as engine]
-            [com.vendekagonlabs.unify.util.aws :as s3]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
             [com.vendekagonlabs.unify.import.upsert-coordination :as upsert-coord]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
-            [com.vendekagonlabs.unify.util.text :refer [->unifyty-string folder-of]]
+            [com.vendekagonlabs.unify.util.text :refer [->pretty-string folder-of]]
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 (defn validate
@@ -57,8 +55,8 @@
                                                  continue-on-error)
         txn-data-pre-process (tx-data/make-transaction-data! target-dir
                                                              tx-batch-size)]
-    (log/info (str "Data files prepared: \n" (->unifyty-string (map #(get-in % [:job :unify/input-file]) import-result))
-                   "TX data prepared: \n " (->unifyty-string txn-data-pre-process)))
+    (log/info (str "Data files prepared: \n" (->pretty-string (map #(get-in % [:job :unify/input-file]) import-result))
+                   "TX data prepared: \n " (->pretty-string txn-data-pre-process)))
     (if-let [errors (seq (filter ::anomalies/category import-result))]
       {:errors errors}
       import-result)))
@@ -94,7 +92,7 @@
     (if-let [anomalies (seq (concat (filter ::anomalies/category ref-results)
                                     (filter ::anomalies/category data-results)))]
       (do (log/error "Import did not complete successfully (see logs for full report): "
-                     (->unifyty-string anomalies))
+                     (->pretty-string anomalies))
           {:errors anomalies})
       {:results (apply merge-with + (concat ref-results data-results))})))
 
@@ -151,3 +149,6 @@
   (let [_emit-import-result (prepare-import ctx)
         tx-result (transact-import ctx)]
     tx-result))
+
+(comment
+  (keep :kind/name (db.schema/get-metamodel-and-schema)))

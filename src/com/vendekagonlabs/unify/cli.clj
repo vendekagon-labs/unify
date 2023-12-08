@@ -118,7 +118,7 @@
       (catch Exception e
         (exit 1 (str "Error encountered creating Unify database " database "\n"
                      (when-let [err-data (ex-data e)]
-                       (text/->unifyty-string (dissoc err-data :message)))
+                       (text/->pretty-string (dissoc err-data :message)))
                      \newline
                      (.getMessage e)))))
     (exit 1 (str "ERROR: requires --database argument"))))
@@ -217,7 +217,7 @@
   (let [{:keys [filename line-number]} (:unify/annotations transaction-entity)]
     (str "File: " filename " at line-number: " line-number "\n"
          (apply str
-                (text/->unifyty-string (dissoc transaction-entity :unify/annotations :unify/identifying-avpair))
+                (text/->pretty-string (dissoc transaction-entity :unify/annotations :unify/identifying-avpair))
                 (for [attr (keys difference)]
                   (str "\nTransaction file specified " attr " with value "
                        (get transaction-entity attr)

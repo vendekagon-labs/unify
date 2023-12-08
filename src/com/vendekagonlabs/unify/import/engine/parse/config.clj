@@ -181,7 +181,7 @@
                     missing-top-keys (assoc :config-file/missing-top-keys (vec missing-top-keys)))]
     (if-not (seq error-map)
       cfg-map
-      (throw (ex-info (str "Config was invalid:\n" (text/->unifyty-string error-map))
+      (throw (ex-info (str "Config was invalid:\n" (text/->pretty-string error-map))
                       error-map)))))
 
 

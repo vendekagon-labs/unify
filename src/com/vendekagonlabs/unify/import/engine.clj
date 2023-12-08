@@ -345,13 +345,13 @@
           matrix-results (run-matrix-jobs! target-dir full-import-ctx matrix-jobs continue-on-error?)
           dataset-results (run-jobs! target-dir full-import-ctx jobs continue-on-error?)
           results (vec (concat ref-data-results matrix-results dataset-results))]
-      (io/write-edn-file (str target-dir "/import-summary.edn") (text/->unifyty-string results))
+      (io/write-edn-file (str target-dir "/import-summary.edn") (text/->pretty-string results))
       (println "\n")
       (log/info (str "Entity generation elapsed time: " (/  (- (System/currentTimeMillis) start) 1000.0) "seconds."))
       results)
     (catch Exception e
       (let [data (ex-data e)
-            unifyty-data (text/->unifyty-string data)
+            unifyty-data (text/->pretty-string data)
             err-fname "PRET_ERROR_DUMP"]
         (log/error "Engine encountered exception while generating entity data, error state in file: "
                    err-fname)

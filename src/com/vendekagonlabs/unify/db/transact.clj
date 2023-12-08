@@ -18,7 +18,7 @@
             [clojure.edn :as edn]
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
             [com.vendekagonlabs.unify.db.common :refer [retryable?]]
-            [com.vendekagonlabs.unify.util.text :refer [->unifyty-string]]
+            [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.util.uuid :as util.uuid]
             [clojure.tools.logging :as log]
@@ -168,7 +168,7 @@
                           (if (::anom/category result)
                             (do
                               (log/error "Anomaly encountered running transactions -- stopping."
-                                         (->unifyty-string result))
+                                         (->pretty-string result))
                               (a/close! from-ch)
                               (a/close! to-ch)
                               (a/>!! done-ch result))

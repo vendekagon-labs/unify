@@ -47,7 +47,8 @@
   "Returns an ordered set of all schema transactions."
   [schema-dir]
   (let [read-schema-file (partial read-import-schema schema-dir)
-        metamodel-edn (read-schema-file "metamodel.edn")]
+        [metamodel-entities
+         metamodel-refs] (read-schema-file "metamodel.edn")]
     [{:name :unify.schema/metadata
       :query new-ident-q
       :tx-data (unify-schema)}
@@ -57,18 +58,15 @@
      {:name :enums
       :query new-ident-q
       :tx-data (read-schema-file "enums.edn")}
-     {:name :metamodel-attr
-      :query new-ident-q
-      :tx-data (first metamodel-edn)}
      {:name :metamodel-entities
       :query '[:find (count ?k)
                :where [?k :unify.kind/name]]
-      :tx-data (second metamodel-edn)}
+      :tx-data metamodel-entities}
      {:name :metamodel-refs
       :query '[:find (count ?p)
                :with ?c
                :where [?p :unify.ref/to ?c]]
-      :tx-data (last  metamodel-edn)}]))
+      :tx-data metamodel-refs}]))
 
 
 (defn cache

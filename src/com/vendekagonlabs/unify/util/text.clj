@@ -23,7 +23,7 @@
        (namespace x)
        (str/starts-with? (namespace x) ns)))
 
-(defn ->unifyty-string
+(defn ->pretty-string
   "Returns a unifyty string of x."
   [x]
   (with-out-str (pprint x)))
