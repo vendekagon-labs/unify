@@ -7,12 +7,12 @@
             [clojure.string :as string]))
 
 (def fpath
-  "/Users/bkamphaus/data/variants.final.annotated.tsv")
+  "/Users/vendekagon-labs/code/unify/test/resources/reference-import/template-dataset/processed/cnv_ref_fixed_1.tsv ")
 
 (def variants
   (ds/->dataset
     fpath
-    {:column-whitelist ["SYMBOL" "HGVSp"]}))
+    #_{:column-whitelist ["SYMBOL" "HGVSp"]}))
 
 (comment
   (ds/head variants)
@@ -28,3 +28,4 @@
                      (second)))})))
 
 (ds/write! fixed "test.tsv")
+

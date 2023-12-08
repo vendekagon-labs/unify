@@ -350,7 +350,7 @@
 
                       ; Just like with other maps above, you can input multiple maps
                       ; and each map can come from many files if they are structured in the same way
-                      {:unify/input-file    #glob["processed/" "variant_ref_*.tsv"]
+                      {:unify/input-file    #glob["processed/" "variant_ref_*fixed.tsv"]
                        :unify/na            ""
                        :id                  "var.id"
                        :genomic-coordinates "gc.id"
@@ -383,7 +383,7 @@
                                              "COSMIC"                 :variant/cosmic}}]
 
  ; If your dataset contains CNV measurements you will likely need to insert CNV reference entities as well
- :cnv                {:unify/input-file    #glob["processed/" "cnv_ref_fixed*.tsv"]
+ :cnv                {:unify/input-file    #glob["processed/" "cnv_ref_fixed_again*.tsv"]
                       :unify/na            ""
                       :genomic-coordinates "gc.id"
                       :id                  "gc.id"
