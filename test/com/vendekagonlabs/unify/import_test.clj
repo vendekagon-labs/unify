@@ -48,7 +48,11 @@
   (db/init datomic-uri :schema-directory (schema-directory))
   ;; TODO: Temp fix for drug ordering issue with template dataset.
   (let [conn (d/connect datomic-uri)]
-    @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])))
+    @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])
+    @(d/transact conn [{:db/id "LDHA-protein"
+                        :protein/uniprot-name "LDHA"}
+                       {:epitope/id "LDHA"
+                        :epitope/protein "LDHA-protein"}])))
 
 (defn teardown []
   (log/info "Ending integration test and deleting db.")
