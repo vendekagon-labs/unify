@@ -30,7 +30,7 @@
   (read-import-schema schema-dir "enums.edn"))
 (defn metamodel [schema-dir]
   (read-import-schema schema-dir "metamodel.edn"))
-(defn unify-meta []
+(defn unify-schema []
   (-> (io/resource "unify-schema.edn")
       (util.io/read-edn-file)))
 
@@ -47,7 +47,10 @@
   [schema-dir]
   (let [read-schema-file (partial read-import-schema schema-dir)
         metamodel-edn (read-schema-file "metamodel.edn")]
-    [{:name :base-schema
+    [{:name :unify.schema/metadata
+      :query new-ident-q
+      :tx-data (unify-schema)}
+     {:name :base-schema
       :query new-ident-q
       :tx-data (read-schema-file "schema.edn")}
      {:name :enums
@@ -64,10 +67,8 @@
       :query '[:find (count ?p)
                :with ?c
                :where [?p :ref/to ?c]]
-      :tx-data (last  metamodel-edn)}
-     {:name :com.vendekagonlabs.unify.import.tx-data/metadata
-      :query new-ident-q
-      :tx-data (unify-meta)}]))
+      :tx-data (last  metamodel-edn)}]))
+
 
 (defn cache
   "Write schema to resources (wrapped in vec for eagerness, readability)"
@@ -127,11 +128,15 @@
    (util.io/read-edn-file cached)))
 
 (defn version
-  []
-  (-> (keep (fn [{:keys [db/ident] :as ent}]
-              (when (= ident :candel/schema)
-                ent))
-            (util.io/read-edn-file (io/resource "schema/enums.edn")))
-      (first)
-      (:candel.schema/version)))
+  ([]
+   (let [cached-schema (io/resource "cached-schema.edn")]))
+  ([schema-dir]
+   (->> (io/file schema-dir "enums.edn")
+        (util.io/read-edn-file)
+        (filter :unify.schema/version)
+        (first)
+        (:unify.schema/version))))
 
+(comment
+  (def cschem (io/resource "cached-schema.edn"))
+  (first cschem))

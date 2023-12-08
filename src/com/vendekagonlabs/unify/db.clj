@@ -104,9 +104,12 @@
 (defn version [datomic-uri]
   (let [conn (d/connect datomic-uri)
         db (d/db conn)]
-    (-> db
-        (d/pull '[:candel.schema/version] :candel/schema)
-        (:candel.schema/version))))
+    ;; NOTE: this query assumes there is only one schema version entity, need to
+    ;; ensure this constraint is satisfied at update/transaction time.
+    (d/q '[:find ?v .
+           :where
+           [_ :unify.schema/version ?v]]
+         db)))
 
 (defn init
   "Loads all base schema, enums, and metamodel into database if necessary."
@@ -149,9 +152,9 @@
 (defn compare-schema-version
   "Compares schema at datomic-uri to cached schema in unify URI. Returns a kw indicating whether
   or not the schema are :incompatible, :identical, or :compatible"
-  [datomic-uri]
+  [schema-directory datomic-uri]
   (let [db-schema-map (-> datomic-uri version version->map)
-        unify-schema-map (-> (schema/version) version->map)]
+        unify-schema-map (-> (schema/version schema-directory) version->map)]
     (cond
       (or (not= (:major db-schema-map) (:major unify-schema-map))
           (not= (:minor db-schema-map) (:minor unify-schema-map)))
@@ -168,7 +171,7 @@
   "Returns map with schema included as a key, will throw at Datomic call level if
   unable to connect to database. Will also throw if versions are incompatible."
   [schema-directory datomic-uri]
-  (let [version-outcome (compare-schema-version datomic-uri)]
+  (let [version-outcome (compare-schema-version schema-directory datomic-uri)]
     (cond
       (= version-outcome :identical)
       datomic-uri
@@ -182,7 +185,7 @@
       (= version-outcome :incompatible)
       (throw (ex-info "Version of candel schema in database is not compatible."
                       {:candel.schema/version {:db/version (version datomic-uri)
-                                               :unify/version (schema/version)}})))))
+                                               :unify/version (schema/version schema-directory)}})))))
 
 
 (defn contains-txn?

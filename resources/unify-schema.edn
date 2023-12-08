@@ -1,5 +1,34 @@
 [
- ;; Metamodel attributes:
+ ;; Unify high level schema metadata
+ {:db/ident               :unify.schema/name
+  :db/valueType           :db.type/keyword
+  :db/cardinality         :db.cardinality/one
+  :db/doc                 "The name/identifier for this particular Unify schema, use of namespace in keyword encouraged."}
+ {:db/ident               :unify.schema/version
+  :db/valueType           :db.type/string
+  :db/cardinality         :db.cardinality/one
+  :db/doc                 "The version of this particular Unify schema (in x.x.x format)"}
+
+ ;; Import annotation data (links between import files and transactions)
+ {:db/ident         :unify.annotation/entity
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Entity to which this annotation refers."}
+ {:db/ident         :unify.annotation/filename
+  :db/valueType     :db.type/string
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "Filename where entity was sourced from."}
+ {:db/ident         :unify.annotation/line-number
+  :db/valueType     :db.type/long
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "The line number in the file that this entity was sourced from"}
+ {:db/ident         :unify.import/most-recent
+  :db/valueType     :db.type/ref
+  :db/cardinality   :db.cardinality/one
+  :db/doc           "The most recent import to alter this entity."}
+
+
+;; Metamodel attributes:
  {:db/ident         :unify.kind/name
   :db/valueType     :db.type/keyword
   :db/unique        :db.unique/identity
@@ -81,7 +110,7 @@
   :db/cardinality   :db.cardinality/one
   :db/doc           "target of a ref attribute, must be a :kind/name"}
 
- ;; Similar to :db/tupleTypes but allows kinds
+ ;; Similar to :db/tupleTypes but allows unify kinds
  {:db/ident         :unify.ref/tuple-types
   :db/valueType     :db.type/tuple
   :db/tupleType     :db.type/keyword

@@ -1,9 +1,4 @@
 [
- ;; Schema metadata
- {:db/ident               :candel/schema
-  :candel.schema/version  "1.3.1"}
-
-
  ; From GDC
  {:db/ident  :sample.type/tumor}
  {:db/ident  :sample.type/normal}

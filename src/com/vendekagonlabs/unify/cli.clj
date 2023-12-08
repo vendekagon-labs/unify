@@ -97,8 +97,8 @@
 ;;
 
 (defn schema-version
-  [_]
-  (println (str "schema version:" (schema/version))))
+  [{:keys [schema-directory]}]
+  (println (str "schema version:" (schema/version schema-directory))))
 
 (defn request-db
   [{:keys [database
