@@ -30,13 +30,19 @@
 (def import-cfg-file
   "test/resources/tuple-import/config.edn")
 
+(def schema-dir
+  "test/resources/reference-import/template-dataset/schema")
+
 (defn bootstrap-genes []
   (first
     (filter #(= :genes (:name %)) (bootstrap.data/all-datasets))))
 
 (defn setup []
   (log/info "Initializing in-memory tuple test db.")
-  (db/init datomic-uri :skip-bootstrap true)
+  (db/init datomic-uri
+           :skip-bootstrap true
+           :schema-directory schema-dir)
+
   (log/info "Bootstrap gene/HGNC data only.")
   (let [conn (d/connect datomic-uri)
         version (db/version datomic-uri)
@@ -58,6 +64,7 @@
                   {:target-dir           tmp-dir
                    :datomic-uri          datomic-uri
                    :import-cfg-file      import-cfg-file
+                   :schema-directory     schema-dir
                    :disable-remote-calls true
                    :tx-batch-size        50})))
   (teardown))
