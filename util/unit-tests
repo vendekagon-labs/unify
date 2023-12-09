@@ -1,0 +1,2 @@
+#!/bin/bash
+clojure -J-Xmx2g -J-XX:+UseG1GC -J-XX:MaxGCPauseMillis=50 -J-server -J-Xss4m -J-Dclojure.core.async.go-checking="true" -Xtest "{:excludes [:integration :performance]}"
