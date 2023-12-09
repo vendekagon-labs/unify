@@ -1,1 +1,4 @@
 - Reference data updates for template dataset.
+- Move reference/bootstrap data and re-organize to make it schema specific.
+- Create more compact, edn friendly, user friendly way to define bootstrap reference data.
+- CLI arg for request-db to point to bootstrap reference data

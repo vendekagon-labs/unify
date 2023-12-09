@@ -77,6 +77,10 @@
     :expected [[2482]]
     :files ["all-so-sequence-features-tx-data.edn"]}
    {:name :nanostring-signatures
+    ;; TODO: in ignored key, new form for this data structure that's better for
+    ;; end user management in edn
+    ;; {:install-check {:nanostring-signature/name 42}}
+    ;; could potentially have multiple keys here.
     :query '[:find (count ?s)
              :where
              [?s :nanostring-signature/name]]
@@ -89,7 +93,7 @@
   []
   (let [datasets (all-datasets)]
     (filter (fn [{:keys [name]}]
-              (#{:genes} name))
+              (#{:genes :gdc-anatomic-sites} name))
             datasets)
     #_(remove
         (fn [{:keys [name]}]

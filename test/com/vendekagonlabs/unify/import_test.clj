@@ -45,6 +45,8 @@
 
 (defn setup []
   (log/info "Initializing in-memory integration test db.")
+  ;; TODO: a better end-to-end test for user contract would run request-db
+  ;; via the CLI equivalent entrypoint.
   (db/init datomic-uri :schema-directory (schema-directory))
   ;; TODO: Temp fix for drug ordering issue with template dataset.
   (let [conn (d/connect datomic-uri)]
@@ -70,6 +72,9 @@
                            :tx-batch-size        50})]
       (testing "Import runs to completion without throwing."
         (is import-result))
+      ;; TODO: make this test for a set of known entities rather than transactions, as transactions
+      ;        aren't part of the contract, but e.g. 50 samples should be imported by this import
+      ;        would be a fair stipulation of the contract implied by a unify import.
       (testing "Right number of txes completed. This implicitly also tests for data import failures."
         (is (= 3464 (get-in import-result [:results :completed]))))
       (testing "No reference data import errors."
