@@ -12,7 +12,8 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.bootstrap.data
-  (:require [com.vendekagonlabs.unify.util.aws :as s3]
+  (:require [clojure.set :as set]
+            [com.vendekagonlabs.unify.util.aws :as s3]
             [com.vendekagonlabs.unify.db.config :as db.config]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.java.io :as io]))
@@ -94,7 +95,10 @@
   (let [datasets (all-datasets)]
     (remove
       (fn [{:keys [name]}]
-        (#{:nanostring-signatures :drugs :diseases} name))
+        (let [proprietary #{:nanostring-signatures :drugs :diseases}
+              not-yet-here #{:proteins-epitopes}
+              exclude (set/union proprietary not-yet-here)]
+          (exclude name)))
       datasets)))
 
 (defn maybe-download
