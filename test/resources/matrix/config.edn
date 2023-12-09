@@ -13,14 +13,14 @@
                     :measurement-matrices
                     [{:name                          "screening-rna-seq"
                       :measurement-type              :measurement/read-count
-                      :unify.matrix/input-file       "dense-rnaseq.tsv"
+                      :unify.matrix/input-file       "dense-rnaseq-fixed.tsv"
                       :unify.matrix/format           :unify.matrix.format/dense
                       :unify.matrix/column-attribute :measurement-matrix/gene-products
                       :unify.matrix/indexed-by       {"sample.id" :measurement-matrix/samples}}
                      {:name                    "single cell counts"
                       :measurement-type        :measurement/read-count
                       :unify.matrix/constants  {:measurement-matrix/samples "SYNTH-SC-DATA-01"}
-                      :unify.matrix/input-file "short-processed-counts.tsv"
+                      :unify.matrix/input-file "short-processed-counts-fixed.tsv"
                       :unify.matrix/format     :unify.matrix.format/sparse
                       :unify.matrix/indexed-by {"barcode" :measurement-matrix/single-cells
                                                 "hugo"    :measurement-matrix/gene-products}}]}]}]

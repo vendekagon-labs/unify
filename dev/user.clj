@@ -104,8 +104,12 @@
 (comment
   ;; Queries for answering questions about reference data presence/absence in
   ;; the CANDEL reference schema (v1.3.1)
-  :reference-data-queries
-  (def db-uri "datomic:mem://unify-test")
+  :construct-gene-lookup
+  (def db-name "unify-test")
+  (def schema-dir "/Users/vendekagon-labs/code/unify/test/resources/reference-import/template-dataset/schema")
+  (unify "request-db" "--database" db-name "--schema-directory" schema-dir)
+
+  (def db-uri (str "datomic:mem://" db-name))
   (def conn (d/connect db-uri))
   (def db (d/db conn))
 
@@ -119,18 +123,15 @@
            [?g :gene/alias-hgnc-symbols ?alias]]
          db))
 
-  (def all-genes-2
+  (def all-genes
     (set (map first (d/q '[:find ?hgnc
                            :in $
                            :where
                            [?g :gene/hgnc-symbol ?hgnc]]
                          db))))
 
-  (count all-genes-2)
 
-  #_(def all-genes (set (map first genes)))
-  (def all-genes all-genes-2)
-  (all-genes problem-gene)
+  (all-genes "AGFR2")
 
   (defn gene-remap-lookup
     "Given an ordered coll of [curr-hgnc-symbol, prev-hgnc-symbol, alias-hgnc-symbol]
@@ -263,11 +264,65 @@
                 row
                 (when-let [resolved-hgnc (get lookup gene-symbol variants-ds)]
                   (assoc row 5 resolved-hgnc)))))
-         (rest variants-ds)))
+          (rest variants-ds)))
   (take 10 fixed-variants)
   (count fixed-variants)
   (first fixed-variants)
   (count fixed-variants)
   (count (rest variants-ds))
-  (make-tsv variants-fpath hdr fixed-variants))
+  (make-tsv variants-fpath hdr fixed-variants)
 
+  ;; Extend fixes to matrix files.
+  (def dense-matrix-path
+    "/Users/vendekagon-labs/code/unify/test/resources/matrix/dense-rnaseq.tsv")
+  (def sparse-matrix-path
+    "/Users/vendekagon-labs/code/unify/test/resources/matrix/short-processed-counts.tsv")
+  (def dense-matrix
+    (read-tsv dense-matrix-path))
+  (def sparse-matrix
+    (read-tsv sparse-matrix-path))
+
+  (def sparse-hdr (first sparse-matrix))
+  (def sparse-data (rest sparse-matrix))
+
+  (def sparse-data-clean
+    (keep
+      (fn [[barcode hugo count]]
+        (if (all-genes hugo)
+          [barcode hugo count]
+          (when-let [new-hgnc (get lookup hugo)]
+            [barcode new-hgnc count])))
+      sparse-data))
+
+  (count sparse-data)
+  (count sparse-data-clean)
+
+  (make-tsv "test/resources/matrix/short-processed-counts-fixed.tsv"
+            sparse-hdr sparse-data-clean)
+
+  (def orig-dense-hdr (first dense-matrix))
+  (def dense-data (rest dense-matrix))
+  (def renamed-dense-hdr*
+    (map (fn [hgnc]
+           (if (all-genes hgnc)
+             hgnc
+             (get lookup hgnc "TODO_DROP")))
+         (rest orig-dense-hdr)))
+  (def renamed-dense-hdr (cons (first orig-dense-hdr) renamed-dense-hdr*))
+
+  (defn drop-genes [hdr data]
+    (let [clean-hdr (remove #(= "TODO_DROP" %) hdr)
+          clean-data (mapv (fn [row]
+                            (let [row-as-map (zipmap renamed-dense-hdr row)
+                                  wo-bad-genes (dissoc row-as-map "TODO_DROP")]
+                              (mapv #(get wo-bad-genes %) clean-hdr)))
+                           data)]
+      (vec (concat [clean-hdr] clean-data))))
+
+  (def fixed-dense-matrix (drop-genes renamed-dense-hdr dense-data))
+  (mapv count fixed-dense-matrix)
+  (count fixed-dense-matrix)
+
+  (make-tsv "test/resources/matrix/dense-rnaseq-fixed.tsv"
+            (first fixed-dense-matrix)
+            (rest fixed-dense-matrix)))
