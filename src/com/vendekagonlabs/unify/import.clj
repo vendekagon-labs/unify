@@ -73,6 +73,7 @@
            schema-directory
            update
            diff-suffix]}]
+  (println "Transacting prepared tx-data from directory:\n" target-dir "\ninto datomic db at:\n" datomic-uri)
   (let [ensured-datomic-config (db/ensure-db schema-directory datomic-uri)
         tx-result-map (tx-data/transact-import-data! target-dir
                                                      ensured-datomic-config
