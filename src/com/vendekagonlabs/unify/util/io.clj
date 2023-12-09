@@ -86,8 +86,8 @@
 (defn unrealized-glob
   "Reads in a glob specification and outputs a map"
   [[dir pattern]]
-  {:glob/directory dir
-   :glob/pattern pattern})
+  {:unify.glob/directory dir
+   :unify.glob/pattern pattern})
 
 (defn read-edn-file
   "Reads EDN file, or throws ex-info with info on why EDN file can't be read."

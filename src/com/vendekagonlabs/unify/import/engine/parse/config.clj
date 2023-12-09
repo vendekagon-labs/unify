@@ -31,7 +31,7 @@
 (def unify-key-whitelist #{:unify/constants :unify/value :unify/variables :unify/reverse :unify/precomputed
                            :unify/rev-variable :unify/input-tsv-file :unify/import :unify/variable
                            :unify/rev-attr :unify/many-delimiter :unify/many-variable
-                           :unify/na :unify/omit-if-na
+                           :unify/na :unify/omit-if-na :unify/glob
                            :unify.matrix/format :unify.matrix/input-file
                            :unify.matrix.format/sparse :unify.matrix.format/dense
                            :unify.matrix/column-attribute :unify.matrix/indexed-by
@@ -510,7 +510,7 @@
                            (throw
                              (ex-info
                                (str "Glob pattern didn't match any files: " directory " " pattern)
-                               {:directive/glob-with-no-matches {:glob [directory pattern]}})))))))))))
+                               {:directive/glob-with-no-matches {:unify.glob [directory pattern]}})))))))))))
 
 
 (defn reference-data-jobs

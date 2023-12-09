@@ -10,7 +10,7 @@
                                                :technology       :assay.technology/dPCR
                                                :description      "cfDNA assay perfomred by E. Carpenter at UPenn"
                                                :measurement-sets [{:name         "baseline"
-                                                                   :measurements [{:unify/input-tsv {:unify/glob "processed/cfdna_measurements.*"}
+                                                                   :measurements [{:unify/input-tsv-file {:unify/glob "processed/cfdna_measurements.*"}
                                                                                    :unify/na         "NA"
                                                                                    :unify/omit-if-na [*]
                                                                                    :sample          "Originating ID (specimen barcode ID)"
@@ -20,7 +20,7 @@
                                                :technology       :assay.technology/ELISA
                                                :description      "THBSP2 in plasma as measured by ELISA"
                                                :measurement-sets [{:name         "baseline"
-                                                                   :measurements [{:unify/input-tsv   "processed/thbsp2_measurements.txt"
+                                                                   :measurements [{:unify/input-tsv-file   "processed/thbsp2_measurements.txt"
                                                                                    :unify/na           "NA"
                                                                                    :unify/omit-if-na   [:measurement/ng-mL]
                                                                                    :sample            "Originating ID (specimen barcode ID)"
@@ -31,12 +31,12 @@
                                                :technology       :assay.technology/mass-cytometry
                                                :description      "CyTOF analysis performed at Primity Bio"
                                                :measurement-sets [{:name             "Bendall"
-                                                                   :cell-populations [{:unify/input-tsv  "processed/cell_populations_Bendall.txt"
+                                                                   :cell-populations [{:unify/input-tsv-file  "processed/cell_populations_Bendall.txt"
                                                                                        :unify/na          "NA"
                                                                                        :name             "name"
                                                                                        :positive-markers "positive.epitopes"
                                                                                        :cell-type        "cell.type"}]
-                                                                   :measurements     [{:unify/input-tsv "processed/cytof_measurements_Bendall.txt"
+                                                                   :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_Bendall.txt"
                                                                                        :unify/na         "NA"
                                                                                        :sample          "sample"
                                                                                        :cell-population "uniquePopulationName"
@@ -46,12 +46,12 @@
                                                                                                           "normalization.measurement" :measurement/leukocyte-count
                                                                                                           "normalized.measurement"    :measurement/percent-of-leukocytes}}]}
                                                                   {:name             "Spitzer"
-                                                                   :cell-populations [{:unify/input-tsv  "processed/cell_populations_Spitzer.txt"
+                                                                   :cell-populations [{:unify/input-tsv-file  "processed/cell_populations_Spitzer.txt"
                                                                                        :unify/na          "NA"
                                                                                        :name             "name"
                                                                                        :positive-markers "positive.epitopes"
                                                                                        :cell-type        "cell.type"}]
-                                                                   :measurements     [{:unify/input-tsv "processed/cytof_measurements_Spitzer.txt"
+                                                                   :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_Spitzer.txt"
                                                                                        :unify/na         "NA"
                                                                                        :sample          "sample"
                                                                                        :cell-population "uniquePopulationName"
@@ -61,14 +61,14 @@
                                                                                                           "normalization.measurement" :measurement/leukocyte-count
                                                                                                           "normalized.measurement"    :measurement/percent-of-leukocytes}}]}]}]
                       :clinical-observation-sets [{:name "all-clinical-obs"
-                                                   :clinical-observations [{:unify/input-tsv "processed/clinical_observations_recist.txt"
+                                                   :clinical-observations [{:unify/input-tsv-file "processed/clinical_observations_recist.txt"
                                                                             :timepoint       "VISIT"
                                                                             :subject         "USUBJID"
                                                                             :recist          "RSORRES"}
-                                                                           {:unify/input-tsv "processed/subjects.txt"
+                                                                           {:unify/input-tsv-file "processed/subjects.txt"
                                                                             :subject         "USUBJID"
                                                                             :unify/constants  {:timepoint "screening"}}
-                                                                           {:unify/input-tsv "processed/tumor_assessments_measurements.txt"
+                                                                           {:unify/input-tsv-file "processed/tumor_assessments_measurements.txt"
                                                                             :subject         "USUBJID"
                                                                             :timepoint       "VISIT"
                                                                             :unify/value      "TRORRES"
@@ -76,30 +76,30 @@
                                                                             :unify/variables  {"SUMDIAM" :clinical-observation/tumor-sum-diam
                                                                                                "PCBSD"   :clinical-observation/tumor-sum-diam-perc-change}}]}]
 
-                      :samples               [{:unify/input-tsv "processed/samples.txt"
+                      :samples               [{:unify/input-tsv-file "processed/samples.txt"
                                                :id              "Originating ID (specimen barcode ID)"
                                                :subject         "Participant ID"
                                                :timepoint       "VISIT"
                                                :specimen        "Source Matcode"
                                                :container       "BioInventory Group Name"}
-                                              {:unify/input-tsv "original/vectra_samples_pds.txt"
+                                              {:unify/input-tsv-file "original/vectra_samples_pds.txt"
                                                :id              "specimenId"
                                                :subject         "subjectId"
                                                :unify/constants  {:timepoint "screening"}
                                                :specimen        "specimen"}]
-                      :subjects              {:unify/input-tsv "processed/subjects.txt"
+                      :subjects              {:unify/input-tsv-file "processed/subjects.txt"
                                               :id              "USUBJID"
                                               :sex             "SEX"
                                               :race            "RACE"
                                               :ethnicity       "ETHNIC"
-                                              :therapies       {:unify/input-tsv   "processed/therapies.txt"
+                                              :therapies       {:unify/input-tsv-file   "processed/therapies.txt"
                                                                 :treatment-regimen "TRTACD"
                                                                 :order             "order"
                                                                 :unify/reverse      {:unify/rev-variable "USUBJID"
                                                                                      :unify/rev-attr     :subject/therapies}}}
-                      :treatment-regimens    [{:unify/input-tsv "processed/treatment-regimens.txt"
+                      :treatment-regimens    [{:unify/input-tsv-file "processed/treatment-regimens.txt"
                                                :name            "id"}]
-                      :timepoints            [{:unify/input-tsv   "processed/timepoints.txt"
+                      :timepoints            [{:unify/input-tsv-file   "processed/timepoints.txt"
                                                :unify/na           "NA"
                                                :id                "id"
                                                :treatment-regimen "regimen"
@@ -107,17 +107,17 @@
                                                :day               "DAY"
                                                :relative-order    "ORDER"
                                                :type              "TYPE"}
-                                              {:unify/input-tsv "processed/free_timepoints.txt"
+                                              {:unify/input-tsv-file "processed/free_timepoints.txt"
                                                :id              "id"
                                                :type            "TYPE"}]}
- :genomic-coordinate {:unify/input-tsv "processed/cfdna_variants_coordinates.txt"
+ :genomic-coordinate {:unify/input-tsv-file "processed/cfdna_variants_coordinates.txt"
                       :contig          "contig"
                       :start           "start"
                       :end             "end"
                       :id              "id"
                       :strand          "strand"
                       :unify/constants  {:assembly :assembly/GRCh38}}
- :variant            {:unify/input-tsv "processed/cfdna_variants.txt"
+ :variant            {:unify/input-tsv-file "processed/cfdna_variants.txt"
                       :gene            "gene"
                       :id              "id"
                       :coordinates     "coordinates"
@@ -126,7 +126,7 @@
                       :HGVSc           "HGVSc"
                       :HGVSp           "HGVSp"
                       :dbSNP           "dbSNP"}
- :cnv                {:unify/input-tsv "processed/cnv_ref_9999.tsv"
+ :cnv                {:unify/input-tsv-file "processed/cnv_ref_9999.tsv"
                       :coordinates     "gc.id"
                       :id              "gc.id"
                       :unify/na         ""
