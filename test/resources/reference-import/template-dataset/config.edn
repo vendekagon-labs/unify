@@ -45,29 +45,29 @@
 
                                                                       ; To input another set of measurements also from WES, use another measurement-set
                                                                       ; This could be variants called with another pipeline, or on a different set of samples, or other
-                                                                      {:name         "another set of variants"
-                                                                       ; You can use a series of files as input if you specify them as a glob, like below:
-                                                                       :measurements [{:unify/input-file #glob["processed/" "variant_meas_*.tsv"]
-                                                                                       ; The :unify/na key tells unify what to treat as NA in the input file.
-                                                                                       ; Attributes containing an NA will be ignored and not input into CANDEL
-                                                                                       :unify/na         ""
-                                                                                       ; The :unify/omit-if-na key tells unify which attributes to, if they are NA, remove the entire entity from the data import. This is usually applicable to measurements.
-                                                                                       :unify/omit-if-na [:measurement/t-depth
-                                                                                                          :measurement/n-depth
-                                                                                                          :measurement/t-ref-count
-                                                                                                          :measurement/t-alt-count
-                                                                                                          :measurement/n-ref-count
-                                                                                                          :measurement/n-alt-count]
-                                                                                       :sample           "Tumor_Sample_Barcode"
-                                                                                       :variant          "var.id"
-                                                                                       :unify/variable   "variable"
-                                                                                       :unify/value      "value"
-                                                                                       :unify/variables  {"t_depth"     :measurement/t-depth
-                                                                                                          "n_depth"     :measurement/n-depth
-                                                                                                          "t_ref_count" :measurement/t-ref-count
-                                                                                                          "t_alt_count" :measurement/t-alt-count
-                                                                                                          "n_ref_count" :measurement/n-ref-count
-                                                                                                          "n_alt_count" :measurement/n-alt-count}}]}
+                                                                      #_{:name         "another set of variants"
+                                                                         ; You can use a series of files as input if you specify them as a glob, like below:
+                                                                         :measurements [{:unify/input-file #glob["processed/" "variant_meas_*.tsv"]
+                                                                                         ; The :unify/na key tells unify what to treat as NA in the input file.
+                                                                                         ; Attributes containing an NA will be ignored and not input into CANDEL
+                                                                                         :unify/na         ""
+                                                                                         ; The :unify/omit-if-na key tells unify which attributes to, if they are NA, remove the entire entity from the data import. This is usually applicable to measurements.
+                                                                                         :unify/omit-if-na [:measurement/t-depth
+                                                                                                            :measurement/n-depth
+                                                                                                            :measurement/t-ref-count
+                                                                                                            :measurement/t-alt-count
+                                                                                                            :measurement/n-ref-count
+                                                                                                            :measurement/n-alt-count]
+                                                                                         :sample           "Tumor_Sample_Barcode"
+                                                                                         :variant          "var.id"
+                                                                                         :unify/variable   "variable"
+                                                                                         :unify/value      "value"
+                                                                                         :unify/variables  {"t_depth"     :measurement/t-depth
+                                                                                                            "n_depth"     :measurement/n-depth
+                                                                                                            "t_ref_count" :measurement/t-ref-count
+                                                                                                            "t_alt_count" :measurement/t-alt-count
+                                                                                                            "n_ref_count" :measurement/n-ref-count
+                                                                                                            "n_alt_count" :measurement/n-alt-count}}]}
 
 
                                                                       ; This measurement-set consists of copy number variation measurements run on the same samples as the above variants

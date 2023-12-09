@@ -3,3 +3,4 @@
 - Create more compact, edn friendly, user friendly way to define bootstrap reference data.
 - CLI arg for request-db to point to bootstrap reference data
 - Why does prepare slow down when pret is run twice at the REPL? Can we identify and fix this?
+- Variant fixes: revert back to original variant_ref files, maybe?
