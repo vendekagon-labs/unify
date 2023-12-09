@@ -18,10 +18,13 @@
 
   https://obofoundry.org/ontology/so.html
 
+  As of 09-DEC-2023 this file can be downloaded via:
+  https://raw.githubusercontent.com/The-Sequence-Ontology/SO-Ontologies/master/Ontology_Files/so.obo
+
   For more information."
-  (:require [com.vendekagonlabs.pret.bootstrap.obo :as obo]
+  (:require [com.vendekagonlabs.unify.bootstrap.obo :as obo]
             [clojure.java.io :as io]
-            [com.vendekagonlabs.pret.util.io :as util.io]))
+            [com.vendekagonlabs.unify.util.io :as util.io]))
 
 ;; Thi
 

@@ -92,13 +92,10 @@
   general public without a license (non-proprietary datasets)"
   []
   (let [datasets (all-datasets)]
-    (filter (fn [{:keys [name]}]
-              (#{:genes :gdc-anatomic-sites} name))
-            datasets)
-    #_(remove
-        (fn [{:keys [name]}]
-          (#{:nanostring-signatures :drugs :diseases} name))
-        datasets)))
+    (remove
+      (fn [{:keys [name]}]
+        (#{:nanostring-signatures :drugs :diseases} name))
+      datasets)))
 
 (defn maybe-download
   "If seed data doesn't exist locally, will download it. Returns (as java.io.File objects),
