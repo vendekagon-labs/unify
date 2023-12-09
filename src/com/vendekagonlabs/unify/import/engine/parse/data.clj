@@ -470,7 +470,7 @@
                           (throw (ex-info "Row did not provide the right number of values to form a tuple."
                                           {:engine/invalid-tuple-entry
                                            {:column-names     col-names
-                                            :file             (:unify/input-file job)
+                                            :file             (:unify/input-tsv-file job)
                                             :candel-attribute attr
                                             :tuple-values     raw-values}})))
                       resolved-values (mapv (fn [rv dt]

@@ -29,7 +29,7 @@
             [clojure.string :as str]))
 
 (def unify-key-whitelist #{:unify/constants :unify/value :unify/variables :unify/reverse :unify/precomputed
-                           :unify/rev-variable :unify/input-file :unify/import :unify/variable
+                           :unify/rev-variable :unify/input-tsv-file :unify/import :unify/variable
                            :unify/rev-attr :unify/many-delimiter :unify/many-variable
                            :unify/na :unify/omit-if-na
                            :unify.matrix/format :unify.matrix/input-file
@@ -98,19 +98,19 @@
     (walk/postwalk f m)))
 
 (defn remove-directives
-  "Remove any map in a nested map structure that contains the :unify/input-file
+  "Remove any map in a nested map structure that contains the :unify/input-tsv-file
   or :unify.matrix/input-file keys"
   [config-map]
   (-> config-map
       ;; if we end up supporting more formats than tsv -> datoms and tsv -> s3,
       ;; we may want to make this pruning/separation more generic.
-      (prune-nodes-by-key :unify/input-file)
+      (prune-nodes-by-key :unify/input-tsv-file)
       (prune-nodes-by-key :unify.matrix/input-file)
       flatten-nil-vecs
       remove-nils))
 
 (defn only-directives
-  "Return a map preserving only the nested structures that contain the :unify/input-file key"
+  "Return a map preserving only the nested structures that contain the :unify/input-tsv-file key"
   [config-map]
   (second (data/diff (remove-directives config-map) config-map)))
 
@@ -305,18 +305,18 @@
   [node]
   (let [context-type (last (:unify/ns-node-ctx node))]
 
-    ;; skip :unify/input-file nodes
+    ;; skip :unify/input-tsv-file nodes
     ;; skip nodes whose context ends with
-    ;;  :unify/reverse, :unify/constants, :unify/variables, :unify/input-file
+    ;;  :unify/reverse, :unify/constants, :unify/variables, :unify/input-tsv-file
 
     ;; I have no idea wtf this does, it doesn't skip these like it says, just sends them
     ;; to parse.data/uid-attr-val instead of synthetic-uid. Why? I also have no
     ;; idea.
-    (not (or (contains? node :unify/input-file)
+    (not (or (contains? node :unify/input-tsv-file)
              (= context-type :unify/reverse)
              (= context-type :unify/constants)
              (= context-type :unify/variables)
-             (= context-type :unify/input-file)))))
+             (= context-type :unify/input-tsv-file)))))
 
 (defn- skip-uid?
   [node]
@@ -367,11 +367,11 @@
        reverse))
 
 (defn add-parent-ref
-  "Adds parent refs to directives (containing :unify/input-file) and specifies output file prefix
+  "Adds parent refs to directives (containing :unify/input-tsv-file) and specifies output file prefix
   to indicate that children/dependent data should be transacted after parent directives."
   [schema parsed-cfg node]
   ;; theoretically this could be name check now.
-  (if-not (or (:unify/input-file node)
+  (if-not (or (:unify/input-tsv-file node)
               (:unify.matrix/input-file node))
     node
     (if (:unify/reverse node)
@@ -404,7 +404,7 @@
 
 
 (defn add-node-contexts
-  "Given a directive map, add node contexts (as per contextual) to each :unify/input-file node
+  "Given a directive map, add node contexts (as per contextual) to each :unify/input-tsv-file node
   in either the :unify/node-ctx key or another passed key."
   ([m unify-key]
    (let [add-ctx-fn (fn [node]
@@ -487,23 +487,23 @@
        fname))
 
 (defn get-directive-maps
-  "Returns a seq of directives (maps that contain :unify/input-file) from
+  "Returns a seq of directives (maps that contain :unify/input-tsv-file) from
   a (possibly multiply-nested) map"
   [cfg-dir m]
-  (let [all-maps-list (coll/all-nested-maps m :unify/input-file)
-        rm-fun (fn [[_ v]] (and (map? v) (:unify/input-file v)))]
+  (let [all-maps-list (coll/all-nested-maps m :unify/input-tsv-file)
+        rm-fun (fn [[_ v]] (and (map? v) (:unify/input-tsv-file v)))]
     (->> all-maps-list
          (map #(into {} (remove rm-fun %)))
          ;; if we have multiple files from parsed glob pattern, then we
          ;; make a directive map for each.
          (mapcat (fn [d-map]
-                   (let [input-file-spec (:unify/input-file d-map)]
+                   (let [input-file-spec (:unify/input-tsv-file d-map)]
                      (if-not (map? input-file-spec)
-                       [(assoc d-map :unify/input-file (maybe->absolute-path cfg-dir input-file-spec))]
+                       [(assoc d-map :unify/input-tsv-file (maybe->absolute-path cfg-dir input-file-spec))]
                        (let [{:keys [glob/directory glob/pattern]} input-file-spec
                              abs-dir (maybe->absolute-path cfg-dir directory)
                              matched-files (util.io/glob abs-dir pattern)
-                             returned (mapv #(assoc d-map :unify/input-file %)
+                             returned (mapv #(assoc d-map :unify/input-tsv-file %)
                                             matched-files)]
                          (if (seq returned)
                            returned

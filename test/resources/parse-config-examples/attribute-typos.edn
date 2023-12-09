@@ -11,7 +11,7 @@
                                                    :technology       :assay.technology/nanostring
                                                    :description      "gene expr via nanostring"
                                                    :measurement-sets [{:name         "baseline"
-                                                                       :measurements [{:unify/input-file "processed/nanostring.txt"
+                                                                       :measurements [{:unify/input-tsv-file "processed/nanostring.txt"
                                                                                        :gene             "variable"
                                                                                        :sample           "sample"
                                                                                        :nanostring-count "value"}]}]}
@@ -19,14 +19,14 @@
                                                    :technology       :assay.technology/TCR-seq
                                                    :desc             "TCR sequencing"
                                                    :measurement-sets [{:name         "baseline"
-                                                                       :measurements [{:unify/input-file "processed/tcr_clonality.txt"
+                                                                       :measurements [{:unify/input-tsv-file "processed/tcr_clonality.txt"
                                                                                        :sample           "sample"
                                                                                        :tcr-clonality    "Clonality"}]}]}
                                                   {:name             "WES"
                                                    :technology       :assay.technology/WES
                                                    :description      "whole exome sequencing"
                                                    :measurement-sets [{:name         "baseline"
-                                                                       :measurements [{:unify/input-file "processed/point_muts_indels_measurements.txt"
+                                                                       :measurements [{:unify/input-tsv-file "processed/point_muts_indels_measurements.txt"
                                                                                        :sample           "Sample"
                                                                                        :variant          "id"
                                                                                        :unify/variable   "variable"
@@ -41,7 +41,7 @@
 
 
                       :clinical-observation-sets [{:name                  "all-clinical-observations"
-                                                   :clinical-observations [{:unify/input-file               "processed/clinical_observations.txt"
+                                                   :clinical-observations [{:unify/input-tsv-file               "processed/clinical_observations.txt"
                                                                             :clinical-observation/subject   "Patient ID"
                                                                             :clinical-observation/timepoint "timepoint"
                                                                             :unify/variable                 "variable"
@@ -50,7 +50,7 @@
                                                                                                              "ctla-4_RECIST"    :clinical-observation/recist
                                                                                                              "Overall Survival" :clinical-observation/os}}]}]
 
-                      :samples                   {:unify/input-file "processed/samples.txt"
+                      :samples                   {:unify/input-tsv-file "processed/samples.txt"
                                                   :id               "sample"
                                                   :subject          "patient"
                                                   :timepoint        "time"
@@ -58,11 +58,11 @@
                                                   :unify/constants  {:type     :sample.type/tumor
                                                                      :specimen :sample.specimen/ffpe}}
 
-                      :subjects                  {:unify/input-file "processed/subjects.txt"
+                      :subjects                  {:unify/input-tsv-file "processed/subjects.txt"
                                                   :id               "Patient ID"
                                                   :sex              "Sex"
                                                   :dead             "Dead (Y/N)"
-                                                  :therapies        {:unify/input-file  "processed/therapies.txt"
+                                                  :therapies        {:unify/input-tsv-file  "processed/therapies.txt"
                                                                      :treatment-regimen "regimen"
                                                                      :order             "order"
                                                                      :unify/reverse     {:unify/rev-variable "Patient ID"
@@ -103,7 +103,7 @@
 
 
 
- :genomic-coordinate {:unify/input-file "processed/point_muts_indels_coord.txt"
+ :genomic-coordinate {:unify/input-tsv-file "processed/point_muts_indels_coord.txt"
                       :contig           "chrom"
                       :start            "start"
                       :end              "end"
@@ -111,7 +111,7 @@
                       :assembly         "assembly"
                       :id               "id"}
 
- :variant            {:unify/input-file "processed/point_muts_indels.txt"
+ :variant            {:unify/input-tsv-file "processed/point_muts_indels.txt"
                       :id               "id"
                       :coordinates      "coordinates"
                       :gene             "Hugo_Symbol"

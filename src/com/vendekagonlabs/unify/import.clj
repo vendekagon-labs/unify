@@ -55,7 +55,7 @@
                                                  continue-on-error)
         txn-data-pre-process (tx-data/make-transaction-data! target-dir
                                                              tx-batch-size)]
-    (log/info (str "Data files prepared: \n" (->pretty-string (map #(get-in % [:job :unify/input-file]) import-result))
+    (log/info (str "Data files prepared: \n" (->pretty-string (map #(get-in % [:job :unify/input-tsv-file]) import-result))
                    "TX data prepared: \n " (->pretty-string txn-data-pre-process)))
     (if-let [errors (seq (filter ::anomalies/category import-result))]
       {:errors errors}

@@ -17,7 +17,7 @@
 
 
 (def example-job-1
-  {:unify/input-file    "processed/variants.txt"
+  {:unify/input-tsv-file    "processed/variants.txt"
    :id                  "var.id"
    :genomic-coordinates "gc.id"
    :gene                "hugo"
@@ -25,7 +25,7 @@
    :alt-allele          "alt"})
 
 (def example-job-2
-  {:unify/input-file    ["processed/" "cnv_ref_*.tsv"]
+  {:unify/input-tsv-file    ["processed/" "cnv_ref_*.tsv"]
    :unify/na            ""
    :genomic-coordinates "gc.id"
    :id                  "gc.id"
@@ -33,7 +33,7 @@
                          :unify/many-variable  "Genes"}})
 
 (def example-job-3
-  {:unify/input-file "processed/coordinates.txt"
+  {:unify/input-tsv-file "processed/coordinates.txt"
    :unify/na         ""
    :genes            ["gene" "value"]
    :name             "signature"})

@@ -49,7 +49,7 @@
     (str import-root-dir "processed/" bendall-meas-fname)
     10))
 (defn bendall-meas-job []
-  (first (filter #(str/ends-with? (:unify/input-file %) bendall-meas-fname)
+  (first (filter #(str/ends-with? (:unify/input-tsv-file %) bendall-meas-fname)
                  (directives))))
 
 (def bendall-cellpop-fname "cell_populations_Bendall.txt")
@@ -59,7 +59,7 @@
     10))
 
 (defn bendall-cellpop-job []
-  (first (filter #(str/ends-with? (:unify/input-file %) bendall-cellpop-fname)
+  (first (filter #(str/ends-with? (:unify/input-tsv-file %) bendall-cellpop-fname)
                  (directives))))
 
 
