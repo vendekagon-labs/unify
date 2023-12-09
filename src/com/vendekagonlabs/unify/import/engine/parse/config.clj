@@ -28,10 +28,12 @@
             [com.vendekagonlabs.unify.db.schema :as schema]
             [clojure.string :as str]))
 
-(def unify-key-whitelist #{:unify/constants :unify/value :unify/variables :unify/reverse :unify/precomputed
+(def unify-key-whitelist #{:unify/constants :unify/value :unify/variables
+                           :unify/reverse :unify/precomputed
                            :unify/rev-variable :unify/input-tsv-file :unify/import :unify/variable
                            :unify/rev-attr :unify/many-delimiter :unify/many-variable
-                           :unify/na :unify/omit-if-na :unify/glob
+                           :unify/na :unify/omit-if-na
+                           :unify/glob :unify.glob/directory :unify.glob/pattern
                            :unify.matrix/format :unify.matrix/input-file
                            :unify.matrix.format/sparse :unify.matrix.format/dense
                            :unify.matrix/column-attribute :unify.matrix/indexed-by
@@ -500,7 +502,7 @@
                    (let [input-file-spec (:unify/input-tsv-file d-map)]
                      (if-not (map? input-file-spec)
                        [(assoc d-map :unify/input-tsv-file (maybe->absolute-path cfg-dir input-file-spec))]
-                       (let [{:keys [glob/directory glob/pattern]} input-file-spec
+                       (let [{:keys [unify.glob/directory unify.glob/pattern]} input-file-spec
                              abs-dir (maybe->absolute-path cfg-dir directory)
                              matched-files (util.io/glob abs-dir pattern)
                              returned (mapv #(assoc d-map :unify/input-tsv-file %)

@@ -42,6 +42,8 @@
    :schema     schema
    :mapping    (mapping-lookup)})
 
+(comment
+  (def cfg (parsed-config)))
 (deftest job-extraction-test
   (let [cfg (parsed-config)
         directives (parse.config/cfg-map->directives schema (mapping-lookup) import-root-dir cfg)

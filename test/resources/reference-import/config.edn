@@ -10,7 +10,7 @@
                                                :technology       :assay.technology/dPCR
                                                :description      "cfDNA assay perfomred by E. Carpenter at UPenn"
                                                :measurement-sets [{:name         "baseline"
-                                                                   :measurements [{:unify/input-tsv-file {:unify/glob "processed/cfdna_measurements.*"}
+                                                                   :measurements [{:unify/input-tsv-file #glob["processed/" "cfdna_measurements.*"]
                                                                                    :unify/na         "NA"
                                                                                    :unify/omit-if-na [*]
                                                                                    :sample          "Originating ID (specimen barcode ID)"
