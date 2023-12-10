@@ -13,11 +13,12 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import.tuple-test
   (:require [clojure.test :refer :all]
+            [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [datomic.api :as d]
             [com.vendekagonlabs.unify.bootstrap.data :as bootstrap.data]
             [com.vendekagonlabs.unify.util.io :as util.io]
-            [clojure.java.io :as io]
+            [com.vendekagonlabs.unify.test-util :as tu]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.import :as import]))
 
@@ -60,7 +61,7 @@
 
 (deftest tuple-import
   (setup)
-  (is (:results (import/run
+  (is (:results (tu/run-import
                   {:target-dir           tmp-dir
                    :datomic-uri          datomic-uri
                    :import-cfg-file      import-cfg-file

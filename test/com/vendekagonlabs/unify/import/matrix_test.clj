@@ -17,6 +17,7 @@
             [datomic.api :as d]
             [com.vendekagonlabs.unify.bootstrap.data :as bootstrap.data]
             [com.vendekagonlabs.unify.util.io :as util.io]
+            [com.vendekagonlabs.unify.test-util :as tu]
             [clojure.java.io :as io]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.import :as import]
@@ -106,7 +107,7 @@
 
 (deftest matrix-import
   (testing "matrix import runs to completion"
-    (is (import/run
+    (is (tu/run-import
           {:target-dir           tmp-dir
            :datomic-uri          datomic-uri
            :import-cfg-file      import-cfg-file

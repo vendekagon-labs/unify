@@ -144,12 +144,7 @@
     (mapcat (partial upsert-coord/report-upserts ensured-cfg) ref-files)))
 
 
-(defn run
-  "Runs a complete, end-to-end import of unify data."
-  [ctx]
-  (let [_emit-import-result (prepare-import ctx)
-        tx-result (transact-import ctx)]
-    tx-result))
+
 
 (comment
   (keep :kind/name (db.schema/get-metamodel-and-schema)))

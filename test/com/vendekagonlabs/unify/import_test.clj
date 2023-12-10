@@ -16,6 +16,7 @@
             [clojure.tools.logging :as log]
             [datomic.api :as d]
             [com.vendekagonlabs.unify.util.text :as text]
+            [com.vendekagonlabs.unify.test-util :as tu]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import :as import]
@@ -63,7 +64,7 @@
 (deftest ^:integration sanity-test
   (try
     (setup)
-    (let [import-result (import/run
+    (let [import-result (tu/run-import
                           {:target-dir           tmp-dir
                            :datomic-uri          datomic-uri
                            :import-cfg-file      (import-cfg-file)
