@@ -44,27 +44,29 @@
 
 (defn usage [options-summary]
   (->> [""
-        "Usage: unify [options] task import-cfg-file target-dir"
+        "Usage: unify task [parameters]"
         ""
         "Options:"
         options-summary
         ""
         "Task:"
         "  request-db        Creates a new Unify database. Specify the name of the database with --database"
+        "                    and the schema to install with --schema-directory"
         "  list-dbs          Lists information about all current databases."
-        "  delete-db         Deletes the database (empty or branch) specified by --database"
+        "  delete-db         Deletes the database specified by --database"
         "  prepare           Uses an import config file to generate all data needed to run an import."
-        "                    Requires --import-config and --working-directory args."
+        "                    Requires --import-config, --working-directory and --schema-directory args."
         "  diff              Generates all changes required to update an existing dataset to match the target."
         "                    Requires --working-directory and --database arguments."
-        "  transact          Transacts all data (as from prepare) for an import job into Datomic."
-        "                    Requires --working-directory and --database arguments."
-        "                    If --update is supplied the command will transact updated changes instead of prepared transactions. "
-        "  validate          Runs validation checks against the database."
-        "                    Requires --working-directory and --database arguments when working with branch databases."
+        "  transact          Transacts all data (as created by prepare) for an import job --working-directory"
+        "                    into database specified by --database."
+        "                    Optionally use --update to transact updated changes instead of prepared transactions."
+        "                    If an imports fails due to eg network latency or process termination, you can resume"
+        "                    with --resume"
+;;        "  validate          Runs validation checks against the database."
+;;        "                    Requires --working-directory and --database arguments when working with branch databases."
         "  crosscheck-reference   Checks all reference data files for potential upsert collisions."
         "                         Requires --database and --working-directory args."
-        "  schema-version    Prints the schema version supported by Unify"
         ""]
        (str/join \newline)))
 
@@ -95,10 +97,6 @@
 
 ;; Tasks ---------------------------------------------------------------
 ;;
-
-(defn schema-version
-  [{:keys [schema-directory]}]
-  (println (str "schema version:" (schema/version schema-directory))))
 
 (defn request-db
   [{:keys [database
@@ -250,8 +248,7 @@
    "validate" validate
    "crosscheck-reference" crosscheck-reference
    "list-dbs" list-dbs
-   "delete-db" delete-db
-   "schema-version" schema-version})
+   "delete-db" delete-db})
 
 (def allowed-tasks (set (keys tasks)))
 
