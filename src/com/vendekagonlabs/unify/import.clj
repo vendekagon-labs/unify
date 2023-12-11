@@ -84,11 +84,11 @@
                                                      (+ 2 (.. Runtime
                                                               getRuntime
                                                               availableProcessors))
-                                                     {:resume resume
-                                                      :skip-annotations skip-annotations
+                                                     {:resume               resume
+                                                      :skip-annotations     skip-annotations
                                                       :disable-remote-calls disable-remote-calls
-                                                      :update update
-                                                      :diff-suffix diff-suffix})
+                                                      :update               update
+                                                      :diff-suffix          diff-suffix})
         {:keys [ref-results data-results]} tx-result-map]
     (if-let [anomalies (seq (concat (filter ::anomalies/category ref-results)
                                     (filter ::anomalies/category data-results)))]
@@ -102,8 +102,6 @@
   "Performs the update operation:
    1. prepared data is transacted to branch with temp dataset uids
    2. Diff transactions are generated"
-  ;; TODO: since very few of these keys get used, is that the intention? or is
-  ;; something miswired? Do we even care for diff functionality?
   [{:keys [target-dir
            database] :as ctx}]
   (try
@@ -116,7 +114,6 @@
 
       ;; Write out the diff summary which includes the current HEAD
       ;; before transacting.
-      ;;
       (log/info "Writing-summary " diff-opts)
       (diff/write-summary! diff-opts)
 
@@ -128,9 +125,9 @@
       (diff/make-transaction-data! diff-opts))
 
     (catch Exception e
-        {:errors [{::anomalies/category ::anomalies/fault
-                   ::anomalies/message (.getMessage e)
-                   ::anomalies/ex-data (ex-data e)}]})))
+      {:errors [{::anomalies/category ::anomalies/fault
+                 ::anomalies/message  (.getMessage e)
+                 ::anomalies/ex-data  (ex-data e)}]})))
 
 
 (defn crosscheck-references
@@ -142,9 +139,3 @@
         ensured-cfg (db/ensure-db schema-directory datomic-uri)
         ref-files (conventions/ref-tx-data-filenames target-dir)]
     (mapcat (partial upsert-coord/report-upserts ensured-cfg) ref-files)))
-
-
-
-
-(comment
-  (keep :kind/name (db.schema/get-metamodel-and-schema)))

@@ -30,9 +30,9 @@
   (let [uri (str (db-base-uri) database)
         result (d/create-database uri)]
     (if result
-      {:db-name database
+      {:db-name  database
        :database database
-       :uri uri}
+       :uri      uri}
       {:error "Database already exists!"})))
 
 (defn delete-db
@@ -40,10 +40,10 @@
   (let [uri (str (db-base-uri) database)
         result (d/delete-database uri)]
     (if result
-      {:success true
-       :db-name database
+      {:success  true
+       :db-name  database
        :database database
-       :uri uri}
+       :uri      uri}
       {:error "Database not deleted!"})))
 
 (defn database-info

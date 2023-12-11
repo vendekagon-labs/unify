@@ -23,8 +23,6 @@
             [clojure.java.io :as io]
             [clojure.string :as str]))
 
-;; Non-master database peer/client API info -----------------------------
-;;
 
 (defn fetch-info [database]
   (let [info (backend/database-info database)]
@@ -35,17 +33,11 @@
                  msg
                  {:candelabra/access {:message msg}}))))))
 
-
-;; Peer Fns ----------------------------------------------------------------
-;;
-
-
 (defn get-connection [info]
   (d/connect (:uri info)))
 
 (defn latest-db [info]
   (d/db (get-connection info)))
-
 
 (defn exists? [datomic-uri]
   (try
@@ -58,7 +50,7 @@
         (if (and msg (.startsWith msg "Could not find"))
           false
           (throw (ex-info "Could not connect to Datomic."
-                   {:datomic/could-not-connect msg})))))))
+                          {:datomic/could-not-connect msg})))))))
 
 (defn transact-bootstrap-data
   "Transact bootstrap data."
@@ -72,8 +64,8 @@
   [conn {:keys [tx-data query name]}]
   (let [db (d/db conn)
         {:keys [db-after]} (d/with db tx-data)]
-      (not= (dq/q+retry query db)
-            (dq/q+retry query db-after))))
+    (not= (dq/q+retry query db)
+          (dq/q+retry query db-after))))
 
 (defn fulfilled?
   "Given a validation map, returns `true` if this database fulfills validation
@@ -93,9 +85,9 @@
                             (mapv (fn [schema-ent]
                                     (if (and (:db/valueType schema-ent)
                                              (not (:db/unique schema-ent)))
-                                       (assoc schema-ent :db/index true)
-                                       schema-ent))
-                                 tx-data)))]
+                                      (assoc schema-ent :db/index true)
+                                      schema-ent))
+                                  tx-data)))]
         (if (tx-effect? conn tx)
           (do (log/info ::schema (:name tx) " not in database, transacting.")
               (db.tx/sync+retry conn (:tx-data tx)))
@@ -120,7 +112,6 @@
   (let [_ (d/create-database datomic-uri)
         _ (do
             (log/info "Database created."))
-        ;; db isn't ready yet if it hasn't been created, this timeout seems sufficient
         conn (d/connect datomic-uri)
         _ (log/info "Connected to database")]
     (apply-schema schema-directory datomic-uri)
@@ -182,13 +173,14 @@
 
       (= version-outcome :compatible)
       (do (log/info "Compatible schema installed, applying necessary updates.")
-          (init datomic-uri :skip-bootstrap true
-                            :schema-directory schema-directory)
+          (init datomic-uri
+                :skip-bootstrap true
+                :schema-directory schema-directory)
           datomic-uri)
 
       (= version-outcome :incompatible)
       (throw (ex-info "Version of candel schema in database is not compatible."
-                      {:candel.schema/version {:db/version (version datomic-uri)
+                      {:candel.schema/version {:db/version    (version datomic-uri)
                                                :unify/version (schema/version schema-directory)}})))))
 
 
@@ -221,9 +213,9 @@
                           :import/name)
                       (throw (ex-info "No datasets transacted"
                                       {:error :no-imports-on-database})))]
-    {:timestamp (:db/txInstant txn-data)
-     :txn-id (:import/txn-id txn-data)
-     :import-name  import-name}))
+    {:timestamp   (:db/txInstant txn-data)
+     :txn-id      (:import/txn-id txn-data)
+     :import-name import-name}))
 
 (defn ordered-imports
   "Returns all import entity data. The import entity is the first entity to be
@@ -239,9 +231,9 @@
        (map
          (fn [[name tx-id]]
            (let [tx (d/touch (d/entity db tx-id))]
-             {:timestamp (:db/txInstant tx)
+             {:timestamp   (:db/txInstant tx)
               :import-name name
-              :ent-id tx-id})))
+              :ent-id      tx-id})))
        (sort-by
          :timestamp
          #(.before %2 %1))))

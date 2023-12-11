@@ -64,13 +64,3 @@
 
 (defn upload-matrix-files! [working-dir]
   (db.matrix/upload-matrix-files! working-dir))
-
-(comment
-
-  (apply str  \tab (interpose \tab ["blah" "blah"]))
-  (copy-matrix-file! "test/resources/matrix/short-processed-counts.tsv"
-                     "/Users/bkamphaus/scratch/crap-matrix.tsv"
-                     {"barcode" :measurement-matrix/cell-populations
-                      "hugo" :measurement-matrix/gene-products
-                      "count" :measurement/read-count}
-                     nil))

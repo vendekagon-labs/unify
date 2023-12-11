@@ -49,23 +49,23 @@
   (let [read-schema-file (partial read-import-schema schema-dir)
         [metamodel-entities
          metamodel-refs] (read-schema-file "metamodel.edn")]
-    [{:name :unify.schema/metadata
-      :query new-ident-q
+    [{:name    :unify.schema/metadata
+      :query   new-ident-q
       :tx-data (unify-schema)}
-     {:name :base-schema
-      :query new-ident-q
+     {:name    :base-schema
+      :query   new-ident-q
       :tx-data (read-schema-file "schema.edn")}
-     {:name :enums
-      :query new-ident-q
+     {:name    :enums
+      :query   new-ident-q
       :tx-data (read-schema-file "enums.edn")}
-     {:name :metamodel-entities
-      :query '[:find (count ?k)
-               :where [?k :unify.kind/name]]
+     {:name    :metamodel-entities
+      :query   '[:find (count ?k)
+                 :where [?k :unify.kind/name]]
       :tx-data metamodel-entities}
-     {:name :metamodel-refs
-      :query '[:find (count ?p)
-               :with ?c
-               :where [?p :unify.ref/to ?c]]
+     {:name    :metamodel-refs
+      :query   '[:find (count ?p)
+                 :with ?c
+                 :where [?p :unify.ref/to ?c]]
       :tx-data metamodel-refs}]))
 
 
@@ -92,7 +92,7 @@
                                          {:db/valueType [:db/ident]}
                                          {:db/cardinality [:db/ident]}
                                          {:db/unique [:db/ident]}])
-                                         ;; also metamodel ref from and to on attr
+                         ;; also metamodel ref from and to on attr
                          :where [_ :db.install/attribute ?e]] db)))
 
 (defn get-non-attr-idents

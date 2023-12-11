@@ -18,7 +18,6 @@
   i.e. a dataset whose name has been systematically altered when being
        transacted that contais the changes this namespace collects."
   (:require [clojure.data :as data]
-            [clojure.pprint :refer [pprint]]
             [datomic.api :as d]
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [com.vendekagonlabs.unify.db :as db]
@@ -73,7 +72,7 @@
 
       :else
       (throw (ex-info "Unresolved path reference in diff!"
-                      {:uid uid
+                      {:uid        uid
                        :entity-map ent-map})))))
 
 (defn inflate-paths
@@ -104,7 +103,7 @@
     ;; note: this returns `nil` unlike other uses of nonexistent db id
     ;; for d/entity because p is a ref id lookup
     (if (nil? ent)
-        nil
+      nil
       (-> (into {} ent)
           (dissoc :db/id)
           (dissoc attr-key)
@@ -162,7 +161,7 @@
     (let [resolved (->> changes
                         (resolve-references dataset-name))
           base {:state state
-                :uid (uid-ref dataset-name attr-key ref)}
+                :uid   (uid-ref dataset-name attr-key ref)}
           filtered (filter #(not (set? (second %))) resolved)
           result (reduce
                    (fn [coll [k v]]
@@ -205,11 +204,11 @@
   (let [o (attrs dataset-name attr-key ref-o)
         ;;_ (prn {:o o})
         s (attrs diff-dataset-name attr-key ref-s)]
-        ;;_ (prn {:s s})]
+    ;;_ (prn {:s s})]
 
     (if (nil? o)
       ;; New Entity returns the entire unpacked :entity
-      {:state :new
+      {:state  :new
        :entity (->> s
                     (add-uid dataset-name attr-key ref-o)
                     (resolve-references dataset-name))}
@@ -272,7 +271,7 @@
           (if (nil? e)
             (conj
               coll
-              {:state :removed-entity
+              {:state  :removed-entity
                :entity [attr-key [dataset-name path]]})
             coll)))
       []

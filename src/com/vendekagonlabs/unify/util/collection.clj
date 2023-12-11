@@ -80,7 +80,6 @@
 
 (defn csv-data->maps [csv-data]
   "Converts CSV data into a collection of maps with keys corresponding to the column headers"
-  (map zipmap
-       (->> (first csv-data) ;; First row is the header
-            repeat)
-       (rest csv-data)))
+  (let [hdr (first csv-data)
+        data (rest csv-data)]
+    (map zipmap (repeat hdr) data)))

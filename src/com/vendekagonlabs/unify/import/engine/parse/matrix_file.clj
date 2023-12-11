@@ -25,7 +25,7 @@
       one
       (throw (ex-info (str "More than one value when only one expected!\n"
                            message)
-                      {::expected-one one
+                      {::expected-one  one
                        ::more-than-one more})))))
 
 
@@ -101,17 +101,17 @@
                          {:unify.matrix/sparse-value-column (only non-ind-cols
                                                                   (str "Too many measurement columns for sparse matrix: "
                                                                        non-ind-cols))}))
-               (recur (rest rows)
-                      (merge-with conj index-sets
-                                  (select-keys row-as-map target-inds))
-                      (let [matrix-field-only (vals (apply dissoc row-as-map target-inds))
-                            invalid-entries (->> matrix-field-only
-                                                 (map coerce-fn)
-                                                 (remove #{::na})
-                                                 (remove valid?))]
-                        (if (seq invalid-entries)
-                          ;; to keep this from blowing up, we limit it to first 1000 invalid entries.
-                          ;; -- punting on early termination here, but we could also wire that in with
-                          ;; -- a count test.
-                          (take 1000 (concat invalid-entries validation-errors))
-                          validation-errors)))))))))))
+                (recur (rest rows)
+                       (merge-with conj index-sets
+                                   (select-keys row-as-map target-inds))
+                       (let [matrix-field-only (vals (apply dissoc row-as-map target-inds))
+                             invalid-entries (->> matrix-field-only
+                                                  (map coerce-fn)
+                                                  (remove #{::na})
+                                                  (remove valid?))]
+                         (if (seq invalid-entries)
+                           ;; to keep this from blowing up, we limit it to first 1000 invalid entries.
+                           ;; -- punting on early termination here, but we could also wire that in with
+                           ;; -- a count test.
+                           (take 1000 (concat invalid-entries validation-errors))
+                           validation-errors)))))))))))

@@ -176,11 +176,11 @@
         invalid-unify-keys (seq (filter (complement unify-key-whitelist) unify-keys))
         invalid-map (when-not (map? cfg-map) (type cfg-map))
         error-map (cond-> {}
-                    invalid-map (assoc :config-file/containing-form-not-map invalid-map)
-                    invalid-unify-keys (assoc :config-file/invalid-unify-keys (vec invalid-unify-keys))
-                    invalid-var-attrs (assoc :config-file/invalid-unify-variables-keys (vec invalid-var-attrs))
-                    invalid-top-keys (assoc :config-file/invalid-top-keys (vec invalid-top-keys))
-                    missing-top-keys (assoc :config-file/missing-top-keys (vec missing-top-keys)))]
+                          invalid-map (assoc :config-file/containing-form-not-map invalid-map)
+                          invalid-unify-keys (assoc :config-file/invalid-unify-keys (vec invalid-unify-keys))
+                          invalid-var-attrs (assoc :config-file/invalid-unify-variables-keys (vec invalid-var-attrs))
+                          invalid-top-keys (assoc :config-file/invalid-top-keys (vec invalid-top-keys))
+                          missing-top-keys (assoc :config-file/missing-top-keys (vec missing-top-keys)))]
     (if-not (seq error-map)
       cfg-map
       (throw (ex-info (str "Config was invalid:\n" (text/->pretty-string error-map))
@@ -232,7 +232,7 @@
             (throw
               (ex-info (str "Wrong attribute namespace: " wrong-attr " for entity: " kind)
                        {:config-file/entity-attribute-mismatch {:entity kind
-                                                                :attrs wrong-attr}}))
+                                                                :attrs  wrong-attr}}))
             node))))
     ns-cfg-map))
 
@@ -251,7 +251,7 @@
     (throw (ex-info (str "The following keywords in the config map: "
                          (vec wrong-keywords)
                          " are not in the CANDEL schema.")
-             {:config-file/bad-keywords (vec wrong-keywords)})))
+                    {:config-file/bad-keywords (vec wrong-keywords)})))
   ns-cfg-map)
 
 
@@ -295,10 +295,10 @@
                              (clojure.string/join metamodel/synthetic-sep))]
     (if (clojure.string/blank? synthetic-value)
       (throw (ex-info (str "Could not synthesize an attribute for " node-kind)
-                      {:engine/unsynthesized-attr {:synthetic-attribute synth-attr
+                      {:engine/unsynthesized-attr {:synthetic-attribute  synth-attr
                                                    :synthetic-components components
-                                                   :node node
-                                                   :from ::synthetic-uid}}))
+                                                   :node                 node
+                                                   :from                 ::synthetic-uid}}))
       (parse.data/uid-attr-val schema parsed-cfg (assoc node synth-attr synthetic-value) {}))))
 
 (defn- uid-config-node?
@@ -381,7 +381,7 @@
       ;; for forward ref case, we resolve forward ref with constant literal as lookup ref
       (let [ctx (:unify/ns-node-ctx node)
             fwd-ref-attr (last (filter keyword? ctx))
-            par-kind (keyword (namespace fwd-ref-attr)) ;; todo - this should be done with metamodel-utils ?
+            par-kind (keyword (namespace fwd-ref-attr))     ;; todo - this should be done with metamodel-utils ?
 
 
             par-uid-attr (or (metamodel/need-uid? schema par-kind)
@@ -476,10 +476,10 @@
     (apply concat (for [[key job-maps] ref-jobs-by-ref-kind]
                     (map (fn [job-map]
                            (-> job-map
-                             (assoc :unify/out-file-prefix (get prefix-map key))
-                             ;; this is a band-aid on the misguided use of temp keys here to ensure that
-                             ;; they don't leak out of ref job resolution.
-                             (dissoc :tmp/ref-deps :tmp/ref-attr)))
+                               (assoc :unify/out-file-prefix (get prefix-map key))
+                               ;; this is a band-aid on the misguided use of temp keys here to ensure that
+                               ;; they don't leak out of ref job resolution.
+                               (dissoc :tmp/ref-deps :tmp/ref-attr)))
                          job-maps)))))
 
 
@@ -614,7 +614,7 @@
       directives-maps
       (throw (ex-info (str "One of :" molten-kws
                            " set, but not all set (directive must specify all or none)")
-               {:config/malformed-directive-maps malformed-molten})))))
+                      {:config/malformed-directive-maps malformed-molten})))))
 
 (defn cfg-map->directives
   "Given a schema, a mapping lookup, the import-root-dir and a parsed config map,
@@ -650,12 +650,12 @@
                            ":name, and :user keys."
                            "Note: if older config, you may need to change :import-name to :name")
                       {:config-file/invalid-unify-import-keys
-                        {:keys-present (-> cfg-map :unify/import keys)
-                         :keys-required #{:user :name :mappings}}})))
-    {:import/user user
+                       {:keys-present  (-> cfg-map :unify/import keys)
+                        :keys-required #{:user :name :mappings}}})))
+    {:import/user           user
      :import/schema-version schema-version
-     :import/unify-version unify-version
-     :import/name import-name}))
+     :import/unify-version  unify-version
+     :import/name           import-name}))
 
 (defn cfg-map->matrix-directives
   "Returns all matrix parsing directives specified in the import config, w/annotations in the map

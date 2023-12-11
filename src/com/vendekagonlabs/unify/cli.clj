@@ -64,23 +64,24 @@
         "  delete-db         Deletes the database specified by --database"
         "  prepare           Uses an import config file to generate all data needed to run an import."
         "                    Requires --import-config, --working-directory and --schema-directory args."
-;;        "  diff              Generates all changes required to update an existing dataset to match the target."
-;;        "                    Requires --working-directory and --database arguments."
+        ;;        "  diff              Generates all changes required to update an existing dataset to match the target."
+        ;;"                    Requires --working-directory and --database arguments."
         "  transact          Transacts all data (as created by prepare) for an import job --working-directory"
         "                    into database specified by --database."
         "                    Optionally use --update to transact updated changes instead of prepared transactions."
         "                    If an imports fails due to eg network latency or process termination, you can resume"
-        "                    with --resume" ""]
-;;        "  validate          Runs validation checks against the database."
-;;        "                    Requires --working-directory and --database arguments when working with branch databases."
-;;         "  crosscheck-reference   Checks all reference data files for potential upsert collisions."
-;;        "                         Requires --database and --working-directory args."
+        "                    with --resume"
+        ;;"  validate          Runs validation checks against the database."
+        ;;"                    Requires --working-directory and --database arguments when working with branch databases."
+        ;;"  crosscheck-reference   Checks all reference data files for potential upsert collisions."
+        ;;"                         Requires --database and --working-directory args."
+        ""]
        (str/join \newline)))
 
 (def cli-options
   [[nil "--import-config     IMPORT-CONFIG" "Import config edn file"]
    [nil "--working-directory WORKING-DIRECTORY"
-        "Directory where prepared data goes, transact uses data prepare puts here."]
+    "Directory where prepared data goes, transact uses the data prepare puts here."]
    [nil "--schema-directory  SCHEMA-DIRECTORY"
     "Directory containing a Unify schema (base Datomic schema + metamodel annotations)"]
    [nil "--tx-batch-size     TX-BATCH-SIZE" "Datomic transaction batch size"
@@ -182,7 +183,7 @@
   (let [returned (import/transact-import ctx)]
     (if-let [errors (:errors returned)]
       (do (println "Transactions did not all complete successfully, see logs. Anomalies: " errors)
-       returned)
+          returned)
       (println "Completed " (get-in returned [:results :completed])
                " transactions, entire import job at " target-dir))))
 
@@ -208,7 +209,7 @@
 
 #_(defn validate
     [{:keys [working-directory database] :as ctx}]
-    (import/validate {:database database
+    (import/validate {:database          database
                       :working-directory working-directory}))
 
 
@@ -243,15 +244,14 @@
 
 
 (def tasks
-  {
-   "request-db" request-db
-   "prepare" prepare
-;;   "diff" diff
-   "transact" transact
-;;   "validate" validate
-;;   "crosscheck-reference" crosscheck-reference
-   "list-dbs" list-dbs
-   "delete-db" delete-db})
+  {"request-db" request-db
+   "prepare"    prepare
+   ;;   "diff" diff
+   "transact"   transact
+   ;;   "validate" validate
+   ;;   "crosscheck-reference" crosscheck-reference
+   "list-dbs"   list-dbs
+   "delete-db"  delete-db})
 
 (def allowed-tasks (set (keys tasks)))
 
@@ -312,12 +312,12 @@
                 resume
                 update]} options
         task (first arguments)]
-    (cond-> {:task task
+    (cond-> {:task       task
              :target-dir working-directory}
-      database (assoc :datomic-uri (database-name->datomic-uri task database))
-      import-config (assoc :import-cfg-file import-config)
-      working-directory (assoc :target-dir working-directory)
-      options (assoc :options options))))
+            database (assoc :datomic-uri (database-name->datomic-uri task database))
+            import-config (assoc :import-cfg-file import-config)
+            working-directory (assoc :target-dir working-directory)
+            options (assoc :options options))))
 
 
 (defn- elapsed [start end]

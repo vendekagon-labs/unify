@@ -51,12 +51,12 @@
        (into {})))
 
 (defn all [schema]
-  {:index/idents (by-ident schema)
-   :index/kinds (by-kind-name schema)
+  {:index/idents     (by-ident schema)
+   :index/kinds      (by-kind-name schema)
    :index/kind-attrs (by-kind-attr schema)
-   :index/uids (by-uid schema)
-   :index/refs (refs-by-ident schema)
-   :index/card-many (card-many-by-ident schema)})
+   :index/uids       (by-uid schema)
+   :index/refs       (refs-by-ident schema)
+   :index/card-many  (card-many-by-ident schema)})
 
 (comment
   (require '[com.vendekagonlabs.unify.db.schema :as db.schema])

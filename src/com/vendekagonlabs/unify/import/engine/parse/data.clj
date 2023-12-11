@@ -141,7 +141,7 @@
   [schema parsed-cfg node replace-map]
   (let [node-ctx (:unify/ns-node-ctx node)
         kinds (ctx-path->kinds schema node-ctx)
-        ;; Get's the context id (which is used as the proxy 'value' for the end of the UID)
+        ;; Gets the context id (which is used as the proxy 'value' for the end of the UID)
         ;; for every value in the path
         ctx-ids (ctx-kinds->context-ids schema kinds)
         ;; Maps each node value to the attribute key
@@ -154,9 +154,8 @@
 
             ;; Grabs the last attribute name out of the path
             ;; then looks up the value from the lookup table that
-            ;; maps context-id values to it's keyword at this level of
+            ;; maps context-id values to its keyword at this level of
             ;; the path stack.
-            ;;
             ctx-attr-name (->> curr-node-ctx-stack
                                (filter keyword?)
                                last
@@ -287,7 +286,6 @@
       [(metamodel/kind-context-id schema target-kind) resolved-ref-val]
       ;; Unbundles the constructed uid, repackage to conform to:
       ;; ["dataset-name" "path specifier"]
-      ;;
       (let [dataset-name (get-in parsed-cfg [:dataset :dataset/name])]
         {uid-attribute [dataset-name resolved-ref-val]}))))
 
@@ -344,8 +342,6 @@
                            {:data-file/unmapped-enum {:attribute attribute-name
                                                       :value     raw-value}}))
            parsed-value))))))
-
-
 
 
 (defn- reverse-ref-uid-map
@@ -551,7 +547,7 @@
       (when-not (and column-name attribute)
         (throw (ex-info (str "Specified column name or attribute mismatch between config and file: "
                              "column " column-name " to attribute name: " attribute)
-                        {:data-file-or-config/unify-variable-name {:column-name    column-name
+                        {:data-file-or-config/unify-variable-name {:column-name     column-name
                                                                    :unify/variables (keys (:unify/variables job))}})))
       ;; drop value if that column is not present in record, as this means it was
       ;; filtered out by NA logic. Also no truthy check, as `false` could be potentially valid.
@@ -674,7 +670,6 @@
               ;; Reference-data is decorated with the :unify.import/most-recent
               ;; attribute. This allows validation to identify those entities
               ;; that are a part of an import and later use.
-              ;;
               import-metadata (if (reference-data-entity? schema base-entity)
                                 {:unify.import/most-recent [:import/name import-name]}
                                 {})]

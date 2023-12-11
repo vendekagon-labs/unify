@@ -183,9 +183,9 @@
   [import-name target-dir]
   (let [import-ent (get (ffirst (conventions/job-entity target-dir))
                         :import/import)
-        import-tx [{:db/id "datomic.tx"
-                     :import/import (assoc import-ent :db/id "temp-import-ent"
-                                                      :import/name import-name)
+        import-tx [{:db/id         "datomic.tx"
+                    :import/import (assoc import-ent :db/id "temp-import-ent"
+                                                     :import/name import-name)
                     :import/txn-id (uuid/random)}]
         full-path (conventions/in-diff-tx-dir target-dir "import-job.edn")]
     (log/info "Writing diff import job to: " full-path)
@@ -204,11 +204,11 @@
         db-info (db/fetch-info database)
         db (db/latest-db db-info)
         head (db/head db)
-        summary {:timestamp (java.util.Date.)
-                 :database database
-                 :import-name import-name
+        summary {:timestamp         (java.util.Date.)
+                 :database          database
+                 :import-name       import-name
                  :diff-dataset-name diff-dataset-name
-                 :head head}]
+                 :head              head}]
     (log/info "Writing diff summary to: " full-path)
     (pprint summary (io/writer full-path))))
 
@@ -224,7 +224,7 @@
         import-name (str (conventions/import-name target-dir) "-diff-" (timestamps/now))
         dataset-name (conventions/dataset-name target-dir)
         diff-dataset-name (str dataset-name "-" diff-suffix)
-        diff-opts {:dataset-name dataset-name
+        diff-opts {:dataset-name      dataset-name
                    :diff-dataset-name diff-dataset-name}
         db-info (db/fetch-info database)]
 

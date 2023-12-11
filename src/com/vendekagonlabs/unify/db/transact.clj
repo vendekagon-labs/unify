@@ -39,8 +39,8 @@
                            (some? (::anom/category data)))
                     data
                     {::anom/category ::anom/fault
-                     ::anom/message (.getMessage e)
-                     ::anom/ex-data (ex-data e)}))))]
+                     ::anom/message  (.getMessage e)
+                     ::anom/ex-data  (ex-data e)}))))]
     res))
 
 ;; retry functions all here for convenience
@@ -96,12 +96,12 @@
                                        :in $ ?txn-id
                                        :where
                                        [?tx :import/txn-id ?txn-id]]
-                        db tx-uid)]
+                                     db tx-uid)]
       ;; this allows e.g. anomaly check on tx result map to work
       ;; TODO: but, should it maybe try to figure out info on transaction
       ;; and report that db state, as though it were tx result?
       (when-let [tx-eid (ffirst tx-q-res)]
-        {:tx-ent-id tx-eid
+        {:tx-ent-id     tx-eid
          :import/txn-id tx-uid}))))
 
 
@@ -136,21 +136,21 @@
                    ;;linear-retry-fn
                    scaled-retry-fn)]
 
-      (if-not (::anom/category res)
-        res
-        ;; if we got an error, reformat error data to squash line number annotations into one range
-        (let [file (->> tx-data
-                        (map :unify.annotation/filename)
-                        (remove nil?)
-                        first)
-              line-numbers (->> tx-data
-                                (map :unify.annotation/line-number)
-                                (remove nil?))]
-         (merge res
-                (when (and file (seq line-numbers))
-                  {:unify.annotation/filename file
-                   :unify.annotation/start-line (apply min line-numbers)
-                   :unify.annotation/end-line (apply max line-numbers)}))))))
+    (if-not (::anom/category res)
+      res
+      ;; if we got an error, reformat error data to squash line number annotations into one range
+      (let [file (->> tx-data
+                      (map :unify.annotation/filename)
+                      (remove nil?)
+                      first)
+            line-numbers (->> tx-data
+                              (map :unify.annotation/line-number)
+                              (remove nil?))]
+        (merge res
+               (when (and file (seq line-numbers))
+                 {:unify.annotation/filename   file
+                  :unify.annotation/start-line (apply min line-numbers)
+                  :unify.annotation/end-line   (apply max line-numbers)}))))))
 
 (defn pipeline
   "Transacts data from from-ch. Returns a map with:
@@ -163,8 +163,8 @@
         done-ch (a/chan)
         transact-data (fn [data]
                         (let [result (async-transact-w-retry conn data opts)]
-;;                          (println "transct result: ")
-;;                          (clojure.pprint/pprint result)
+                          ;;                          (println "transct result: ")
+                          ;;                          (clojure.pprint/pprint result)
                           (if (::anom/category result)
                             (do
                               (log/error "Anomaly encountered running transactions -- stopping."
@@ -177,11 +177,11 @@
     ; go block prints a '.' after every 10 transactions, puts completed
     ; report on done channel when no value left to be taken.
     (a/go-loop [total 0]
-               (when (zero? (mod total 10))
-                 (print ".") (flush))
-               (if-let [c (a/<! to-ch)]
-                 (recur (inc total))
-                 (a/>! done-ch {:completed total})))
+      (when (zero? (mod total 10))
+        (print ".") (flush))
+      (if-let [c (a/<! to-ch)]
+        (recur (inc total))
+        (a/>! done-ch {:completed total})))
 
     ; pipeline that uses transducer form of map to transact data taken from
     ; from-ch and puts results on to-ch
@@ -194,7 +194,7 @@
     ; returns done channel and a function that you can use
     ; for early termination.
     {:result done-ch
-     :stop (fn [] (a/close! to-ch))}))
+     :stop   (fn [] (a/close! to-ch))}))
 
 
 (defn diff-renames
@@ -275,18 +275,18 @@
                           ;; coll logic (since partitions are put on channel, tx-map
                           ;; affecting transducers but be sub-collection fns)
                           txn-uuid-set (ic/successful-uuid-set db import-name {:invalidate false})
-                          base-xform   (remove (fn [tx-batch]
-                                                 (when-let [batch-txn-id (-> tx-batch first :import/txn-id)]
-                                                   (when (txn-uuid-set batch-txn-id)
-                                                     (log/debug "Skipping transaction: " batch-txn-id)
-                                                     true))))
+                          base-xform (remove (fn [tx-batch]
+                                               (when-let [batch-txn-id (-> tx-batch first :import/txn-id)]
+                                                 (when (txn-uuid-set batch-txn-id)
+                                                   (log/debug "Skipping transaction: " batch-txn-id)
+                                                   true))))
                           xform (if (and dataset-name diff-suffix)
                                   (comp base-xform (map (partial diff-renames opts)))
                                   base-xform)]
                       xform))
          ;; don't just pass `opts` through here to make it clear import-name is not intended for pipeline
          result-map (pipeline conn conc input-chan {:skip-annotations skip-annotations
-                                                    :transducer tx-xform})]
+                                                    :transducer       tx-xform})]
      (doseq [path f-list]
        (log/info "Transacting tx-data file into Datomic: " (str path))
        (log/debug "Starting transaction pipelining of file: " (str path))
@@ -332,43 +332,3 @@
              (throw (ex-info "Encountered unexpected transaction result" tx-result)))))))
   ([conn tx]
    (sync+retry conn tx 2000 10)))
-
-
-(comment
-  :single-file-pipeline-test
-  (in-ns 'com.vendekagonlabs.unify.db.transact)
-  (def path "/Users/bkamphaus/scratch/template-diff-clean/tx-data/import-job.edn")
-  (def path "/Users/bkamphaus/scratch/template-diff-clean/tx-data/unify-ref-0001-gc_ref_cnv_1.tsv-6b4a98ae-6fe9-5b7e-b5ee-fb197dabe7cd.edn")
-  (def path "/Users/bkamphaus/scratch/template-diff-clean/tx-data/unify-ref-0001-gc_ref_cnv_3.tsv-34ea5f0e-f617-5cfb-b282-05919fb436a1.edn")
-  (require '[clojure.java.io :as io])
-
-  (def part-renames
-    (partial diff-renames
-             {:dataset-name "template-diff-many"
-              :import-name "template-diff-many-0d05dbe2"
-              :diff-suffix "blah"}))
-
-  (clojure.edn/read (PushbackReader. (io/reader (io/file path)
-                                                :encoding "UTF-8")))
-  (slurp path)
-
-  (with-open [in (PushbackReader. (io/reader (io/file path)))]
-    (let [input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
-                         (take-while #(not= % ::eof)))]
-      (doseq [tx input-seq]
-        (pp/pprint (part-renames tx))))))
-
-
-(comment
-  (def import-ref
-    '({:db/id "datomic.tx",
-       :import/import
-              {:import/user "your-user-name",
-               :import/schema-version "0.5.0",
-               :import/unify-version "0.4.83",
-               :import/name "template-diff-many-0d05dbe2",
-               :db/id "temp-import-ent"},
-       :import/txn-id "fb7a546d-53a6-4749-8b83-9d9b9116ac38"}))
-
-  (first import-ref)
-  (update-in (first import-ref) [:import/import 0] #(str % "-" "blah")))

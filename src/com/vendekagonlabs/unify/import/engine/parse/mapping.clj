@@ -12,8 +12,7 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import.engine.parse.mapping
-  (:require [com.vendekagonlabs.unify.util.io :as util.io]
-            [com.vendekagonlabs.unify.db.metamodel :as metamodel]
+  (:require [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [com.vendekagonlabs.unify.db.schema :as schema]))
 
 (defn reverse-unroll
@@ -46,7 +45,7 @@
                     (vec))]
     (when (seq errors)
       (throw (ex-info (str "Enums: " errors " in mapping file not in the CANDEL schema.")
-               {:mapping-file/enums errors})))))
+                      {:mapping-file/enums errors})))))
 
 (defn mappings-edn->lookup
   "Given EDN as read from the mappings file, returns a lookup map for which a value can
@@ -56,14 +55,3 @@
   (->> (for [[attr enum-name] (:unify/variables mappings-edn)]
          [attr (reverse-unroll (get (:unify/mappings mappings-edn) enum-name))])
        (into {})))
-
-(comment
-  (require '[com.vendekagonlabs.unify.util.io :as util.io])
-
-  (def mfile
-    "/Users/bkamphaus/azure-datasets/abida2019/mappings.edn")
-
-  (def ex-mapping
-    (util.io/read-edn-file mfile))
-  (-> ex-mapping mfile)
-  (mappings-edn->lookup ex-mapping))

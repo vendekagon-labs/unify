@@ -13,7 +13,6 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import.tx-data
   (:require [clojure.spec.alpha :as s]
-            [clojure.pprint :refer [pprint]]
             [clojure.edn :as edn]
             [clojure.walk :as w]
             [datomic.api :as d]
@@ -91,7 +90,7 @@
   "Return the :import/txn-id and :import/import transaction metadata for the given
   UUID and import-name"
   [import-name]
-  {:db/id "datomic.tx"
+  {:db/id         "datomic.tx"
    :import/txn-id (str (UUID/randomUUID))
    :import/import [:import/name import-name]})
 
@@ -112,9 +111,9 @@
       (doseq [data (->> input-seq
                         (partition-all batch)
                         (map (fn [tx-batch]
-                              (conj (hash-uids tx-batch all-uids)
-                                    (create-txn-metadata
-                                      import-job-name)))))]
+                               (conj (hash-uids tx-batch all-uids)
+                                     (create-txn-metadata
+                                       import-job-name)))))]
         (binding [*out* out]
           (prn data)))))
   ;; print one dot per file.
@@ -135,18 +134,18 @@
   'batch' is the size (# of entities) batches to create"
   [import-job-name ent-file-path batch]
   (log/info "Generating transaction data from entity data.")
-  (let [workers    40
+  (let [workers 40
         all-fnames (conventions/all-entity-filenames ent-file-path)
         tx-data-gen (fn [abs-filepath]
-                     (process-one-file!
-                       import-job-name
-                       abs-filepath
-                       (conventions/in-tx-data-dir ent-file-path (text/filename abs-filepath))
-                       batch))
+                      (process-one-file!
+                        import-job-name
+                        abs-filepath
+                        (conventions/in-tx-data-dir ent-file-path (text/filename abs-filepath))
+                        batch))
         input-ch (a/to-chan!! all-fnames)
         result-ch (a/chan workers)]
-     (a/pipeline-blocking workers result-ch (map tx-data-gen) input-ch)
-     (a/<!! (a/into [] result-ch))))
+    (a/pipeline-blocking workers result-ch (map tx-data-gen) input-ch)
+    (a/<!! (a/into [] result-ch))))
 
 
 (defn process-import-cfg-file!
@@ -160,7 +159,7 @@
         cfg-file-data (edn/read-string (str "[" (slurp in-file-path) "]"))
         import-ent (first cfg-file-data)
         import-job-name (:import/name import-ent)
-        processed-import-ent {:db/id "datomic.tx"
+        processed-import-ent {:db/id         "datomic.tx"
                               :import/import (assoc import-ent :db/id "temp-import-ent")
                               :import/txn-id (str (UUID/randomUUID))}
         all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
@@ -185,8 +184,8 @@
     ;; end .... tx-data progress reporting with newline
     (println)
     (log/info (str "Transaction data generated from entity data in: "
-                   (/  (- (System/currentTimeMillis) start)
-                       1000.0) " seconds."))
+                   (/ (- (System/currentTimeMillis) start)
+                      1000.0) " seconds."))
     {:import-job-name import-job-name :result process-result}))
 
 
@@ -299,11 +298,11 @@
 
     (let [read-opts (if (some? diff-suffix)
                       (let [dataset-name (conventions/dataset-name target-dir)]
-                        {:import-name import-job-name
-                         :dataset-name dataset-name
-                         :diff-suffix diff-suffix
+                        {:import-name      import-job-name
+                         :dataset-name     dataset-name
+                         :diff-suffix      diff-suffix
                          :skip-annotations skip-annotations})
-                      {:import-name import-job-name
+                      {:import-name      import-job-name
                        :skip-annotations skip-annotations})
 
           matrix-upload (if-not disable-remote-calls
@@ -334,12 +333,12 @@
                           (run-ordered-file-imports! conn all-ref-fnames conc read-opts)))
 
           data-results (if (and ref-results
-                               (not (seq (filter ::anom/category ref-results))))
+                                (not (seq (filter ::anom/category ref-results))))
                          (do
                            (log/info "Transacting normal data.")
                            (run-ordered-file-imports! conn all-dataset-fnames conc read-opts))
                          (log/error "Skipping normal data because all reference data did not transact."))]
       {:import-literal-result import-literal-results
-       :ref-results ref-results
-       :matrix-results [matrix-upload]
-       :data-results data-results})))
+       :ref-results           ref-results
+       :matrix-results        [matrix-upload]
+       :data-results          data-results})))
