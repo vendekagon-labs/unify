@@ -4,22 +4,19 @@ repl:
 	clj -X:repl-server :port 5555
 
 version-info: clean
-	echo "{:pret/version \"$(VERSION)\"}" > resources/info.edn
-
-cache-schema:
-	clj -M -m com.vendekagonlabs.unify.db.schema.cache
+	echo "{:unify/version \"$(VERSION)\"}" > resources/info.edn
 
 uberjar: version-info cache-schema
-	clj -Mdepstar target/pret.jar
+	clj -Mdepstar target/unify.jar
 
 package-prod: uberjar
-	mkdir target/pret-$(VERSION)
-	mkdir target/pret-$(VERSION)/env
-	cp target/pret.jar target/pret-$(VERSION)/.
-	cp pret target/pret-$(VERSION)/.
-	cp pretw.bat target/pret-$(VERSION)/.
+	mkdir target/unify-$(VERSION)
+	mkdir target/unify-$(VERSION)/env
+	cp target/unify.jar target/unify-$(VERSION)/.
+	cp unify target/unify-$(VERSION)/.
+	cp unifyw.bat target/unify-$(VERSION)/.
 	cd target && \
-		zip -r pret-$(VERSION).zip pret-$(VERSION)
+		zip -r unify-$(VERSION).zip unify-$(VERSION)
 
 clean:
 	mkdir -p target
