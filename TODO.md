@@ -1,3 +1,4 @@
+- Simplify metamodel, esp. re: need-uid, etc.
 - Documentation!!! esp README.md
 - Move candel to its own sysytem in test resources
 - Move dataset processing to scripts that can be run end-to-end in a test
