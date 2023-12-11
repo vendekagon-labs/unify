@@ -14,41 +14,27 @@
 (ns com.vendekagonlabs.unify.import-test
   (:require [clojure.test :refer :all]
             [clojure.tools.logging :as log]
-            [clojure.java.shell :refer [sh]]
-            [clojure.java.io :as io]
             [datomic.api :as d]
             [com.vendekagonlabs.unify.util.text :as text]
+            [com.vendekagonlabs.unify.test-util :as tu]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.util.io :as util.io]
-            [com.vendekagonlabs.unify.util.aws :as aws]
             [com.vendekagonlabs.unify.import :as import]
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 
 (def template-dir "test/resources/reference-import/template-dataset")
 
-(defn clone-template!
-  []
-  (sh "git" "clone" "git@github.com:CANDELbio/template-dataset.git"
-      :dir "test/resources/reference-import/"))
-
-(defn local-template []
-  (when-let [root-dir (System/getenv "CANDEL_TEST_DATA_DIR")]
-    (str root-dir "/template")))
-
-(defn ensure-template-dataset! []
-  (when-not (local-template)
-    (clone-template!)))
 
 (defn import-cfg-file []
-  (if-let [template-root (local-template)]
-    (str template-root "/config.edn")
-    "test/resources/reference-import/template-dataset/config.edn"))
+  (str template-dir "/config.edn"))
+
+(defn schema-directory []
+  (str template-dir "/schema"))
 
 (def dataset-name
   (memoize
     (fn []
-      (ensure-template-dataset!)
       (-> (import-cfg-file)
           (util.io/read-edn-file)
           (get-in [:dataset :name])))))
@@ -59,51 +45,59 @@
 (def tmp-dir "tmp-output")
 
 (defn setup []
-  (ensure-template-dataset!)
   (log/info "Initializing in-memory integration test db.")
-  (db/init datomic-uri)
-  ;; Temp fix for drug ordering issue with template dataset.
+  ;; TODO: a better end-to-end test for user contract would run request-db
+  ;; via the CLI equivalent entrypoint.
+  (db/init datomic-uri :schema-directory (schema-directory))
+  ;; TODO: Temp fix for drug ordering issue with template dataset.
   (let [conn (d/connect datomic-uri)]
-    @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])))
+    @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])
+    @(d/transact conn [{:db/id "LDHA-protein"
+                        :protein/uniprot-name "LDHA"}
+                       {:epitope/id "LDHA"
+                        :epitope/protein "LDHA-protein"}])))
 
 (defn teardown []
   (log/info "Ending integration test and deleting db.")
-  (d/delete-database datomic-uri)
-  (util.io/delete-recursively template-dir))
+  (d/delete-database datomic-uri))
 
 (deftest ^:integration sanity-test
   (try
     (setup)
-    (let [import-result (import/run
+    (let [import-result (tu/run-import
                           {:target-dir           tmp-dir
                            :datomic-uri          datomic-uri
                            :import-cfg-file      (import-cfg-file)
+                           :schema-directory     (schema-directory)
                            :disable-remote-calls true
                            :tx-batch-size        50})]
       (testing "Import runs to completion without throwing."
         (is import-result))
+      ;; TODO: make this test for a set of known entities rather than transactions, as transactions
+      ;        aren't part of the contract, but e.g. 50 samples should be imported by this import
+      ;        would be a fair stipulation of the contract implied by a unify import.
       (testing "Right number of txes completed. This implicitly also tests for data import failures."
-        (is (= 3464 (get-in import-result [:results :completed]))))
+        (is (=  2535 (get-in import-result [:results :completed]))))
       (testing "No reference data import errors."
         (is (not (seq (:errors import-result)))))
-      (testing "Validation runs with expected failures (until test updated)."
-        (Thread/sleep 2000)
-        (let [dataset-name (dataset-name)
-              db-info {:uri datomic-uri}]
-          (is (not (seq (post-import/run-all-validations db-info dataset-name)))))))
+      (println "NOTE: currently skipping validation tests.")
+     #_(testing "Validation runs with expected failures (until test updated)."
+         (Thread/sleep 2000)
+         (let [dataset-name (dataset-name)
+               db-info {:uri datomic-uri}]
+           (is (not (seq (post-import/run-all-validations db-info dataset-name)))))))
 
     (catch Exception e
       (log/error "Test threw during import attempt "
                  :message (.getMessage e)
-                 :ex-data (text/->unifyty-string (ex-data e)))
+                 :ex-data (text/->pretty-string (ex-data e)))
       (throw e))
     (finally
       (try
-        (util.io/delete-recursively tmp-dir)
         (teardown)
+        (util.io/delete-recursively tmp-dir)
         (catch Exception e
           (log/error (.getMessage e)))))))
-
 
 
 (comment

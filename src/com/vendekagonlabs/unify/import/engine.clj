@@ -52,7 +52,7 @@
   `(try
      ~body
      (catch Exception e#
-       {::anom/category ::anom/incorrect
+       {::anom/category              ::anom/incorrect
         :csv-file/could-not-read-row {:cause (or (ex-data e#)
                                                  (.getMessage e#))}})))
 
@@ -64,13 +64,13 @@
                                 [(mapv str/trim row) line-no])))]
     (a/go-loop [tsv-lines (csv/read-csv rdr :separator \tab)
                 line-no 1]
-        (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
-          (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
-            (if (a/>! ch [this-line line-no])
-              (recur rest-lines (inc line-no))
-              (a/close! ch)))
-          (a/close! ch)))
-    {:header (first (a/<!! ch))
+      (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
+        (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
+          (if (a/>! ch [this-line line-no])
+            (recur rest-lines (inc line-no))
+            (a/close! ch)))
+        (a/close! ch)))
+    {:header  (first (a/<!! ch))
      :channel ch}))
 
 (defn get-req-column-names
@@ -82,18 +82,18 @@
     (->> job
          (mapcat
            (fn [[k v]]
-            (if (= "unify" (namespace k))
-              []
-              (cond
-                (and (map? v)
-                     (:unify/many-delimiter v))
-                [(:unify/many-variable v)]
+             (if (= "unify" (namespace k))
+               []
+               (cond
+                 (and (map? v)
+                      (:unify/many-delimiter v))
+                 [(:unify/many-variable v)]
 
-                (vector? v)
-                v
+                 (vector? v)
+                 v
 
-                :else
-                [v]))))
+                 :else
+                 [v]))))
          (concat unify-attr))))
 
 (defn ensure-job+header!
@@ -103,14 +103,14 @@
   (let [req-cols (into #{} (get-req-column-names job))
         hdr-set (into #{} header)
         missing-cols (seq (set/difference req-cols hdr-set))
-        in-file (:unify/input-file job)]
+        in-file (:unify/input-tsv-file job)]
     (when missing-cols
       (a/close! channel)
       (Thread/sleep 500)
       (throw (ex-info (str "Directive specified use of columns not found in file: " in-file)
-               {:data-file/header-mismatch {:filename (text/file->str in-file)
-                                            :cols-not-in-file missing-cols
-                                            :other-causes {:wrong-format [:not-tab-separated]}}})))))
+                      {:data-file/header-mismatch {:filename         (text/file->str in-file)
+                                                   :cols-not-in-file missing-cols
+                                                   :other-causes     {:wrong-format [:not-tab-separated]}}})))))
 
 (defn comp->anomalies
   "Return composition of fns with one modification: if fn in chain encounters an anomaly, that anomaly
@@ -154,8 +154,8 @@
                         record
                         na-val-set
                         {:line-number line-n
-                         :line record
-                         :filename (text/file->str in-f)})))
+                         :line        record
+                         :filename    (text/file->str in-f)})))
                (remove #(= % :unify/omit))
                (map record/validate))]
       (ensure-job+header! job header channel)
@@ -171,9 +171,9 @@
                   (catch Exception e
                     (a/<!
                       (exit+cleanup (merge (ex-data e)
-                                           {::anom/category ::anom/fault
+                                           {::anom/category            ::anom/fault
                                             :engine/output-file-closed {:out-file out-f
-                                                                        :message (.getMessage e)}})))))
+                                                                        :message  (.getMessage e)}})))))
                 (recur (inc total))))
           (a/>! done-ch {:line-count total})))
 
@@ -195,8 +195,8 @@
     (if (::anom/category result)
       (do (log/error :engine/process-file "\n" "Error processing record")
           (throw (ex-info (str "Error processing file: " in-f)
-                   (merge {:engine/input-file (text/file->str in-f)}
-                          (dissoc result ::anom/category)))))
+                          (merge {:engine/input-file (text/file->str in-f)}
+                                 (dissoc result ::anom/category)))))
       (merge process-ctx result))))
 
 (defn job->file
@@ -204,7 +204,7 @@
    and calls the process-file fn to do the work"
   [full-import-ctx job target-dir]
   (let [outfile-prefix (:unify/out-file-prefix job)
-        in-file (clojure.java.io/file (:unify/input-file job))
+        in-file (clojure.java.io/file (:unify/input-tsv-file job))
         in-f-name (.getName in-file)
         out-f-path (str target-dir
                         (when-not (clojure.string/ends-with? target-dir "/") "/")
@@ -215,9 +215,9 @@
     (if (and (:resume full-import-ctx)
              (io/exists? out-f-path))
       (do (log/info "Prepare is in [resume] mode, skipping existing entity file: " out-f-path)
-          {:job job
-           :in-filename in-f-name
-           :out-filename out-f-path
+          {:job                 job
+           :in-filename         in-f-name
+           :out-filename        out-f-path
            :prepare.resume/skip true})
       (process-file full-import-ctx job in-file out-f-path))))
 
@@ -232,7 +232,7 @@
                      (catch Exception e
                        (merge (ex-data e)
                               {::anom/category ::anom/fault
-                               :async/file (:unify/input-file job)}))))
+                               :async/file     (:unify/input-tsv-file job)}))))
         results (doall (map exec-job jobs))]
     (if-let [errors (seq (filter ::anom/category results))]
       (let [errored-file (:async/file (first errors))]
@@ -242,7 +242,7 @@
                 (log/error error))
               errors)
           (throw (ex-info (str "Encountered error preparing file: " errored-file)
-                    (dissoc (first errors) ::anom/category :async/file))))))
+                          (dissoc (first errors) ::anom/category :async/file))))))
     results))
 
 (defn ensure-import-files-exist
@@ -251,7 +251,7 @@
   ;; two keeps on the same collection isn't the most efficient way to do this, but these
   ;; are going to be small (typed in by humans), though due to ugliness should probably fix
   ;; before shipping... using "input-file" name independent of namespace maybe?
-  (let [files (concat (keep :unify/input-file jobs)
+  (let [files (concat (keep :unify/input-tsv-file jobs)
                       (keep :unify.matrix/input-file jobs))]
     (when-let [not-found (seq (keep (fn [file]
                                       (let [fname (str (when (text/filename-relative? file)
@@ -323,16 +323,16 @@
           import-entity (parse.config/cfg-map->import-entity cfg-map)
           matrix-jobs (parse.config/cfg-map->matrix-directives schema mapping-lookup cfg-root-dir parsed-cfg)
 
-          full-import-ctx {:parsed-cfg      parsed-cfg
-                           :schema          schema
-                           :mapping         mapping-lookup
-                           :resume          resume?
-                           :import-name     (:import/name import-entity)}
+          full-import-ctx {:parsed-cfg  parsed-cfg
+                           :schema      schema
+                           :mapping     mapping-lookup
+                           :resume      resume?
+                           :import-name (:import/name import-entity)}
 
           _ (io/write-edn-file (str target-dir "/import-job.edn") import-entity)
-          import-file  (str target-dir "/import-job.edn")
+          import-file (str target-dir "/import-job.edn")
           _ (pp/pprint dataset-entity
-                                   (clojure.java.io/writer import-file :append true))
+                       (clojure.java.io/writer import-file :append true))
 
           _ (ensure-import-files-exist cfg-root-dir (concat matrix-jobs jobs))
           ref-only-cfg-map (select-keys cfg-map (metamodel/allowed-ref-data schema))
@@ -345,13 +345,13 @@
           matrix-results (run-matrix-jobs! target-dir full-import-ctx matrix-jobs continue-on-error?)
           dataset-results (run-jobs! target-dir full-import-ctx jobs continue-on-error?)
           results (vec (concat ref-data-results matrix-results dataset-results))]
-      (io/write-edn-file (str target-dir "/import-summary.edn") (text/->unifyty-string results))
+      (io/write-edn-file (str target-dir "/import-summary.edn") (text/->pretty-string results))
       (println "\n")
-      (log/info (str "Entity generation elapsed time: " (/  (- (System/currentTimeMillis) start) 1000.0) "seconds."))
+      (log/info (str "Entity generation elapsed time: " (/ (- (System/currentTimeMillis) start) 1000.0) "seconds."))
       results)
     (catch Exception e
       (let [data (ex-data e)
-            unifyty-data (text/->unifyty-string data)
+            unifyty-data (text/->pretty-string data)
             err-fname "PRET_ERROR_DUMP"]
         (log/error "Engine encountered exception while generating entity data, error state in file: "
                    err-fname)

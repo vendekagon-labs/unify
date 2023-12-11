@@ -13,15 +13,27 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.db.schema
   (:require [clojure.java.io :as io]
+            [datomic.api :as d]
             [com.vendekagonlabs.unify.util.io :as util.io]
+            [clojure.string :as str]
             [com.vendekagonlabs.unify.db.indexes :as indexes]
             [com.vendekagonlabs.unify.db.query :as dq]
             [clojure.set :as set]))
 
-(defn base-schema [] (util.io/read-edn-file (io/resource "schema/schema.edn")))
-(defn enums [] (util.io/read-edn-file (io/resource "schema/enums.edn")))
-(defn metamodel [] (util.io/read-edn-file (io/resource "schema/metamodel.edn")))
-(defn unify-meta [] (util.io/read-edn-file (io/resource "schema/unify-meta.edn")))
+
+(defn read-import-schema [schema-dir fname]
+  (let [fpath (io/file schema-dir fname)]
+    (util.io/read-edn-file fpath)))
+
+(defn base-schema [schema-dir]
+  (read-import-schema schema-dir "schema.edn"))
+(defn enums [schema-dir]
+  (read-import-schema schema-dir "enums.edn"))
+(defn metamodel [schema-dir]
+  (read-import-schema schema-dir "metamodel.edn"))
+(defn unify-schema []
+  (-> (io/resource "unify-schema.edn")
+      (util.io/read-edn-file)))
 
 ;; for metamodel inference backing, etc.
 (def cached (clojure.java.io/resource "cached-schema.edn"))
@@ -31,32 +43,31 @@
     :with ?e
     :where [?e :db/ident ?i]])
 
-(def schema-txes
-  ;; this is an ordered set of all schema transactions required to bring database up to date
-  ;; txes will be applied in order, conditionally, if transacting schema would change the
-  ;; result of the probing query.
-  ;; Queries are starting out simplistic, we can adjust based on how schema actually evolves.
-  [{:name :base-schema
-    :query new-ident-q
-    :tx-data (base-schema)}
-   {:name :enums
-    :query new-ident-q
-    :tx-data (enums)}
-   {:name :metamodel-attr
-    :query new-ident-q
-    :tx-data (first (metamodel))}
-   {:name :metamodel-entities
-    :query '[:find (count ?k)
-             :where [?k :kind/name]]
-    :tx-data (second (metamodel))}
-   {:name :metamodel-refs
-    :query '[:find (count ?p)
-             :with ?c
-             :where [?p :ref/to ?c]]
-    :tx-data (last  (metamodel))}
-   {:name :com.vendekagonlabs.unify.import.tx-data/metadata
-    :query new-ident-q
-    :tx-data (unify-meta)}])
+(defn schema-txes
+  "Returns an ordered set of all schema transactions."
+  [schema-dir]
+  (let [read-schema-file (partial read-import-schema schema-dir)
+        [metamodel-entities
+         metamodel-refs] (read-schema-file "metamodel.edn")]
+    [{:name    :unify.schema/metadata
+      :query   new-ident-q
+      :tx-data (unify-schema)}
+     {:name    :base-schema
+      :query   new-ident-q
+      :tx-data (read-schema-file "schema.edn")}
+     {:name    :enums
+      :query   new-ident-q
+      :tx-data (read-schema-file "enums.edn")}
+     {:name    :metamodel-entities
+      :query   '[:find (count ?k)
+                 :where [?k :unify.kind/name]]
+      :tx-data metamodel-entities}
+     {:name    :metamodel-refs
+      :query   '[:find (count ?p)
+                 :with ?c
+                 :where [?p :unify.ref/to ?c]]
+      :tx-data metamodel-refs}]))
+
 
 (defn cache
   "Write schema to resources (wrapped in vec for eagerness, readability)"
@@ -68,11 +79,11 @@
   "Get all the entities representing the kinds in the system"
   [db]
   (flatten (dq/q+retry '[:find (pull ?e [*
-                                         {:kind/attr [:db/ident]}
-                                         {:kind/context-id [:db/ident]}
-                                         {:kind/need-uid [:db/ident]}
-                                         {:kind/synthetic-attr-name [:db/ident]}])
-                         :where [?e :kind/name]] db)))
+                                         {:unify.kind/attr [:db/ident]}
+                                         {:unify.kind/context-id [:db/ident]}
+                                         {:unify.kind/need-uid [:db/ident]}
+                                         {:unify.kind/synthetic-attr-name [:db/ident]}])
+                         :where [?e :unify.kind/name]] db)))
 
 (defn get-all-schema
   "Query database for installed attributes"
@@ -81,7 +92,7 @@
                                          {:db/valueType [:db/ident]}
                                          {:db/cardinality [:db/ident]}
                                          {:db/unique [:db/ident]}])
-                                         ;; also metamodel ref from and to on attr
+                         ;; also metamodel ref from and to on attr
                          :where [_ :db.install/attribute ?e]] db)))
 
 (defn get-non-attr-idents
@@ -108,19 +119,27 @@
    (let [flat-schema (concat (map #(assoc % :db.install/_attribute true)
                                   (get-all-schema db))
                              (get-all-kind-data db))
+         unify-schema-metadata (-> (d/pull db [:unify.schema/version
+                                               :unify.schema/name] :unify.schema/metadata))
          core-indexes (indexes/all flat-schema)
          enums (get-non-attr-idents db)
-         indexes (assoc core-indexes :index/enum-idents enums)]
+         indexes (assoc core-indexes :index/enum-idents enums
+                                     :index/unify-schema-metadata unify-schema-metadata)]
      (concat [indexes] flat-schema)))
   ([]
    (util.io/read-edn-file cached)))
 
 (defn version
-  []
-  (-> (keep (fn [{:keys [db/ident] :as ent}]
-              (when (= ident :candel/schema)
-                ent))
-            (util.io/read-edn-file (io/resource "schema/enums.edn")))
-      (first)
-      (:candel.schema/version)))
-
+  ([]
+   (-> "cached-schema.edn"
+       (io/resource)
+       (util.io/read-edn-file)
+       (first)
+       (:index/unify-schema-metadata)
+       (:unify.schema/version)))
+  ([schema-dir]
+   (->> (io/file schema-dir "schema.edn")
+        (util.io/read-edn-file)
+        (filter :unify.schema/version)
+        (first)
+        (:unify.schema/version))))

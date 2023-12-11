@@ -13,6 +13,7 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.util.release
   (:require [clojure.edn :as edn]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.java.io :as io]))
 
 (defn version
@@ -26,12 +27,6 @@
                       "\n----------------------\n"
                       "> echo \"{:unify/version \\\"$(util/version)\\\"}\" > resources/info.edn"
                       "\n----------------------\n"
-                      "If you see this error as an end user, report to candel dev team.")
+                      "If you see this error as an end user, report to Unify dev team.")
                  {:cli/missing-file "resources/info.edn"})))
-    (-> info-edn
-        (slurp)
-        (edn/read-string)
-        (:unify/version))))
-
-(comment
-  (version))
+    (:unify/version (util.io/read-edn-file info-edn))))

@@ -1,2 +1,0 @@
-#!/bin/bash
-clojure -Mtest -e :integration -e :performance

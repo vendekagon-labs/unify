@@ -7,7 +7,7 @@
                                                      :technology       :assay.technology/nanostring
                                                      :description      "gene expr via nanostring"
                                                      :measurement-sets [{:name "baseline"}]
-                                                                              :measurements     [{:unify/input-file "example-data/nanostring.txt"}]
+                                                                              :measurements     [{:unify/input-tsv-file "example-data/nanostring.txt"}]
                                                                                                   :gene             "variable"
                                                                                                   :sample           "sample"
                                                                                                   :nanostring-count "value"}
@@ -16,12 +16,12 @@
                                                      :technology       :assay.technology/TCR-seq
                                                      :description      "TCR sequencing"
                                                      :measurement-sets [{:name "baseline"}]
-                                                                              :measurements     [{:unify/input-file "example-data/tcr_clonality.txt"}]
+                                                                              :measurements     [{:unify/input-tsv-file "example-data/tcr_clonality.txt"}]
                                                                                                   :sample           "sample"
                                                                                                   :tcr-clonality    "Clonality"}]
 
                         :clinical-observation-sets [{:name                  "all-clinical-observations"
-                                                     :clinical-observations [{:unify/input-file               "example-data/clinical_observations.txt"
+                                                     :clinical-observations [{:unify/input-tsv-file               "example-data/clinical_observations.txt"
                                                                               :clinical-observation/subject   "Patient ID"
                                                                               :clinical-observation/timepoint "timepoint"
                                                                               :unify/variable                 "variable"
@@ -31,7 +31,7 @@
                                                                                                                "LDH @ Baseline"   :clinical-observation/ldh
                                                                                                                "Overall Survival" :clinical-observation/os}}]}]
 
-                        :samples                   {:unify/input-file "example-data/samples.txt"
+                        :samples                   {:unify/input-tsv-file "example-data/samples.txt"
                                                     :id               "sample"
                                                     :subject          "patient"
                                                     :timepoint        "time"
@@ -39,7 +39,7 @@
                                                     :unify/constants  {:type     :sample.type/tumor
                                                                        :specimen :sample.specimen/ffpe}}
 
-                        :subjects                  {:unify/input-file "example-data/subjects.txt"
+                        :subjects                  {:unify/input-tsv-file "example-data/subjects.txt"
                                                     :id               "Patient ID"
                                                     :sex              "Sex"
                                                     :dead             "Dead (Y/N)"}
@@ -76,7 +76,7 @@
                                                      :relative-order    3
                                                      :id                "Nivolumab/post-treatment"}]
 
-                        :therapies                 {:unify/input-file  "processed/therapies.txt"
+                        :therapies                 {:unify/input-tsv-file  "processed/therapies.txt"
                                                     :treatment-regimen "regimen"
                                                     :line              "line"
                                                     :unify/constants   {:order 1}
@@ -84,7 +84,7 @@
                                                                         :unify/rev-attr     :subject/therapies}}}
 
 
- :unify/reference-data {:genomic-coordinate {:unify/input-file "example-data/point_muts_indels_coord.txt"
+ :unify/reference-data {:genomic-coordinate {:unify/input-tsv-file "example-data/point_muts_indels_coord.txt"
                                              :contig           "chrom"
                                              :start            "start"
                                              :end              "end"
@@ -92,7 +92,7 @@
                                              :assembly         "assembly"
                                              :id               "id"}
 
-                        :variant            {:unify/input-file "example-data/point_muts_indels.txt"
+                        :variant            {:unify/input-tsv-file "example-data/point_muts_indels.txt"
                                              :id               "id"
                                              :coordinates      "coordinates"
                                              :gene             "Hugo_Symbol"

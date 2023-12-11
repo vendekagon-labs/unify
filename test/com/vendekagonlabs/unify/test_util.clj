@@ -14,7 +14,8 @@
 (ns com.vendekagonlabs.unify.test-util
   (:require [clojure.edn :as edn]
             [clojure.data.csv :as data.csv]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [com.vendekagonlabs.unify.import :as import]))
 
 (defmacro thrown->ex-data
   [body]
@@ -40,3 +41,10 @@
     (let [csv-stream (data.csv/read-csv rdr :separator \tab)]
       {:header (first csv-stream)
        :data   (into [] (take n (rest csv-stream)))})))
+
+(defn run-import
+  "Runs a complete, end-to-end import of unify data. Wrapper for tests only."
+  [arg-map]
+  (let [_prepare-result (import/prepare-import arg-map)
+        tx-result (import/transact-import arg-map)]
+    tx-result))

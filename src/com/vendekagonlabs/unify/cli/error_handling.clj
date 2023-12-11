@@ -28,7 +28,7 @@
   (println "-------- Error occurred during import --------")
   (doseq [[k v] err-map]
     (println "Error in: " (namespace k) \newline
-             "Problem: " (name k) (text/->unifyty-string v))))
+             "Problem: " (name k) (text/->pretty-string v))))
 
 (defn report-and-exit [t]
   "If anticipated error (proxied by ex-info being thrown entity) we report errors in

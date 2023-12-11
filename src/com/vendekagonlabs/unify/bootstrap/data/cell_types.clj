@@ -18,7 +18,9 @@
 
   https://obofoundry.org/ontology/cl.html
 
-  Files can also be downloaded from the above site."
+  Files can also be downloaded from the above site.
+
+  Can download via: https://purl.obolibrary.org/obo/cl.obo as of 09-DEC-2023"
   (:require [com.vendekagonlabs.unify.bootstrap.obo :as obo]
             [clojure.java.io :as io]
             [com.vendekagonlabs.unify.util.io :as util.io]))

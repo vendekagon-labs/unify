@@ -37,7 +37,7 @@
 ;;
 ;; This ordering is provided by leveraging the metamodel:
 ;;
-;; 1. Pull all refs by a given kind (ie. :ref/from :measurement)
+;; 1. Pull all refs by a given kind (ie. :unify.ref/from :measurement)
 ;; 2. Only use kind-name's that are part of the uid keys
 ;; 3. Count # of dependencies to 'terminating' kind in deps set
 ;;    Score for kind is max of all counts.
@@ -183,9 +183,9 @@
   [import-name target-dir]
   (let [import-ent (get (ffirst (conventions/job-entity target-dir))
                         :import/import)
-        import-tx [{:db/id "datomic.tx"
-                     :import/import (assoc import-ent :db/id "temp-import-ent"
-                                                      :import/name import-name)
+        import-tx [{:db/id         "datomic.tx"
+                    :import/import (assoc import-ent :db/id "temp-import-ent"
+                                                     :import/name import-name)
                     :import/txn-id (uuid/random)}]
         full-path (conventions/in-diff-tx-dir target-dir "import-job.edn")]
     (log/info "Writing diff import job to: " full-path)
@@ -204,11 +204,11 @@
         db-info (db/fetch-info database)
         db (db/latest-db db-info)
         head (db/head db)
-        summary {:timestamp (java.util.Date.)
-                 :database database
-                 :import-name import-name
+        summary {:timestamp         (java.util.Date.)
+                 :database          database
+                 :import-name       import-name
                  :diff-dataset-name diff-dataset-name
-                 :head head}]
+                 :head              head}]
     (log/info "Writing diff summary to: " full-path)
     (pprint summary (io/writer full-path))))
 
@@ -224,7 +224,7 @@
         import-name (str (conventions/import-name target-dir) "-diff-" (timestamps/now))
         dataset-name (conventions/dataset-name target-dir)
         diff-dataset-name (str dataset-name "-" diff-suffix)
-        diff-opts {:dataset-name dataset-name
+        diff-opts {:dataset-name      dataset-name
                    :diff-dataset-name diff-dataset-name}
         db-info (db/fetch-info database)]
 

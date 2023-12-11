@@ -1,0 +1,566 @@
+[
+ ;; Entity metadata:
+ [{:unify.kind/name       :dataset
+   :unify.kind/attr       :dataset/name
+   :unify.kind/context-id :dataset/name}
+
+  {:unify.kind/name       :assay
+   :unify.kind/attr       :assay/name
+   :unify.kind/context-id :assay/name
+   :unify.kind/need-uid   :assay/uid
+   :unify.kind/parent     :dataset}
+
+  {:unify.kind/name       :clinical-observation-set
+   :unify.kind/attr       :clinical-observation-set/name
+   :unify.kind/context-id :clinical-observation-set/name
+   :unify.kind/parent     :dataset
+   :unify.kind/need-uid   :clinical-observation-set/uid}
+
+  {:unify.kind/name       :measurement-set
+   :unify.kind/attr       :measurement-set/name
+   :unify.kind/context-id :measurement-set/name
+   :unify.kind/parent     :assay
+   :unify.kind/need-uid   :measurement-set/uid}
+
+  {:unify.kind/name       :tcr
+   :unify.kind/attr       :tcr/id
+   :unify.kind/context-id :tcr/id
+   :unify.kind/parent     :measurement-set
+   :unify.kind/need-uid   :tcr/uid}
+
+  {:unify.kind/name       :cell-population
+   :unify.kind/attr       :cell-population/name
+   :unify.kind/context-id :cell-population/name
+   :unify.kind/parent     :measurement-set
+   :unify.kind/need-uid   :cell-population/uid}
+
+  {:unify.kind/name       :single-cell
+   :unify.kind/attr       :single-cell/id
+   :unify.kind/context-id :single-cell/id
+   :unify.kind/parent     :measurement-set
+   :unify.kind/need-uid   :single-cell/uid}
+
+  {:unify.kind/name       :otu
+   :unify.kind/attr       :otu/id
+   :unify.kind/context-id :otu/id
+   :unify.kind/parent     :measurement-set
+   :unify.kind/need-uid   :otu/uid}
+
+  {:unify.kind/name                      :measurement
+   :unify.kind/parent                    :measurement-set
+   :unify.kind/attr                      :measurement/sample
+   :unify.kind/context-id                :measurement/id
+   :unify.kind/need-uid                  :measurement/uid
+   :unify.kind/synthetic-attr-name       :measurement/id
+   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
+                                           :unify.kind.sythetic-attr-components/name :measurement/sample}
+                                          {:unify.kind.synthetic-attr-components/idx 1
+                                           :unify.kind.sythetic-attr-components/name :measurement/region-of-interest}
+                                          {:unify.kind.synthetic-attr-components/idx 2
+                                           :unify.kind.sythetic-attr-components/name :measurement/gene-product}
+                                          {:unify.kind.synthetic-attr-components/idx 3
+                                           :unify.kind.sythetic-attr-components/name :measurement/variant}
+                                          {:unify.kind.synthetic-attr-components/idx 4
+                                           :unify.kind.sythetic-attr-components/name :measurement/cnv}
+                                          {:unify.kind.synthetic-attr-components/idx 5
+                                           :unify.kind.sythetic-attr-components/name :measurement/epitope}
+                                          {:unify.kind.synthetic-attr-components/idx 6
+                                           :unify.kind.sythetic-attr-components/name :measurement/tcr}
+                                          {:unify.kind.synthetic-attr-components/idx 7
+                                           :unify.kind.sythetic-attr-components/name :measurement/cell-population}
+                                          {:unify.kind.synthetic-attr-components/idx 8
+                                           :unify.kind.sythetic-attr-components/name :measurement/atac-peak}
+                                          {:unify.kind.synthetic-attr-components/idx 9
+                                           :unify.kind.sythetic-attr-components/name :measurement/nanostring-signature}
+                                          {:unify.kind.synthetic-attr-components/idx 10
+                                           :unify.kind.sythetic-attr-components/name :measurement/otu}]}
+
+  {:unify.kind/name                              :measurement-matrix
+   :unify.kind/parent                            :measurement-set
+   :unify.kind/attr                              :measurement-matrix/name
+   :unify.kind/context-id                        :measurement-matrix/name
+   :unify.kind.matrix-blob/storage-key-attribute :measurement-matrix/backing-file
+   :unify.kind.matrix-blob/data-type-attribute   :measurement-matrix/measurement-type
+   :unify.kind/need-uid                          :measurement-matrix/uid}
+
+  {:unify.kind/name       :sample
+   :unify.kind/attr       :sample/id
+   :unify.kind/parent     :dataset
+   :unify.kind/context-id :sample/id
+   :unify.kind/need-uid   :sample/uid}
+
+  {:unify.kind/name       :subject
+   :unify.kind/attr       :subject/id
+   :unify.kind/parent     :dataset
+   :unify.kind/context-id :subject/id
+   :unify.kind/need-uid   :subject/uid}
+
+  {:unify.kind/name                      :clinical-observation
+   :unify.kind/attr                      :clinical-observation/subject
+   :unify.kind/parent                    :clinical-observation-set
+   :unify.kind/need-uid                  :clinical-observation/uid
+   :unify.kind/context-id                :clinical-observation/id
+   :unify.kind/synthetic-attr-name       :clinical-observation/id
+   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
+                                           :unify.kind.sythetic-attr-components/name :clinical-observation/subject}
+                                          {:unify.kind.synthetic-attr-components/idx 1
+                                           :unify.kind.sythetic-attr-components/name :clinical-observation/timepoint}
+                                          {:unify.kind.synthetic-attr-components/idx 2
+                                           :unify.kind.sythetic-attr-components/name :clinical-observation/study-day}]}
+
+  {:unify.kind/name                      :adverse-event
+   ;; NOTE: This :unify.kind/attr should be revisited
+   ;; because this entity kind has a synthetic ID (no domain identity), there is
+   ;; no obvious option for :unify.kind/attr. The choice of subject means the
+   ;; "ae must have a subject" validation is irrelevant, but without an external
+   ;; identifier, this is potentially the best we can do.
+   ;; Worth noting that this is the same situation with clinical-observation :unify.kind/attr
+   :unify.kind/attr                      :adverse-event/subject
+   :unify.kind/parent                    :clinical-observation-set
+   :unify.kind/need-uid                  :adverse-event/uid
+   :unify.kind/context-id                :adverse-event/id
+   :unify.kind/synthetic-attr-name       :adverse-event/id
+   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/subject}
+                                          {:unify.kind.synthetic-attr-components/idx 1
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/timepoint}
+                                          {:unify.kind.synthetic-attr-components/idx 2
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/meddra-adverse-event}
+                                          {:unify.kind.synthetic-attr-components/idx 3
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/ctcae-grade}
+                                          {:unify.kind.synthetic-attr-components/idx 4
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/verbatim-adverse-event}
+                                          {:unify.kind.synthetic-attr-components/idx 5
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/ae-start-relative-day}
+                                          {:unify.kind.synthetic-attr-components/idx 6
+                                           :unify.kind.sythetic-attr-components/name :adverse-event/ae-causality}]}
+
+
+
+  {:unify.kind/name       :timepoint
+   :unify.kind/attr       :timepoint/id
+   :unify.kind/parent     :dataset
+   :unify.kind/context-id :timepoint/id
+   :unify.kind/need-uid   :timepoint/uid}
+
+  {:unify.kind/name       :study-day
+   :unify.kind/attr       :study-day/id
+   :unify.kind/parent     :dataset
+   :unify.kind/context-id :study-day/id
+   :unify.kind/need-uid   :study-day/uid}
+
+  {:unify.kind/name       :treatment-regimen
+   :unify.kind/attr       :treatment-regimen/name
+   :unify.kind/context-id :treatment-regimen/name
+   :unify.kind/need-uid   :treatment-regimen/uid
+   :unify.kind/parent     :dataset}
+
+  {:unify.kind/name                      :drug-regimen
+   :unify.kind/attr                      :drug-regimen/drug
+   :unify.kind/parent                    :treatment-regimen
+   :unify.kind/context-id                :drug-regimen/id
+   :unify.kind/need-uid                  :drug-regimen/uid
+   :unify.kind/synthetic-attr-name       :drug-regimen/id
+   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
+                                           :unify.kind.sythetic-attr-components/name :drug-regimen/drug}
+                                          {:unify.kind.synthetic-attr-components/idx 1
+                                           :unify.kind.sythetic-attr-components/name :drug-regimen/cycle-length}]}
+
+  {:unify.kind/name                      :therapy
+   :unify.kind/attr                      :therapy/treatment-regimen
+   :unify.kind/parent                    :subject
+   :unify.kind/context-id                :therapy/id
+   :unify.kind/need-uid                  :therapy/uid
+   :unify.kind/synthetic-attr-name       :therapy/id
+   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
+                                           :unify.kind.sythetic-attr-components/name :subject/therapies}
+                                          {:unify.kind.synthetic-attr-components/idx 1
+                                           :unify.kind.sythetic-attr-components/name :therapy/treatment-regimen}]}
+
+
+  {:unify.kind/name       :atac-peak
+   :unify.kind/attr       :atac-peak/name
+   :unify.kind/context-id :atac-peak/name
+   :unify.kind/parent     :measurement-set
+   :unify.kind/need-uid   :atac-peak/uid}
+
+  {:unify.kind/name       :gene
+   :unify.kind/attr       :gene/hgnc-symbol
+   :unify.kind/context-id :gene/hgnc-symbol
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :protein
+   :unify.kind/attr       :protein/uniprot-name
+   :unify.kind/context-id :protein/uniprot-name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name                   :epitope
+   :unify.kind/attr                   :epitope/id
+   :unify.kind/context-id             :epitope/id
+   :unify.kind/ref-data               true
+   :unify.kind/allow-create-on-import true}
+
+  {:unify.kind/name                   :genomic-coordinate
+   :unify.kind/attr                   :genomic-coordinate/id
+   :unify.kind/context-id             :genomic-coordinate/id
+   :unify.kind/ref-data               true
+   :unify.kind/allow-create-on-import true}
+
+  {:unify.kind/name                   :cnv
+   :unify.kind/attr                   :cnv/id
+   :unify.kind/context-id             :cnv/id
+   :unify.kind/allow-create-on-import true
+   :unify.kind/ref-data               true}
+
+  {:unify.kind/name                   :variant
+   :unify.kind/attr                   :variant/id
+   :unify.kind/context-id             :variant/id
+   :unify.kind/ref-data               true
+   :unify.kind/allow-create-on-import true}
+
+  {:unify.kind/name                   :neo-antigen
+   :unify.kind/attr                   :neo-antigen/mut-peptide
+   :unify.kind/context-id             :neo-antigen/id
+   :unify.kind/allow-create-on-import true
+   :unify.kind/ref-data               true}
+
+  {:unify.kind/name       :chr-acc-reg
+   :unify.kind/attr       :chr-acc-reg/genomic-coordinates
+   :unify.kind/context-id :chr-acc-reg/genomic-coordinates
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :cell-type
+   :unify.kind/attr       :cell-type/co-name
+   :unify.kind/context-id :cell-type/co-name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :so-sequence-feature
+   :unify.kind/attr       :so-sequence-feature/name
+   :unify.kind/context-id :so-sequence-feature/name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :drug
+   :unify.kind/attr       :drug/preferred-name
+   :unify.kind/context-id :drug/preferred-name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :comorbidity
+   :unify.kind/attr       :comorbidity/name
+   :unify.kind/context-id :comorbidity/name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :meddra-disease
+   :unify.kind/attr       :meddra-disease/preferred-name
+   :unify.kind/context-id :meddra-disease/preferred-name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :gdc-anatomic-site
+   :unify.kind/attr       :gdc-anatomic-site/name
+   :unify.kind/context-id :gdc-anatomic-site/name
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name       :gene-product
+   :unify.kind/attr       :gene-product/id
+   :unify.kind/context-id :gene-product/id
+   :unify.kind/ref-data   true}
+
+  {:unify.kind/name                   :nanostring-signature
+   :unify.kind/attr                   :nanostring-signature/name
+   :unify.kind/context-id             :nanostring-signature/name
+   :unify.kind/allow-create-on-import true
+   :unify.kind/ref-data               true}
+
+  {:unify.kind/name                   :clinical-trial
+   :unify.kind/attr                   :clinical-trial/nct-number
+   :unify.kind/context-id             :clinical-trial/nct-number
+   :unify.kind/allow-create-on-import true
+   :unify.kind/ref-data               true}]
+
+ ; References between entities
+ [{:db/id          :dataset/samples
+   :unify.ref/from :dataset
+   :unify.ref/to   :sample}
+
+  {:db/id          :dataset/subjects
+   :unify.ref/from :dataset
+   :unify.ref/to   :subject}
+
+  {:db/id          :dataset/assays
+   :unify.ref/from :dataset
+   :unify.ref/to   :assay}
+
+  {:db/id          :dataset/treatment-regimens
+   :unify.ref/from :dataset
+   :unify.ref/to   :treatment-regimen}
+
+  {:db/id          :dataset/clinical-observation-sets
+   :unify.ref/from :dataset
+   :unify.ref/to   :clinical-observation-set}
+
+  {:db/id          :clinical-observation-set/clinical-observations
+   :unify.ref/from :clinical-observation-set
+   :unify.ref/to   :clinical-observation}
+
+  {:db/id          :clinical-observation-set/adverse-events
+   :unify.ref/from :clinical-observation-set
+   :unify.ref/to   :adverse-event}
+
+  {:db/id          :dataset/timepoints
+   :unify.ref/from :dataset
+   :unify.ref/to   :timepoint}
+
+  {:db/id          :dataset/study-days
+   :unify.ref/from :dataset
+   :unify.ref/to   :study-day}
+
+  {:db/id          :assay/measurement-sets
+   :unify.ref/from :assay
+   :unify.ref/to   :measurement-set}
+
+  {:db/id          :measurement-set/measurements
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :measurement}
+
+  {:db/id          :measurement-set/measurement-matrices
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :measurement-matrix}
+
+  {:db/id          :measurement-set/cell-populations
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :cell-population}
+
+  {:db/id          :measurement-set/single-cells
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :single-cell}
+
+  {:db/id          :measurement-set/tcrs
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :tcr}
+
+  {:db/id          :measurement-set/otus
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :otu}
+
+  {:db/id          :measurement-set/atac-peaks
+   :unify.ref/from :measurement-set
+   :unify.ref/to   :atac-peak}
+
+  {:db/id          :measurement/sample
+   :unify.ref/from :measurement
+   :unify.ref/to   :sample}
+
+  {:db/id          :measurement/gene-product
+   :unify.ref/from :measurement
+   :unify.ref/to   :gene-product}
+
+  {:db/id          :measurement/cnv
+   :unify.ref/from :measurement
+   :unify.ref/to   :cnv}
+
+  {:db/id          :measurement/epitope
+   :unify.ref/from :measurement
+   :unify.ref/to   :epitope}
+
+  {:db/id          :measurement/variant
+   :unify.ref/from :measurement
+   :unify.ref/to   :variant}
+
+  {:db/id          :measurement/tcr
+   :unify.ref/from :measurement
+   :unify.ref/to   :tcr}
+
+  {:db/id          :measurement/cell-population
+   :unify.ref/from :measurement
+   :unify.ref/to   :cell-population}
+
+  {:db/id          :measurement/otu
+   :unify.ref/from :measurement
+   :unify.ref/to   :otu}
+
+  {:db/id          :measurement/atac-peak
+   :unify.ref/from :measurement
+   :unify.ref/to   :atac-peak}
+
+  {:db/id          :measurement/nanostring-signature
+   :unify.ref/from :measurement
+   :unify.ref/to   :nanostring-signature}
+
+  {:db/id          :measurement-matrix/cell-populations
+   :unify.ref/from :measurement-matrix
+   :unify.ref/to   :cell-population}
+
+  {:db/id          :measurement-matrix/single-cells
+   :unify.ref/from :measurement-matrix
+   :unify.ref/to   :single-cell}
+
+  {:db/id          :measurement-matrix/gene-products
+   :unify.ref/from :measurement-matrix
+   :unify.ref/to   :gene-product}
+
+  {:db/id          :measurement-matrix/epitopes
+   :unify.ref/from :measurement-matrix
+   :unify.ref/to   :epitope}
+
+  {:db/id          :measurement-matrix/samples
+   :unify.ref/from :measurement-matrix
+   :unify.ref/to   :sample}
+
+  {:db/id          :sample/subject
+   :unify.ref/from :sample
+   :unify.ref/to   :subject}
+
+  {:db/id          :sample/timepoint
+   :unify.ref/from :sample
+   :unify.ref/to   :timepoint}
+
+  {:db/id          :sample/study-day
+   :unify.ref/from :sample
+   :unify.ref/to   :study-day}
+
+  {:db/id          :sample/gdc-anatomic-site
+   :unify.ref/from :sample
+   :unify.ref/to   :gdc-anatomic-site}
+
+  {:db/id          :clinical-observation/subject
+   :unify.ref/from :clinical-observation
+   :unify.ref/to   :subject}
+
+  {:db/id          :clinical-observation/metastasis-gdc-anatomic-sites
+   :unify.ref/from :clinical-observation
+   :unify.ref/to   :gdc-anatomic-site}
+
+  {:db/id          :adverse-event/subject
+   :unify.ref/from :adverse-event
+   :unify.ref/to   :subject}
+
+  {:db/id          :adverse-event/timepoint
+   :unify.ref/from :adverse-event
+   :unify.ref/to   :timepoint}
+
+  {:db/id          :adverse-event/study-day
+   :unify.ref/from :adverse-event
+   :unify.ref/to   :study-day}
+
+  {:db/id          :adverse-event/meddra-adverse-event
+   :unify.ref/from :adverse-event
+   :unify.ref/to   :meddra-disease}
+
+  {:db/id          :subject/comorbidities
+   :unify.ref/from :subject
+   :unify.ref/to   :comorbidity}
+
+  {:db/id          :subject/therapies
+   :unify.ref/from :subject
+   :unify.ref/to   :therapy}
+
+  {:db/id          :subject/meddra-disease
+   :unify.ref/from :subject
+   :unify.ref/to   :meddra-disease}
+
+  {:db/id          :therapy/treatment-regimen
+   :unify.ref/from :therapy
+   :unify.ref/to   :treatment-regimen}
+
+  {:db/id          :timepoint/treatment-regimen
+   :unify.ref/from :timepoint
+   :unify.ref/to   :treatment-regimen}
+
+  {:db/id          :clinical-observation/timepoint
+   :unify.ref/from :clinical-observation
+   :unify.ref/to   :timepoint}
+
+  {:db/id          :clinical-observation/study-day
+   :unify.ref/from :clinical-observation
+   :unify.ref/to   :study-day}
+
+  {:db/id          :treatment-regimen/drug-regimens
+   :unify.ref/from :treatment-regimen
+   :unify.ref/to   :drug-regimen}
+
+  {:db/id          :drug-regimen/drug
+   :unify.ref/from :drug-regimen
+   :unify.ref/to   :drug}
+
+  {:db/id          :treatment-regimen/clinical-trial
+   :unify.ref/from :treatment-regimen
+   :unify.ref/to   :clinical-trial}
+
+  {:db/id          :gene/genomic-coordinates
+   :unify.ref/from :gene
+   :unify.ref/to   :genomic-coordinate}
+
+  {:db/id          :variant/gene
+   :unify.ref/from :variant
+   :unify.ref/to   :gene}
+
+  {:db/id          :variant/genomic-coordinates
+   :unify.ref/from :variant
+   :unify.ref/to   :genomic-coordinate}
+
+  {:db/id          :variant/so-consequences
+   :unify.ref/from :variant
+   :unify.ref/to   :so-sequence-feature}
+
+  {:db/id          :variant/neo-antigens
+   :unify.ref/from :variant
+   :unify.ref/to   :neo-antigen}
+
+  {:db/id          :epitope/protein
+   :unify.ref/from :epitope
+   :unify.ref/to   :protein}
+
+  {:db/id          :protein/gene
+   :unify.ref/from :protein
+   :unify.ref/to   :gene}
+
+  {:db/id                 :nanostring-signature/gene-weights
+   :unify.ref/from        :nanostring-signature
+   :unify.ref/tuple-types [:gene :db.type/double]}
+
+  {:db/id          :cnv/genes
+   :unify.ref/from :cnv
+   :unify.ref/to   :gene}
+
+  {:db/id          :gene-product/gene
+   :unify.ref/from :gene-product
+   :unify.ref/to   :gene}
+
+  {:db/id          :cnv/genomic-coordinates
+   :unify.ref/from :cnv
+   :unify.ref/to   :genomic-coordinate}
+
+  {:db/id          :chr-acc-reg/genomic-coordinates
+   :unify.ref/from :chr-acc-reg
+   :unify.ref/to   :genomic-coordinate}
+
+  {:db/id          :cell-type/parents
+   :unify.ref/from :cell-type
+   :unify.ref/to   :cell-type}
+
+  {:db/id          :single-cell/cell-populations
+   :unify.ref/from :single-cell
+   :unify.ref/to   :cell-population}
+
+  {:db/id          :single-cell/sample
+   :unify.ref/from :single-cell
+   :unify.ref/to   :sample}
+
+  {:db/id          :cell-population/cell-type
+   :unify.ref/from :cell-population
+   :unify.ref/to   :cell-type}
+
+  {:db/id          :cell-population/parent
+   :unify.ref/from :cell-population
+   :unify.ref/to   :cell-population}
+
+  {:db/id          :cell-population/positive-markers
+   :unify.ref/from :cell-population
+   :unify.ref/to   :epitope}
+
+  {:db/id          :cell-population/negative-markers
+   :unify.ref/from :cell-population
+   :unify.ref/to   :epitope}
+
+  {:db/id          :atac-peak/genomic-coordinates
+   :unify.ref/from :atac-peak
+   :unify.ref/to   :genomic-coordinate}]]

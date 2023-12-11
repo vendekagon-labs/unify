@@ -16,10 +16,7 @@
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [com.vendekagonlabs.unify.util.collection :as util.coll]
             [com.vendekagonlabs.unify.util.uuid :as util.uuid]
-            [com.vendekagonlabs.unify.import.engine.parse.matrix-file :as parse.matrix-file]
-            [com.vendekagonlabs.unify.import.engine.parse.config :as parse.config]
-            [com.vendekagonlabs.unify.util.io :as util.io]
-            [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]))
+            [com.vendekagonlabs.unify.import.engine.parse.matrix-file :as parse.matrix-file]))
 
 
 (defn matrix->entity
@@ -34,7 +31,7 @@
   [{:keys [parsed-cfg schema mapping] :as job-context}
    {:keys [unify.matrix/input-file
            unify.matrix/format
-           unify.matrix/column-attribute ;; only dense, otherwise all in indexed-by
+           unify.matrix/column-attribute                    ;; only dense, otherwise all in indexed-by
            unify.matrix/indexed-by
            unify/node-kind] :as mtx-directive}]
   (let [data-type-key (metamodel/matrix-data-type-attr schema node-kind)
@@ -51,13 +48,13 @@
                           ;; default to sparse
                           (merge {:indexed-by (util.coll/remove-keys-by-ns indexed-by "unify")
                                   :data-spec  value-type
-                                  :data-type db-value-type
+                                  :data-type  db-value-type
                                   :sparse?    true}
                                  ;; when not sparse, add column-attribute/target
                                  ;; for dense matrix column interunifyation
                                  (when (not= :unify.matrix.format/sparse format)
                                    {:sparse? false
-                                    :target column-attribute})))
+                                    :target  column-attribute})))
         no-unify-parsed-mtx-file (util.coll/remove-keys-by-ns parsed-mtx-file "unify")
         raw-entity (util.coll/remove-keys-by-ns mtx-directive "unify")
         resolve-fn (fn [attr val]
@@ -83,7 +80,7 @@
                           backing-key
                           data-type-kv
                           resolved-constants
-                          {:unify.matrix/input-file input-file
+                          {:unify.matrix/input-file  input-file
                            :unify.matrix/output-file key
                            :unify.matrix/header-substitutions
                            (-> (util.coll/remove-keys-by-ns indexed-by "unify")
@@ -93,12 +90,12 @@
         ;; self-uid comes in last, potentially dependent on prior entity parsing stuff.
         self-uid (parse.data/create-self-uid parsed-cfg schema mtx-directive entity-map)
         validation-errors (seq (:validation-errors entity-map))]
-      (if validation-errors
-        (throw (ex-info "Measurements in matrix file did not pass spec!"
-                        {::spec value-type
-                         ::validation-errors (take 1000 validation-errors)}))
-        (-> entity-map
-            (merge self-uid)
-            (merge {:unify.matrix/constant-columns
-                    (util.coll/remove-keys-by-ns (:unify.matrix/constants mtx-directive) "unify")})
-            (dissoc :validation-errors)))))
+    (if validation-errors
+      (throw (ex-info "Measurements in matrix file did not pass spec!"
+                      {::spec              value-type
+                       ::validation-errors (take 1000 validation-errors)}))
+      (-> entity-map
+          (merge self-uid)
+          (merge {:unify.matrix/constant-columns
+                  (util.coll/remove-keys-by-ns (:unify.matrix/constants mtx-directive) "unify")})
+          (dissoc :validation-errors)))))

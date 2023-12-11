@@ -28,10 +28,12 @@
             [com.vendekagonlabs.unify.db.schema :as schema]
             [clojure.string :as str]))
 
-(def unify-key-whitelist #{:unify/constants :unify/value :unify/variables :unify/reverse :unify/precomputed
-                           :unify/rev-variable :unify/input-file :unify/import :unify/variable
+(def unify-key-whitelist #{:unify/constants :unify/value :unify/variables
+                           :unify/reverse :unify/precomputed
+                           :unify/rev-variable :unify/input-tsv-file :unify/import :unify/variable
                            :unify/rev-attr :unify/many-delimiter :unify/many-variable
                            :unify/na :unify/omit-if-na
+                           :unify/glob :unify.glob/directory :unify.glob/pattern
                            :unify.matrix/format :unify.matrix/input-file
                            :unify.matrix.format/sparse :unify.matrix.format/dense
                            :unify.matrix/column-attribute :unify.matrix/indexed-by
@@ -98,19 +100,19 @@
     (walk/postwalk f m)))
 
 (defn remove-directives
-  "Remove any map in a nested map structure that contains the :unify/input-file
+  "Remove any map in a nested map structure that contains the :unify/input-tsv-file
   or :unify.matrix/input-file keys"
   [config-map]
   (-> config-map
       ;; if we end up supporting more formats than tsv -> datoms and tsv -> s3,
       ;; we may want to make this pruning/separation more generic.
-      (prune-nodes-by-key :unify/input-file)
+      (prune-nodes-by-key :unify/input-tsv-file)
       (prune-nodes-by-key :unify.matrix/input-file)
       flatten-nil-vecs
       remove-nils))
 
 (defn only-directives
-  "Return a map preserving only the nested structures that contain the :unify/input-file key"
+  "Return a map preserving only the nested structures that contain the :unify/input-tsv-file key"
   [config-map]
   (second (data/diff (remove-directives config-map) config-map)))
 
@@ -174,14 +176,14 @@
         invalid-unify-keys (seq (filter (complement unify-key-whitelist) unify-keys))
         invalid-map (when-not (map? cfg-map) (type cfg-map))
         error-map (cond-> {}
-                    invalid-map (assoc :config-file/containing-form-not-map invalid-map)
-                    invalid-unify-keys (assoc :config-file/invalid-unify-keys (vec invalid-unify-keys))
-                    invalid-var-attrs (assoc :config-file/invalid-unify-variables-keys (vec invalid-var-attrs))
-                    invalid-top-keys (assoc :config-file/invalid-top-keys (vec invalid-top-keys))
-                    missing-top-keys (assoc :config-file/missing-top-keys (vec missing-top-keys)))]
+                          invalid-map (assoc :config-file/containing-form-not-map invalid-map)
+                          invalid-unify-keys (assoc :config-file/invalid-unify-keys (vec invalid-unify-keys))
+                          invalid-var-attrs (assoc :config-file/invalid-unify-variables-keys (vec invalid-var-attrs))
+                          invalid-top-keys (assoc :config-file/invalid-top-keys (vec invalid-top-keys))
+                          missing-top-keys (assoc :config-file/missing-top-keys (vec missing-top-keys)))]
     (if-not (seq error-map)
       cfg-map
-      (throw (ex-info (str "Config was invalid:\n" (text/->unifyty-string error-map))
+      (throw (ex-info (str "Config was invalid:\n" (text/->pretty-string error-map))
                       error-map)))))
 
 
@@ -230,7 +232,7 @@
             (throw
               (ex-info (str "Wrong attribute namespace: " wrong-attr " for entity: " kind)
                        {:config-file/entity-attribute-mismatch {:entity kind
-                                                                :attrs wrong-attr}}))
+                                                                :attrs  wrong-attr}}))
             node))))
     ns-cfg-map))
 
@@ -249,7 +251,7 @@
     (throw (ex-info (str "The following keywords in the config map: "
                          (vec wrong-keywords)
                          " are not in the CANDEL schema.")
-             {:config-file/bad-keywords (vec wrong-keywords)})))
+                    {:config-file/bad-keywords (vec wrong-keywords)})))
   ns-cfg-map)
 
 
@@ -293,10 +295,10 @@
                              (clojure.string/join metamodel/synthetic-sep))]
     (if (clojure.string/blank? synthetic-value)
       (throw (ex-info (str "Could not synthesize an attribute for " node-kind)
-                      {:engine/unsynthesized-attr {:synthetic-attribute synth-attr
+                      {:engine/unsynthesized-attr {:synthetic-attribute  synth-attr
                                                    :synthetic-components components
-                                                   :node node
-                                                   :from ::synthetic-uid}}))
+                                                   :node                 node
+                                                   :from                 ::synthetic-uid}}))
       (parse.data/uid-attr-val schema parsed-cfg (assoc node synth-attr synthetic-value) {}))))
 
 (defn- uid-config-node?
@@ -305,18 +307,18 @@
   [node]
   (let [context-type (last (:unify/ns-node-ctx node))]
 
-    ;; skip :unify/input-file nodes
+    ;; skip :unify/input-tsv-file nodes
     ;; skip nodes whose context ends with
-    ;;  :unify/reverse, :unify/constants, :unify/variables, :unify/input-file
+    ;;  :unify/reverse, :unify/constants, :unify/variables, :unify/input-tsv-file
 
     ;; I have no idea wtf this does, it doesn't skip these like it says, just sends them
     ;; to parse.data/uid-attr-val instead of synthetic-uid. Why? I also have no
     ;; idea.
-    (not (or (contains? node :unify/input-file)
+    (not (or (contains? node :unify/input-tsv-file)
              (= context-type :unify/reverse)
              (= context-type :unify/constants)
              (= context-type :unify/variables)
-             (= context-type :unify/input-file)))))
+             (= context-type :unify/input-tsv-file)))))
 
 (defn- skip-uid?
   [node]
@@ -367,11 +369,11 @@
        reverse))
 
 (defn add-parent-ref
-  "Adds parent refs to directives (containing :unify/input-file) and specifies output file prefix
+  "Adds parent refs to directives (containing :unify/input-tsv-file) and specifies output file prefix
   to indicate that children/dependent data should be transacted after parent directives."
   [schema parsed-cfg node]
   ;; theoretically this could be name check now.
-  (if-not (or (:unify/input-file node)
+  (if-not (or (:unify/input-tsv-file node)
               (:unify.matrix/input-file node))
     node
     (if (:unify/reverse node)
@@ -379,7 +381,7 @@
       ;; for forward ref case, we resolve forward ref with constant literal as lookup ref
       (let [ctx (:unify/ns-node-ctx node)
             fwd-ref-attr (last (filter keyword? ctx))
-            par-kind (keyword (namespace fwd-ref-attr)) ;; todo - this should be done with metamodel-utils ?
+            par-kind (keyword (namespace fwd-ref-attr))     ;; todo - this should be done with metamodel-utils ?
 
 
             par-uid-attr (or (metamodel/need-uid? schema par-kind)
@@ -404,7 +406,7 @@
 
 
 (defn add-node-contexts
-  "Given a directive map, add node contexts (as per contextual) to each :unify/input-file node
+  "Given a directive map, add node contexts (as per contextual) to each :unify/input-tsv-file node
   in either the :unify/node-ctx key or another passed key."
   ([m unify-key]
    (let [add-ctx-fn (fn [node]
@@ -474,10 +476,10 @@
     (apply concat (for [[key job-maps] ref-jobs-by-ref-kind]
                     (map (fn [job-map]
                            (-> job-map
-                             (assoc :unify/out-file-prefix (get prefix-map key))
-                             ;; this is a band-aid on the misguided use of temp keys here to ensure that
-                             ;; they don't leak out of ref job resolution.
-                             (dissoc :tmp/ref-deps :tmp/ref-attr)))
+                               (assoc :unify/out-file-prefix (get prefix-map key))
+                               ;; this is a band-aid on the misguided use of temp keys here to ensure that
+                               ;; they don't leak out of ref job resolution.
+                               (dissoc :tmp/ref-deps :tmp/ref-attr)))
                          job-maps)))))
 
 
@@ -487,30 +489,30 @@
        fname))
 
 (defn get-directive-maps
-  "Returns a seq of directives (maps that contain :unify/input-file) from
+  "Returns a seq of directives (maps that contain :unify/input-tsv-file) from
   a (possibly multiply-nested) map"
   [cfg-dir m]
-  (let [all-maps-list (coll/all-nested-maps m :unify/input-file)
-        rm-fun (fn [[_ v]] (and (map? v) (:unify/input-file v)))]
+  (let [all-maps-list (coll/all-nested-maps m :unify/input-tsv-file)
+        rm-fun (fn [[_ v]] (and (map? v) (:unify/input-tsv-file v)))]
     (->> all-maps-list
          (map #(into {} (remove rm-fun %)))
          ;; if we have multiple files from parsed glob pattern, then we
          ;; make a directive map for each.
          (mapcat (fn [d-map]
-                   (let [input-file-spec (:unify/input-file d-map)]
+                   (let [input-file-spec (:unify/input-tsv-file d-map)]
                      (if-not (map? input-file-spec)
-                       [(assoc d-map :unify/input-file (maybe->absolute-path cfg-dir input-file-spec))]
-                       (let [{:keys [glob/directory glob/pattern]} input-file-spec
+                       [(assoc d-map :unify/input-tsv-file (maybe->absolute-path cfg-dir input-file-spec))]
+                       (let [{:keys [unify.glob/directory unify.glob/pattern]} input-file-spec
                              abs-dir (maybe->absolute-path cfg-dir directory)
                              matched-files (util.io/glob abs-dir pattern)
-                             returned (mapv #(assoc d-map :unify/input-file %)
+                             returned (mapv #(assoc d-map :unify/input-tsv-file %)
                                             matched-files)]
                          (if (seq returned)
                            returned
                            (throw
                              (ex-info
                                (str "Glob pattern didn't match any files: " directory " " pattern)
-                               {:directive/glob-with-no-matches {:glob [directory pattern]}})))))))))))
+                               {:directive/glob-with-no-matches {:unify.glob [directory pattern]}})))))))))))
 
 
 (defn reference-data-jobs
@@ -612,7 +614,7 @@
       directives-maps
       (throw (ex-info (str "One of :" molten-kws
                            " set, but not all set (directive must specify all or none)")
-               {:config/malformed-directive-maps malformed-molten})))))
+                      {:config/malformed-directive-maps malformed-molten})))))
 
 (defn cfg-map->directives
   "Given a schema, a mapping lookup, the import-root-dir and a parsed config map,
@@ -648,12 +650,12 @@
                            ":name, and :user keys."
                            "Note: if older config, you may need to change :import-name to :name")
                       {:config-file/invalid-unify-import-keys
-                        {:keys-present (-> cfg-map :unify/import keys)
-                         :keys-required #{:user :name :mappings}}})))
-    {:import/user user
+                       {:keys-present  (-> cfg-map :unify/import keys)
+                        :keys-required #{:user :name :mappings}}})))
+    {:import/user           user
      :import/schema-version schema-version
-     :import/unify-version unify-version
-     :import/name import-name}))
+     :import/unify-version  unify-version
+     :import/name           import-name}))
 
 (defn cfg-map->matrix-directives
   "Returns all matrix parsing directives specified in the import config, w/annotations in the map

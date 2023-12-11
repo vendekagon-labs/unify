@@ -18,6 +18,15 @@
 
   https://www.uniprot.org/help/downloads
 
+  We need two files, with links (as of 09-DEC-2023):
+
+  https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.xml.gz
+
+  and:
+
+
+
+
   For more information and to obtain files."
   (:require [clojure.java.io :as io]
             [clojure.data.xml :as xml]

@@ -23,9 +23,9 @@
                                                    ; different analyses run on the same set of assay data, or any other groupings of measurements
                                                    :measurement-sets [; This measurement set consists of somatic variant measurements
                                                                       {:name         "variant-set-1"
-                                                                       :measurements [{; To load in data from input files, we use the :unify/input-file key
+                                                                       :measurements [{; To load in data from input files, we use the :unify/input-tsv-file key
                                                                                        ; Note that the input file can be specified with a relative path (relative to the config.edn location), or an absolute path
-                                                                                       :unify/input-file "processed/variant_measurements.txt"
+                                                                                       :unify/input-tsv-file "processed/variant_measurements.txt"
 
                                                                                        ; The sample and variant attributes are mapped directly from columns in the file
                                                                                        :sample           "sample.id"
@@ -45,36 +45,36 @@
 
                                                                       ; To input another set of measurements also from WES, use another measurement-set
                                                                       ; This could be variants called with another pipeline, or on a different set of samples, or other
-                                                                      {:name         "another set of variants"
-                                                                       ; You can use a series of files as input if you specify them as a glob, like below:
-                                                                       :measurements [{:unify/input-file #glob["processed/" "variant_meas_*.tsv"]
-                                                                                       ; The :unify/na key tells unify what to treat as NA in the input file.
-                                                                                       ; Attributes containing an NA will be ignored and not input into CANDEL
-                                                                                       :unify/na         ""
-                                                                                       ; The :unify/omit-if-na key tells unify which attributes to, if they are NA, remove the entire entity from the data import. This is usually applicable to measurements.
-                                                                                       :unify/omit-if-na [:measurement/t-depth
-                                                                                                          :measurement/n-depth
-                                                                                                          :measurement/t-ref-count
-                                                                                                          :measurement/t-alt-count
-                                                                                                          :measurement/n-ref-count
-                                                                                                          :measurement/n-alt-count]
-                                                                                       :sample           "Tumor_Sample_Barcode"
-                                                                                       :variant          "var.id"
-                                                                                       :unify/variable   "variable"
-                                                                                       :unify/value      "value"
-                                                                                       :unify/variables  {"t_depth"     :measurement/t-depth
-                                                                                                          "n_depth"     :measurement/n-depth
-                                                                                                          "t_ref_count" :measurement/t-ref-count
-                                                                                                          "t_alt_count" :measurement/t-alt-count
-                                                                                                          "n_ref_count" :measurement/n-ref-count
-                                                                                                          "n_alt_count" :measurement/n-alt-count}}]}
+                                                                      #_{:name         "another set of variants"
+                                                                         ; You can use a series of files as input if you specify them as a glob, like below:
+                                                                         :measurements [{:unify/input-tsv-file #glob["processed/" "variant_meas_*.tsv"]
+                                                                                         ; The :unify/na key tells unify what to treat as NA in the input file.
+                                                                                         ; Attributes containing an NA will be ignored and not input into CANDEL
+                                                                                         :unify/na         ""
+                                                                                         ; The :unify/omit-if-na key tells unify which attributes to, if they are NA, remove the entire entity from the data import. This is usually applicable to measurements.
+                                                                                         :unify/omit-if-na [:measurement/t-depth
+                                                                                                            :measurement/n-depth
+                                                                                                            :measurement/t-ref-count
+                                                                                                            :measurement/t-alt-count
+                                                                                                            :measurement/n-ref-count
+                                                                                                            :measurement/n-alt-count]
+                                                                                         :sample           "Tumor_Sample_Barcode"
+                                                                                         :variant          "var.id"
+                                                                                         :unify/variable   "variable"
+                                                                                         :unify/value      "value"
+                                                                                         :unify/variables  {"t_depth"     :measurement/t-depth
+                                                                                                            "n_depth"     :measurement/n-depth
+                                                                                                            "t_ref_count" :measurement/t-ref-count
+                                                                                                            "t_alt_count" :measurement/t-alt-count
+                                                                                                            "n_ref_count" :measurement/n-ref-count
+                                                                                                            "n_alt_count" :measurement/n-alt-count}}]}
 
 
                                                                       ; This measurement-set consists of copy number variation measurements run on the same samples as the above variants
                                                                       ; TODO: Fix this at some point in time when not blocking CANDEL ops. After fixing HGNC identifiers in the reference
                                                                       ;       data there are now some failures here.
                                                                       #_{:name         "copy number variations"
-                                                                         :measurements [{:unify/input-file             #glob["processed/" "cnv_meas_*.tsv"]
+                                                                         :measurements [{:unify/input-tsv-file             #glob["processed/" "cnv_meas_*.tsv"]
                                                                                          :unify/na                     ""
                                                                                          :sample                       "barcode"
 
@@ -90,7 +90,7 @@
                                                    :technology       :assay.technology/ELISA
                                                    :description      "LDH measurement at baseline"
                                                    :measurement-sets [{:name         "clinical LDH measurements"
-                                                                       :measurements {:unify/input-file  "processed/ldh_meas_and_samples.txt"
+                                                                       :measurements {:unify/input-tsv-file  "processed/ldh_meas_and_samples.txt"
                                                                                       :unify/na          "NA"
                                                                                       :unify/omit-if-na  [:measurement/ng-mL]
                                                                                       :sample            "sample.id"
@@ -106,7 +106,7 @@
                                                    :technology       :assay.technology/nanostring
                                                    :description      "gene expr via nanostring"
                                                    :measurement-sets [{:name         "baseline"
-                                                                       :measurements [{:unify/input-file "processed/nanostring.txt"
+                                                                       :measurements [{:unify/input-tsv-file "processed/nanostring.txt"
                                                                                        :gene-product     "variable"
                                                                                        :sample           "sample"
                                                                                        :nanostring-count "value"}]}]}
@@ -118,59 +118,59 @@
                                                    :technology       :assay.technology/TCR-seq
                                                    :description      "TCR sequencing"
                                                    :measurement-sets [{:name         "Baseline TCR clonality measurements"
-                                                                       :measurements [{:unify/input-file "processed/tcr_clonality.txt"
+                                                                       :measurements [{:unify/input-tsv-file "processed/tcr_clonality.txt"
                                                                                        :sample           "sample"
                                                                                        :tcr-clonality    "Clonality"}]}]}
 
                                                   ; Below is an example of how we represent cytometry data, including defining cell populations both from gating and clustering
-                                                  {:name             "CyTOF"
-                                                   :technology       :assay.technology/mass-cytometry
-                                                   :description      "CyTOF analysis performed at Primity Bio"
-                                                   :measurement-sets [{:name             "Spitzer gated"
-                                                                       :cell-populations [{:unify/input-file "processed/cell_populations_Spitzer.txt"
-                                                                                           :unify/na         "NA"
-                                                                                           :cell-type        "cell.type"
-                                                                                           :unify/constants  {:from-clustering false}
-                                                                                           :positive-markers {:unify/many-delimiter ","
-                                                                                                              :unify/many-variable  "positive.epitopes"}
-                                                                                           :name             "name"}]
-                                                                       :measurements     [{:unify/input-file "processed/cytof_measurements_eventCount_Spitzer.txt"
-                                                                                           :unify/na         "NA"
-                                                                                           :unify/omit-if-na [:measurement/cell-count
-                                                                                                              :measurement/leukocyte-count
-                                                                                                              :measurement/percent-of-leukocytes]
-                                                                                           :sample           "sample"
-                                                                                           :cell-population  "uniquePopulationName"
-                                                                                           :unify/variable   "variable"
-                                                                                           :unify/value      "value"
-                                                                                           :unify/variables  {"eventCount"                :measurement/cell-count
-                                                                                                              "normalization.measurement" :measurement/leukocyte-count
-                                                                                                              "normalized.measurement"    :measurement/percent-of-leukocytes}}
-                                                                                          {:unify/input-file     "processed/cytof_measurements_median_Spitzer.txt"
-                                                                                           :unify/na             "NA"
-                                                                                           :unify/omit-if-na     [:measurement/median-channel-value]
-                                                                                           :sample               "sample"
-                                                                                           :cell-population      "uniquePopulationName"
-                                                                                           :epitope              "epitope"
-                                                                                           :median-channel-value "median"}]}
+                                                  #_{:name             "CyTOF"
+                                                     :technology       :assay.technology/mass-cytometry
+                                                     :description      "CyTOF analysis performed at Primity Bio"
+                                                     :measurement-sets [{:name             "Spitzer gated"
+                                                                         :cell-populations [{:unify/input-tsv-file "processed/cell_populations_Spitzer.txt"
+                                                                                             :unify/na         "NA"
+                                                                                             :cell-type        "cell.type"
+                                                                                             :unify/constants  {:from-clustering false}
+                                                                                             :positive-markers {:unify/many-delimiter ","
+                                                                                                                :unify/many-variable  "positive.epitopes"}
+                                                                                             :name             "name"}]
+                                                                         :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_eventCount_Spitzer.txt"
+                                                                                             :unify/na         "NA"
+                                                                                             :unify/omit-if-na [:measurement/cell-count
+                                                                                                                :measurement/leukocyte-count
+                                                                                                                :measurement/percent-of-leukocytes]
+                                                                                             :sample           "sample"
+                                                                                             :cell-population  "uniquePopulationName"
+                                                                                             :unify/variable   "variable"
+                                                                                             :unify/value      "value"
+                                                                                             :unify/variables  {"eventCount"                :measurement/cell-count
+                                                                                                                "normalization.measurement" :measurement/leukocyte-count
+                                                                                                                "normalized.measurement"    :measurement/percent-of-leukocytes}}
+                                                                                            {:unify/input-tsv-file     "processed/cytof_measurements_median_Spitzer.txt"
+                                                                                             :unify/na             "NA"
+                                                                                             :unify/omit-if-na     [:measurement/median-channel-value]
+                                                                                             :sample               "sample"
+                                                                                             :cell-population      "uniquePopulationName"
+                                                                                             :epitope              "epitope"
+                                                                                             :median-channel-value "median"}]}
 
 
-                                                                      {:name             "Spitzer clustered"
-                                                                       :description      "All data pooled together and clustered with grappolo"
-                                                                       :cell-populations [{:unify/input-file "processed/cell_populations_cluster_Spitzer.txt"
-                                                                                           :name             "cluster.id"
-                                                                                           :unify/constants  {:from-clustering true}}]
-                                                                       :measurements     [{:unify/input-file "processed/cytof_measurements_clusters_Spitzer.txt"
-                                                                                           :unify/na         "NA"
-                                                                                           :unify/omit-if-na [:measurement/median-channel-value
-                                                                                                              :measurement/percent-of-leukocytes]
-                                                                                           :sample           "sample"
-                                                                                           :cell-population  "cluster.id"
-                                                                                           :epitope          "epitope"
-                                                                                           :unify/variable   "variable"
-                                                                                           :unify/value      "value"
-                                                                                           :unify/variables  {"median-channel-value" :measurement/median-channel-value
-                                                                                                              "popsize"              :measurement/percent-of-leukocytes}}]}]}]
+                                                                        {:name             "Spitzer clustered"
+                                                                         :description      "All data pooled together and clustered with grappolo"
+                                                                         :cell-populations [{:unify/input-tsv-file "processed/cell_populations_cluster_Spitzer.txt"
+                                                                                             :name             "cluster.id"
+                                                                                             :unify/constants  {:from-clustering true}}]
+                                                                         :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_clusters_Spitzer.txt"
+                                                                                             :unify/na         "NA"
+                                                                                             :unify/omit-if-na [:measurement/median-channel-value
+                                                                                                                :measurement/percent-of-leukocytes]
+                                                                                             :sample           "sample"
+                                                                                             :cell-population  "cluster.id"
+                                                                                             :epitope          "epitope"
+                                                                                             :unify/variable   "variable"
+                                                                                             :unify/value      "value"
+                                                                                             :unify/variables  {"median-channel-value" :measurement/median-channel-value
+                                                                                                                "popsize"              :measurement/percent-of-leukocytes}}]}]}]
 
 
 
@@ -187,7 +187,7 @@
                       ; are used to identify samples that are pointed to by :measurement/sample. Therefore the files
                       ; contained here need to contain all the IDs that are referenced from the measurements files
                       :samples                   [{; This input file will have one line per sample
-                                                   :unify/input-file  "processed/rizvi-samples.txt"
+                                                   :unify/input-tsv-file  "processed/rizvi-samples.txt"
 
                                                    :id                "sample.id"
                                                    :subject           "subject.id"
@@ -201,7 +201,7 @@
                                                   ; This 2nd map is for another set of samples from the same patients as above.
                                                   ; These samples were baseline samples for LDH measurement.
                                                   ; We made up sample IDs for them and we insert known information such as sample type and specimen.
-                                                  {:unify/input-file "processed/ldh_meas_and_samples.txt"
+                                                  {:unify/input-tsv-file "processed/ldh_meas_and_samples.txt"
                                                    :id               "sample.id"
                                                    :subject          "Patient ID"
                                                    :unify/constants  {:type      :sample.type/normal
@@ -210,7 +210,7 @@
 
 
                                                   ;This 3rd map is for another file of samples, from another source
-                                                  {:unify/input-file "processed/tcga-samples.tsv"
+                                                  {:unify/input-tsv-file "processed/tcga-samples.tsv"
                                                    :unify/na         ""
                                                    :id               "barcode"
                                                    :subject          "subject.id"
@@ -223,7 +223,7 @@
 
                       ; The subjects map contains information about each subject. Each patient in the dataset should be represented as one subject entity.
                       :subjects                  [{; The file here will have one line per subject
-                                                   :unify/input-file "processed/rizvi-subjects.txt"
+                                                   :unify/input-tsv-file "processed/rizvi-subjects.txt"
                                                    :id               "subject.id"
                                                    ; You will likely need a mapping for gender values since they are enums in CANDEL
                                                    :sex              "gender"
@@ -242,7 +242,7 @@
                                                    ; The therapy entity links subjects to treatment-regimens (see below) which are things like arms of clinical trials, which many subjects are on.
                                                    ; The wick package contains helper functions to generate all this data for the simple case in which each subject has only a single therapy
                                                    :therapies        {; This input file will have one line per subject-therapy combination
-                                                                      :unify/input-file  "processed/rizvi-therapies.txt"
+                                                                      :unify/input-tsv-file  "processed/rizvi-therapies.txt"
                                                                       ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
                                                                       ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
                                                                       :treatment-regimen "regimen"
@@ -252,7 +252,7 @@
                                                                       :unify/reverse     {:unify/rev-variable "subject.id"
                                                                                           :unify/rev-attr     :subject/therapies}}}
 
-                                                  {:unify/input-file "processed/tcga-subjects.tsv"
+                                                  {:unify/input-tsv-file "processed/tcga-subjects.tsv"
                                                    :unify/na         ""
                                                    :id               "subject.id"
                                                    #_:meddra-disease         #_"disease"}]
@@ -261,7 +261,7 @@
                       ; clinical-observations hold the equivalent of measurements, but for subjects instead of samples
                       ; clinical-observations will store clinical data such as BMI and response, and capture the timepoint at which they are measured
                       :clinical-observation-sets [{:name                  "recist-and-dcb-all-timepoints"
-                                                   :clinical-observations [{:unify/input-file "processed/rizvi-clinical_observations.txt"
+                                                   :clinical-observations [{:unify/input-tsv-file "processed/rizvi-clinical_observations.txt"
                                                                             :subject          "subject.id"
                                                                             :timepoint        "timepoint"
                                                                             :unify/variable   "variable"
@@ -287,7 +287,7 @@
                       ; Laying out the timepoints in your dataset may be one of the first things you do.
                       ; Both samples and clinical-observations are linked to timepoints, which are critical for downstream analysis.
                       ; NOTE - in this example, we have timepoints hard-coded in the config file. However, it is equally valid to enter timepoints in a file and set
-                      ; up the config to read the file and map the columns to attributes, using the :unify/input-file directive as was done with the measurement examples above
+                      ; up the config to read the file and map the columns to attributes, using the :unify/input-tsv-file directive as was done with the measurement examples above
                       :timepoints                [{; The "type" attribute maps a timepoint to a set list of time concepts, like "baseline" or "on-treatment", for easy grouping later
                                                    :type              :timepoint.type/baseline
                                                    ; Timepoints may be tied to a specific treatment-regimen or may be general
@@ -324,14 +324,14 @@
  ; Only some reference types are allowed to be created on input: genomic coordinates, variants, and CNV are some common ones
 
  ; Adding reference genomic-coordinates is probably necessary if your dataset has variants, CNV, or any other measurement not tied only to individual genes
- :genomic-coordinate [{:unify/input-file "processed/genomic_coords.txt"
+ :genomic-coordinate [{:unify/input-tsv-file "processed/genomic_coords.txt"
                        :contig           "chrom"
                        :start            "start"
                        :end              "end"
                        :strand           "strand"
                        :assembly         "assembly"
                        :id               "gc.id"}
-                      {:unify/input-file #glob["processed/" "gc_ref_*.tsv"]
+                      {:unify/input-tsv-file #glob["processed/" "gc_ref_*.tsv"]
                        :unify/na         ""
                        :contig           "Chromosome"
                        :start            "Start_Position"
@@ -341,7 +341,7 @@
                        :id               "gc.id"}]
 
  ; Adding reference variants is probably necessary if your dataset contains variant measurements
- :variant            [{:unify/input-file    "processed/variants.txt"
+ :variant            [{:unify/input-tsv-file    "processed/variants.txt"
                        :id                  "var.id"
                        :genomic-coordinates "gc.id"
                        :gene                "hugo"
@@ -350,7 +350,7 @@
 
                       ; Just like with other maps above, you can input multiple maps
                       ; and each map can come from many files if they are structured in the same way
-                      {:unify/input-file    #glob["processed/" "variant_ref_*.tsv"]
+                      {:unify/input-tsv-file    #glob["processed/" "variant_ref_*fixed.tsv"]
                        :unify/na            ""
                        :id                  "var.id"
                        :genomic-coordinates "gc.id"
@@ -383,7 +383,7 @@
                                              "COSMIC"                 :variant/cosmic}}]
 
  ; If your dataset contains CNV measurements you will likely need to insert CNV reference entities as well
- :cnv                {:unify/input-file    #glob["processed/" "cnv_ref_fixed*.tsv"]
+ :cnv                {:unify/input-tsv-file    #glob["processed/" "cnv_ref_fixed_again*.tsv"]
                       :unify/na            ""
                       :genomic-coordinates "gc.id"
                       :id                  "gc.id"
@@ -395,7 +395,7 @@
  ;; TODO: uncomment out when ref ordering bug fixed
  ;; If you haven't installed a proprietary WHO Drug reference dataset, you can
  ;; define all drug names referred to in treatment data here.
- #_:drug            #_[{:unify/input-file "processed/drugs.tsv"
+ #_:drug            #_[{:unify/input-tsv-file "processed/drugs.tsv"
                         :preferred-name   "name"}]
  :clinical-trial     {:nct-number "NCT01295827"
                       :other-ids  "KEYNOTE-001"

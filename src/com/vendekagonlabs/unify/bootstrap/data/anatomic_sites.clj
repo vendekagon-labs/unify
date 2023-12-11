@@ -24,9 +24,14 @@
   https://docs.gdc.cancer.gov/Data_Dictionary/viewer/#?view=table-definition-view&id=sample&anchor=biospecimen_anatomic_site
 
   For the full listing.
+
+  A raw file is available at:
+  https://raw.githubusercontent.com/CBIIT/GDCMVS/master/server/data/sample.yaml
+  as of (09-DEC-2023)
   "
   (:require [yaml.core :as yaml]
             [com.vendekagonlabs.unify.util.io :as util.io]))
+
 
 
 (defn init
@@ -51,3 +56,6 @@
   (generate-tx-data
     {:gdc-sample-file "seed_data/raw/anatomic_sites/sample.yaml"
      :output-file "seed_data/edn/all-anatomic-site-tx-data.edn"}))
+
+(comment
+  (:properties (yaml/from-file "seed_data/raw/anatomic_sites/sample.yaml")))

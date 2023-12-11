@@ -54,7 +54,7 @@
   (as-bytes [o] o))
 
 (extend-protocol Bytes
-  (Class/forName "[B") ;; primitive byte array
+  (Class/forName "[B")
   (as-bytes [o] o)
 
   java.nio.ByteBuffer

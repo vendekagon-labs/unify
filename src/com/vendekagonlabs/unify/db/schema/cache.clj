@@ -17,23 +17,19 @@
             [com.vendekagonlabs.unify.util.uuid :as uuid]
             [datomic.api :as d]))
 
-(defn temp-uri []
+(defn- mem-uri []
   (str "datomic:mem://" (uuid/random)))
 
-(defn update-cached-schema
-  []
-  (let [db-uri (temp-uri)
-        _ (db/init db-uri :skip-bootstrap true)
+(defn encache
+  [schema-dir]
+  (let [db-uri (mem-uri)
+        ;; init installs the schema
+        _ (db/init db-uri :skip-bootstrap true
+                   :schema-directory schema-dir)
         conn (d/connect db-uri)
         db (d/db conn)
         updated-schema (schema/get-metamodel-and-schema db)]
     (schema/cache updated-schema)))
 
-(defn -main [& args]
-  (println "Re-caching schema.")
-  (update-cached-schema)
-  (println "Schema caching completed.")
-  (System/exit 0))
-
 (comment
-  (-main))
+  (encache "test/resources/reference-import/template-dataset/schema"))

@@ -25,12 +25,12 @@
     (doseq [matrix-key matrix-files]
       (let [src-path (file-conventions/in-matrix-dir working-dir matrix-key)]
         (log/info "Uploading matrix file: " matrix-key)
-        (aws/upload-file src-path
-                         (db.config/matrix-bucket) matrix-key
-                         ;; this content type must be put on s3 object or
-                         ;; pre-signed url will be a pain to deal with
-                         ;; from httr, possibly other clients.
-                         {:ContentType "text/tab-separated-values"})))
+        (aws/upload-file! src-path
+                          (db.config/matrix-bucket) matrix-key
+                          ;; this content type must be put on s3 object or
+                          ;; pre-signed url will be a pain to deal with
+                          ;; from httr, possibly other clients.
+                          {:ContentType "text/tab-separated-values"})))
     true))
 
 (defn noop [_working-dir] true)

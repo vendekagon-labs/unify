@@ -42,14 +42,16 @@
    :schema     schema
    :mapping    (mapping-lookup)})
 
+(comment
+  (def cfg (parsed-config)))
 (deftest job-extraction-test
   (let [cfg (parsed-config)
         directives (parse.config/cfg-map->directives schema (mapping-lookup) import-root-dir cfg)
-        dataset-file-count (coll/find-all-nested-values (:dataset config) :unify/input-file)
+        dataset-file-count (coll/find-all-nested-values (:dataset config) :unify/input-tsv-file)
         ref-data-only (dissoc config :dataset :unify/import)
-        ref-files (coll/find-all-nested-values (concat (vals ref-data-only)) :unify/input-file)
+        ref-files (coll/find-all-nested-values (concat (vals ref-data-only)) :unify/input-tsv-file)
         ref-jobs (parse.config/reference-data-jobs schema ref-data-only (job-args-map))]
-    (testing "Directives gets all maps that have a :unify/input-file entry under the :dataset key."
+    (testing "Directives gets all maps that have a :unify/input-tsv-file entry under the :dataset key."
       (is (= (count directives)
              (count dataset-file-count))))
     (testing "Directives maps for ref data."
@@ -74,8 +76,8 @@
 
 (deftest pruning-tests
   (let [pruned (parse.config/remove-directives good-config)]
-    (testing "All :unify/input-file keywords pruned from nested structure."
-      (is (not-any? #(= :unify/input-file %) (coll/nested->keywords pruned))))))
+    (testing "All :unify/input-tsv-file keywords pruned from nested structure."
+      (is (not-any? #(= :unify/input-tsv-file %) (coll/nested->keywords pruned))))))
 
 (defn raw->ensure-ns
   "From raw config edn. Notice, this duplicates a section only of engine chain. Repetition preferred

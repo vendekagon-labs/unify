@@ -17,16 +17,15 @@
             [clojure.tools.logging :as log])
   (:import (clojure.lang ExceptionInfo)))
 
-;; TODO - rewrite peer specific functions
 (defn retryable?
   "True if the anomaly in resp indicates Datomic is busy, indicating op should be retried."
   [resp]
   (let [category (::anomalies/category resp)
         message (::anomalies/message resp)]
     (when (and (some? category) (some? message))
-          (log/info "retryable?> category: " category)
+      (log/info "retryable?> category: " category)
       (log/info "retryable?> message: " message))
-    (or (= ::anomalies/busy        category)
+    (or (= ::anomalies/busy category)
         (= ::anomalies/unavailable category)
         (= ::anomalies/interrupted category)
         (and (= 500 (:datomic.client/http-error-status resp))
@@ -62,7 +61,7 @@
     (catch ExceptionInfo e
       (if-let [anomaly (-> e ex-data ::anomalies/category)]
         (ex-data {:exception e
-                  :anomaly anomaly})
+                  :anomaly   anomaly})
         (do
           (log/error "Datomic API call encountered exception without any expected anomaly.")
           (throw e))))))

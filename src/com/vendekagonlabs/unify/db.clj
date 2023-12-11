@@ -23,8 +23,6 @@
             [clojure.java.io :as io]
             [clojure.string :as str]))
 
-;; Non-master database peer/client API info -----------------------------
-;;
 
 (defn fetch-info [database]
   (let [info (backend/database-info database)]
@@ -35,17 +33,11 @@
                  msg
                  {:candelabra/access {:message msg}}))))))
 
-
-;; Peer Fns ----------------------------------------------------------------
-;;
-
-
 (defn get-connection [info]
   (d/connect (:uri info)))
 
 (defn latest-db [info]
   (d/db (get-connection info)))
-
 
 (defn exists? [datomic-uri]
   (try
@@ -58,7 +50,7 @@
         (if (and msg (.startsWith msg "Could not find"))
           false
           (throw (ex-info "Could not connect to Datomic."
-                   {:datomic/could-not-connect msg})))))))
+                          {:datomic/could-not-connect msg})))))))
 
 (defn transact-bootstrap-data
   "Transact bootstrap data."
@@ -72,8 +64,8 @@
   [conn {:keys [tx-data query name]}]
   (let [db (d/db conn)
         {:keys [db-after]} (d/with db tx-data)]
-      (not= (dq/q+retry query db)
-            (dq/q+retry query db-after))))
+    (not= (dq/q+retry query db)
+          (dq/q+retry query db-after))))
 
 (defn fulfilled?
   "Given a validation map, returns `true` if this database fulfills validation
@@ -83,10 +75,9 @@
      expected))
 
 
-(defn apply-schema [datomic-uri]
-  (let [conn (d/connect datomic-uri)
-        schema-work schema/schema-txes]
-    (doseq [raw-tx schema-work]
+(defn apply-schema [schema-directory datomic-uri]
+  (let [conn (d/connect datomic-uri)]
+    (doseq [raw-tx (schema/schema-txes schema-directory)]
       ;; if a schema attr is not indexed, we add index true. this allows us to keep
       ;; schema edn in resources datomic impl agnostic while optimizing on-prem queries.
       (let [tx (update-in raw-tx [:tx-data]
@@ -94,9 +85,9 @@
                             (mapv (fn [schema-ent]
                                     (if (and (:db/valueType schema-ent)
                                              (not (:db/unique schema-ent)))
-                                       (assoc schema-ent :db/index true)
-                                       schema-ent))
-                                 tx-data)))]
+                                      (assoc schema-ent :db/index true)
+                                      schema-ent))
+                                  tx-data)))]
         (if (tx-effect? conn tx)
           (do (log/info ::schema (:name tx) " not in database, transacting.")
               (db.tx/sync+retry conn (:tx-data tx)))
@@ -105,20 +96,25 @@
 (defn version [datomic-uri]
   (let [conn (d/connect datomic-uri)
         db (d/db conn)]
-    (-> db
-        (d/pull '[:candel.schema/version] :candel/schema)
-        (:candel.schema/version))))
+    ;; NOTE: this query assumes there is only one schema version entity, need to
+    ;; ensure this constraint is satisfied at update/transaction time.
+    (d/q '[:find ?v .
+           :where
+           [_ :unify.schema/version ?v]]
+         db)))
 
 (defn init
   "Loads all base schema, enums, and metamodel into database if necessary."
-  [datomic-uri & {:keys [skip-bootstrap seed-data-dir include-proprietary]}]
+  [datomic-uri & {:keys [skip-bootstrap
+                         schema-directory
+                         seed-data-dir
+                         include-proprietary]}]
   (let [_ (d/create-database datomic-uri)
         _ (do
             (log/info "Database created."))
-        ;; db isn't ready yet if it hasn't been created, this timeout seems sufficient
         conn (d/connect datomic-uri)
         _ (log/info "Connected to database")]
-    (apply-schema datomic-uri)
+    (apply-schema schema-directory datomic-uri)
     (when-not skip-bootstrap
       (doseq [dataset (if-not include-proprietary
                         (bootstrap.data/open-datasets)
@@ -147,9 +143,13 @@
 (defn compare-schema-version
   "Compares schema at datomic-uri to cached schema in unify URI. Returns a kw indicating whether
   or not the schema are :incompatible, :identical, or :compatible"
-  [datomic-uri]
-  (let [db-schema-map (-> datomic-uri version version->map)
-        unify-schema-map (-> (schema/version) version->map)]
+  [schema-directory datomic-uri]
+  (let [db-schema-map (-> datomic-uri
+                          (version)
+                          (version->map))
+        unify-schema-map (-> schema-directory
+                             (schema/version)
+                             (version->map))]
     (cond
       (or (not= (:major db-schema-map) (:major unify-schema-map))
           (not= (:minor db-schema-map) (:minor unify-schema-map)))
@@ -165,21 +165,23 @@
 (defn ensure-db
   "Returns map with schema included as a key, will throw at Datomic call level if
   unable to connect to database. Will also throw if versions are incompatible."
-  [datomic-uri]
-  (let [version-outcome (compare-schema-version datomic-uri)]
+  [schema-directory datomic-uri]
+  (let [version-outcome (compare-schema-version schema-directory datomic-uri)]
     (cond
       (= version-outcome :identical)
       datomic-uri
 
       (= version-outcome :compatible)
       (do (log/info "Compatible schema installed, applying necessary updates.")
-          (init datomic-uri :skip-bootstrap true)
+          (init datomic-uri
+                :skip-bootstrap true
+                :schema-directory schema-directory)
           datomic-uri)
 
       (= version-outcome :incompatible)
       (throw (ex-info "Version of candel schema in database is not compatible."
-                      {:candel.schema/version {:db/version (version datomic-uri)
-                                               :unify/version (schema/version)}})))))
+                      {:candel.schema/version {:db/version    (version datomic-uri)
+                                               :unify/version (schema/version schema-directory)}})))))
 
 
 (defn contains-txn?
@@ -211,9 +213,9 @@
                           :import/name)
                       (throw (ex-info "No datasets transacted"
                                       {:error :no-imports-on-database})))]
-    {:timestamp (:db/txInstant txn-data)
-     :txn-id (:import/txn-id txn-data)
-     :import-name  import-name}))
+    {:timestamp   (:db/txInstant txn-data)
+     :txn-id      (:import/txn-id txn-data)
+     :import-name import-name}))
 
 (defn ordered-imports
   "Returns all import entity data. The import entity is the first entity to be
@@ -229,10 +231,9 @@
        (map
          (fn [[name tx-id]]
            (let [tx (d/touch (d/entity db tx-id))]
-             {:timestamp (:db/txInstant tx)
+             {:timestamp   (:db/txInstant tx)
               :import-name name
-              :ent-id tx-id})))
+              :ent-id      tx-id})))
        (sort-by
          :timestamp
          #(.before %2 %1))))
-

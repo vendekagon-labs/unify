@@ -16,7 +16,7 @@
             [clojure.edn :as edn]
             [clojure.java.shell :refer [sh]]
             [clojure.string :as s]
-            [com.vendekagonlabs.unify.util.text :refer [->unifyty-string]]
+            [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
             [clojure.java.io :as io]))
 
 (defn delete-recursively [fname]
@@ -65,7 +65,7 @@
   (make-parents f)
   (spit f (if (string? data)
             data
-            (->unifyty-string data))))
+            (->pretty-string data))))
 
 
 (defn glob
@@ -86,8 +86,8 @@
 (defn unrealized-glob
   "Reads in a glob specification and outputs a map"
   [[dir pattern]]
-  {:glob/directory dir
-   :glob/pattern pattern})
+  {:unify.glob/directory dir
+   :unify.glob/pattern   pattern})
 
 (defn read-edn-file
   "Reads EDN file, or throws ex-info with info on why EDN file can't be read."
@@ -107,7 +107,7 @@
                     :else
                     message)]
         (throw (ex-info (str "Invalid EDN file: " f)
-                        {:file f
+                        {:file  f
                          :cause cause}))))))
 
 (defn write-tx-data
@@ -153,12 +153,3 @@
       (throw (ex-info (str "tar execution did not run as expected: " err)
                       {:std-err err
                        :std-out out})))))
-
-
-(comment
-  (tar! "/Users/bkamphaus/data/scratch/template-workdir/tx-data")
-  (def some-file "batch-data/template-test1.tar.gz")
-  (.getName (io/file some-file))
-  (untar! "batch-data/template-test1.tar.gz")
-  (glob "src/org/candelbio/unify/import/" "*.clj")
-  (read-edn-file "example-data/glob.edn"))

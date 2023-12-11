@@ -24,7 +24,7 @@
                                      :where
                                      [?import :import/name ?import-name]]
                                    db import-name))]
-     result))
+    result))
 
 
 (comment
