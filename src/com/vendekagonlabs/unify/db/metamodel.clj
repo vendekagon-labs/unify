@@ -18,11 +18,7 @@
   as returned by the db-util/get-metamodel-and-schema function.
   Note that this includes as the first element indexes for O(1)
   access (hash-map lookup) for common queries."
-  (:require [com.vendekagonlabs.unify.util.text :refer [->str]]
-            [clojure.tools.logging :as log]
-            [com.vendekagonlabs.unify.db.indexes :as indexes]
-            [com.vendekagonlabs.unify.util.collection :as util.coll]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [com.vendekagonlabs.unify.db.schema :as db.schema]))
 
 (defn kind-by-name
@@ -74,12 +70,14 @@
 (defn kind-context-id
   "Returns the context-id (locally identifying attribute) for the specified kind"
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:unify.kind/context-id :db/ident]))
+  (or (get-in (kind-by-name schema kind-name) [:unify.kind/context-id :db/ident])
+      (get-in (kind-by-name schema kind-name) [:unify.kind/global-id :db/ident])))
 
-(defn kind-attr
-  "Returns the context-id (locally identifying attribute) for the specified kind"
+(defn global-id
+  "Returns the attribute that serves as a global-id for this entity, if it has one.
+  If it does not have a global-id, returns `nil`."
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:unify.kind/attr :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/global-id :db/ident]))
 
 
 (defn ref-data?
@@ -101,16 +99,16 @@
   "Returns the target attribute name (as a kw) for the synthesized value if this kind
   requires a synthetic attribute. returns nil for kinds that don't require a synthetic attribute."
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-attr-name :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-composite-id :db/ident]))
 
 (defn synthetic-attr-components
   "Returns the vector of attribute names whose values are used to synthesize the synthetic
   attribute value."
   [schema kind-name]
-  (let [c (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-attr-components])]
+  (let [c (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-composite-components])]
     (mapv
-      #(:unify.kind.sythetic-attr-components/name %)
-      (sort-by :unify.kind.synthetic-attr-components/idx c))))
+      #(:unify.kind.synthetic-composite-id/attribute %)
+      (sort-by :unify.kind.synthetic-composite-id/index c))))
 
 (defn enum-ident?
   "Returns true if the provided ident is in the enums index in the schema."

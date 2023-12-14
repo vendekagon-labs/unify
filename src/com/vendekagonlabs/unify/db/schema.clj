@@ -15,7 +15,6 @@
   (:require [clojure.java.io :as io]
             [datomic.api :as d]
             [com.vendekagonlabs.unify.util.io :as util.io]
-            [clojure.string :as str]
             [com.vendekagonlabs.unify.db.indexes :as indexes]
             [com.vendekagonlabs.unify.db.query :as dq]
             [clojure.set :as set]))
@@ -82,7 +81,8 @@
                                          {:unify.kind/attr [:db/ident]}
                                          {:unify.kind/context-id [:db/ident]}
                                          {:unify.kind/need-uid [:db/ident]}
-                                         {:unify.kind/synthetic-attr-name [:db/ident]}])
+                                         {:unify.kind/global-id [:db/ident]}
+                                         {:unify.kind/synthetic-composite-id [:db/ident]}])
                          :where [?e :unify.kind/name]] db)))
 
 (defn get-all-schema

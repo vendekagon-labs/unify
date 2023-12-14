@@ -1,29 +1,29 @@
 [
  ; From GDC
- {:db/ident  :sample.type/tumor}
- {:db/ident  :sample.type/normal}
- {:db/ident  :sample.type/abnormal}
- {:db/ident  :sample.type/peritumoral}
- {:db/ident  :sample.type/unknown}
- {:db/ident  :sample.type/not-reported}
+ {:db/ident :sample.type/tumor}
+ {:db/ident :sample.type/normal}
+ {:db/ident :sample.type/abnormal}
+ {:db/ident :sample.type/peritumoral}
+ {:db/ident :sample.type/unknown}
+ {:db/ident :sample.type/not-reported}
 
 
- {:db/ident  :sample.laterality/bilateral}
- {:db/ident  :sample.laterality/left}
- {:db/ident  :sample.laterality/right}
- {:db/ident  :sample.laterality/unknown}
- {:db/ident  :sample.laterality/not-reported}
+ {:db/ident :sample.laterality/bilateral}
+ {:db/ident :sample.laterality/left}
+ {:db/ident :sample.laterality/right}
+ {:db/ident :sample.laterality/unknown}
+ {:db/ident :sample.laterality/not-reported}
 
 
- {:db/ident  :sample.specimen/ffpe}
- {:db/ident  :sample.specimen/fresh-frozen}
- {:db/ident  :sample.specimen/pbmc}
- {:db/ident  :sample.specimen/plasma}
- {:db/ident  :sample.specimen/serum}
- {:db/ident  :sample.specimen/whole-blood}
- {:db/ident  :sample.specimen/stool}
- {:db/ident  :sample.specimen/cell-line}
- {:db/ident  :sample.specimen/xenograft}
+ {:db/ident :sample.specimen/ffpe}
+ {:db/ident :sample.specimen/fresh-frozen}
+ {:db/ident :sample.specimen/pbmc}
+ {:db/ident :sample.specimen/plasma}
+ {:db/ident :sample.specimen/serum}
+ {:db/ident :sample.specimen/whole-blood}
+ {:db/ident :sample.specimen/stool}
+ {:db/ident :sample.specimen/cell-line}
+ {:db/ident :sample.specimen/xenograft}
 
  {:db/ident :sample.tissue-acquisition-method/surgical-resection}
  {:db/ident :sample.tissue-acquisition-method/surgical-biopsy}
@@ -31,89 +31,89 @@
  {:db/ident :sample.tissue-acquisition-method/ct-guided-biopsy}
 
 
- {:db/ident  :sample.container/sodium-edta-tube}
- {:db/ident  :sample.container/potassium-edta-tube}
- {:db/ident  :sample.container/cpt-tube}
- {:db/ident  :sample.container/sodium-hep-tube}
- {:db/ident  :sample.container/sodium-citrate-tube}
- {:db/ident  :sample.container/paxgene-blood-dna-tube}
- {:db/ident  :sample.container/paxgene-blood-rna-tube}
- {:db/ident  :sample.container/red-top-serum-tube}
- {:db/ident  :sample.container/gold-top-serum-tube}
- {:db/ident  :sample.container/streck-dna-tube}
- {:db/ident  :sample.container/omnigene-gut-tube}
+ {:db/ident :sample.container/sodium-edta-tube}
+ {:db/ident :sample.container/potassium-edta-tube}
+ {:db/ident :sample.container/cpt-tube}
+ {:db/ident :sample.container/sodium-hep-tube}
+ {:db/ident :sample.container/sodium-citrate-tube}
+ {:db/ident :sample.container/paxgene-blood-dna-tube}
+ {:db/ident :sample.container/paxgene-blood-rna-tube}
+ {:db/ident :sample.container/red-top-serum-tube}
+ {:db/ident :sample.container/gold-top-serum-tube}
+ {:db/ident :sample.container/streck-dna-tube}
+ {:db/ident :sample.container/omnigene-gut-tube}
 
- {:db/ident  :gene.hgnc-locus-group/protein-coding-gene}
- {:db/ident  :gene.hgnc-locus-group/non-coding-rna}
- {:db/ident  :gene.hgnc-locus-group/pseudogene}
- {:db/ident  :gene.hgnc-locus-group/withdrawn}
- {:db/ident  :gene.hgnc-locus-group/other}
- {:db/ident  :gene.hgnc-locus-group/phenotype}
-
-
- {:db/ident  :molecule/gene}
- {:db/ident  :molecule/protein}
-
- {:db/ident  :treatment-regimen.setting/neoadjuvant}
- {:db/ident  :treatment-regimen.setting/adjuvant}
- {:db/ident  :treatment-regimen.setting/palliative}
-
- {:db/ident  :subject.sex/female}
- {:db/ident  :subject.sex/male}
- {:db/ident  :subject.sex/unknown}
+ {:db/ident :gene.hgnc-locus-group/protein-coding-gene}
+ {:db/ident :gene.hgnc-locus-group/non-coding-rna}
+ {:db/ident :gene.hgnc-locus-group/pseudogene}
+ {:db/ident :gene.hgnc-locus-group/withdrawn}
+ {:db/ident :gene.hgnc-locus-group/other}
+ {:db/ident :gene.hgnc-locus-group/phenotype}
 
 
- {:db/ident  :subject.race/white}
- {:db/ident  :subject.race/am-indian-ak-native}
- {:db/ident  :subject.race/african-american}
- {:db/ident  :subject.race/asian}
- {:db/ident  :subject.race/hi-pacific}
- {:db/ident  :subject.race/other}
+ {:db/ident :molecule/gene}
+ {:db/ident :molecule/protein}
 
- {:db/ident  :subject.ethnicity/hispanic}
- {:db/ident  :subject.ethnicity/not-hispanic}
+ {:db/ident :treatment-regimen.setting/neoadjuvant}
+ {:db/ident :treatment-regimen.setting/adjuvant}
+ {:db/ident :treatment-regimen.setting/palliative}
 
- {:db/ident  :clinical-observation.recist/PR}
- {:db/ident  :clinical-observation.recist/PD}
- {:db/ident  :clinical-observation.recist/SD}
- {:db/ident  :clinical-observation.recist/CR}
- {:db/ident  :clinical-observation.recist/MR}
- {:db/ident  :clinical-observation.recist/NE}
-
- {:db/ident  :clinical-observation.ir-recist/irCR}
- {:db/ident  :clinical-observation.ir-recist/irPR}
- {:db/ident  :clinical-observation.ir-recist/irSD}
- {:db/ident  :clinical-observation.ir-recist/irNN}
- {:db/ident  :clinical-observation.ir-recist/irPD}
- {:db/ident  :clinical-observation.ir-recist/irNE}
- {:db/ident  :clinical-observation.ir-recist/irND}
+ {:db/ident :subject.sex/female}
+ {:db/ident :subject.sex/male}
+ {:db/ident :subject.sex/unknown}
 
 
- {:db/ident  :clinical-observation.bor/PR}
- {:db/ident  :clinical-observation.bor/PR-unconfirmed}
- {:db/ident  :clinical-observation.bor/PR-confirmed}
- {:db/ident  :clinical-observation.bor/SD}
- {:db/ident  :clinical-observation.bor/CR}
- {:db/ident  :clinical-observation.bor/PD}
- {:db/ident  :clinical-observation.bor/NE}
+ {:db/ident :subject.race/white}
+ {:db/ident :subject.race/am-indian-ak-native}
+ {:db/ident :subject.race/african-american}
+ {:db/ident :subject.race/asian}
+ {:db/ident :subject.race/hi-pacific}
+ {:db/ident :subject.race/other}
+
+ {:db/ident :subject.ethnicity/hispanic}
+ {:db/ident :subject.ethnicity/not-hispanic}
+
+ {:db/ident :clinical-observation.recist/PR}
+ {:db/ident :clinical-observation.recist/PD}
+ {:db/ident :clinical-observation.recist/SD}
+ {:db/ident :clinical-observation.recist/CR}
+ {:db/ident :clinical-observation.recist/MR}
+ {:db/ident :clinical-observation.recist/NE}
+
+ {:db/ident :clinical-observation.ir-recist/irCR}
+ {:db/ident :clinical-observation.ir-recist/irPR}
+ {:db/ident :clinical-observation.ir-recist/irSD}
+ {:db/ident :clinical-observation.ir-recist/irNN}
+ {:db/ident :clinical-observation.ir-recist/irPD}
+ {:db/ident :clinical-observation.ir-recist/irNE}
+ {:db/ident :clinical-observation.ir-recist/irND}
 
 
- {:db/ident  :clinical-observation.rano/PR}
- {:db/ident  :clinical-observation.rano/SD}
- {:db/ident  :clinical-observation.rano/CR}
- {:db/ident  :clinical-observation.rano/PD}
- {:db/ident  :clinical-observation.rano/NE}
+ {:db/ident :clinical-observation.bor/PR}
+ {:db/ident :clinical-observation.bor/PR-unconfirmed}
+ {:db/ident :clinical-observation.bor/PR-confirmed}
+ {:db/ident :clinical-observation.bor/SD}
+ {:db/ident :clinical-observation.bor/CR}
+ {:db/ident :clinical-observation.bor/PD}
+ {:db/ident :clinical-observation.bor/NE}
 
- {:db/ident  :clinical-observation.event-reason/censored-lost-to-follow-up}
- {:db/ident  :clinical-observation.event-reason/censored-unknown}
- {:db/ident  :clinical-observation.event-reason/dead}
- {:db/ident  :clinical-observation.event-reason/progressed}
- {:db/ident  :clinical-observation.event-reason/event-unknown}
- {:db/ident  :clinical-observation.event-reason/withdrew-from-study}
- {:db/ident  :clinical-observation.event-reason/censored-switched-therapy}
- {:db/ident  :clinical-observation.event-reason/censored-study-period-ended}
- {:db/ident  :clinical-observation.event-reason/censored-study-period-incomplete}
- {:db/ident  :clinical-observation.event-reason/new-lesion}
+
+ {:db/ident :clinical-observation.rano/PR}
+ {:db/ident :clinical-observation.rano/SD}
+ {:db/ident :clinical-observation.rano/CR}
+ {:db/ident :clinical-observation.rano/PD}
+ {:db/ident :clinical-observation.rano/NE}
+
+ {:db/ident :clinical-observation.event-reason/censored-lost-to-follow-up}
+ {:db/ident :clinical-observation.event-reason/censored-unknown}
+ {:db/ident :clinical-observation.event-reason/dead}
+ {:db/ident :clinical-observation.event-reason/progressed}
+ {:db/ident :clinical-observation.event-reason/event-unknown}
+ {:db/ident :clinical-observation.event-reason/withdrew-from-study}
+ {:db/ident :clinical-observation.event-reason/censored-switched-therapy}
+ {:db/ident :clinical-observation.event-reason/censored-study-period-ended}
+ {:db/ident :clinical-observation.event-reason/censored-study-period-incomplete}
+ {:db/ident :clinical-observation.event-reason/new-lesion}
 
 
  {:db/ident :measurement.msi-status/stable}
@@ -127,174 +127,174 @@
 
 
 
- {:db/ident  :subject.smoker/former}
- {:db/ident  :subject.smoker/current}
- {:db/ident  :subject.smoker/never}
+ {:db/ident :subject.smoker/former}
+ {:db/ident :subject.smoker/current}
+ {:db/ident :subject.smoker/never}
 
- {:db/ident  :subject.cause-of-death/related-to-cancer}
- {:db/ident  :subject.cause-of-death/unrelated-to-cancer}
-
-
- {:db/ident  :adverse-event.ctcae-grade/i}
- {:db/ident  :adverse-event.ctcae-grade/ii}
- {:db/ident  :adverse-event.ctcae-grade/iii}
- {:db/ident  :adverse-event.ctcae-grade/iv}
- {:db/ident  :adverse-event.ctcae-grade/v}
-
- {:db/ident  :adverse-event.ae-causality/related}
- {:db/ident  :adverse-event.ae-causality/not-related}
-
- {:db/ident  :clinical-observation.disease-stage/zero}
- {:db/ident  :clinical-observation.disease-stage/zeroA}
- {:db/ident  :clinical-observation.disease-stage/zeroIS}
- {:db/ident  :clinical-observation.disease-stage/i}
- {:db/ident  :clinical-observation.disease-stage/iA}
- {:db/ident  :clinical-observation.disease-stage/iA1}
- {:db/ident  :clinical-observation.disease-stage/iA2}
- {:db/ident  :clinical-observation.disease-stage/iB}
- {:db/ident  :clinical-observation.disease-stage/iB1}
- {:db/ident  :clinical-observation.disease-stage/iB2}
- {:db/ident  :clinical-observation.disease-stage/iC}
- {:db/ident  :clinical-observation.disease-stage/ii}
- {:db/ident  :clinical-observation.disease-stage/iiA}
- {:db/ident  :clinical-observation.disease-stage/iiA1}
- {:db/ident  :clinical-observation.disease-stage/iiA2}
- {:db/ident  :clinical-observation.disease-stage/iiB}
- {:db/ident  :clinical-observation.disease-stage/iiC}
- {:db/ident  :clinical-observation.disease-stage/iii}
- {:db/ident  :clinical-observation.disease-stage/iiiA}
- {:db/ident  :clinical-observation.disease-stage/iiiB}
- {:db/ident  :clinical-observation.disease-stage/iiiC}
- {:db/ident  :clinical-observation.disease-stage/iiiC1}
- {:db/ident  :clinical-observation.disease-stage/iiiC2}
- {:db/ident  :clinical-observation.disease-stage/iiiD}
- {:db/ident  :clinical-observation.disease-stage/iv}
- {:db/ident  :clinical-observation.disease-stage/ivA}
- {:db/ident  :clinical-observation.disease-stage/ivB}
- {:db/ident  :clinical-observation.disease-stage/ivC}
+ {:db/ident :subject.cause-of-death/related-to-cancer}
+ {:db/ident :subject.cause-of-death/unrelated-to-cancer}
 
 
+ {:db/ident :adverse-event.ctcae-grade/i}
+ {:db/ident :adverse-event.ctcae-grade/ii}
+ {:db/ident :adverse-event.ctcae-grade/iii}
+ {:db/ident :adverse-event.ctcae-grade/iv}
+ {:db/ident :adverse-event.ctcae-grade/v}
 
- {:db/ident  :genomic-coordinate.assembly/GRCh37}
- {:db/ident  :genomic-coordinate.assembly/GRCh38}
- {:db/ident  :genomic-coordinate.assembly/NCBI36}
- {:db/ident  :genomic-coordinate.assembly/NCBI35}
- {:db/ident  :genomic-coordinate.assembly/NCBI34}
+ {:db/ident :adverse-event.ae-causality/related}
+ {:db/ident :adverse-event.ae-causality/not-related}
+
+ {:db/ident :clinical-observation.disease-stage/zero}
+ {:db/ident :clinical-observation.disease-stage/zeroA}
+ {:db/ident :clinical-observation.disease-stage/zeroIS}
+ {:db/ident :clinical-observation.disease-stage/i}
+ {:db/ident :clinical-observation.disease-stage/iA}
+ {:db/ident :clinical-observation.disease-stage/iA1}
+ {:db/ident :clinical-observation.disease-stage/iA2}
+ {:db/ident :clinical-observation.disease-stage/iB}
+ {:db/ident :clinical-observation.disease-stage/iB1}
+ {:db/ident :clinical-observation.disease-stage/iB2}
+ {:db/ident :clinical-observation.disease-stage/iC}
+ {:db/ident :clinical-observation.disease-stage/ii}
+ {:db/ident :clinical-observation.disease-stage/iiA}
+ {:db/ident :clinical-observation.disease-stage/iiA1}
+ {:db/ident :clinical-observation.disease-stage/iiA2}
+ {:db/ident :clinical-observation.disease-stage/iiB}
+ {:db/ident :clinical-observation.disease-stage/iiC}
+ {:db/ident :clinical-observation.disease-stage/iii}
+ {:db/ident :clinical-observation.disease-stage/iiiA}
+ {:db/ident :clinical-observation.disease-stage/iiiB}
+ {:db/ident :clinical-observation.disease-stage/iiiC}
+ {:db/ident :clinical-observation.disease-stage/iiiC1}
+ {:db/ident :clinical-observation.disease-stage/iiiC2}
+ {:db/ident :clinical-observation.disease-stage/iiiD}
+ {:db/ident :clinical-observation.disease-stage/iv}
+ {:db/ident :clinical-observation.disease-stage/ivA}
+ {:db/ident :clinical-observation.disease-stage/ivB}
+ {:db/ident :clinical-observation.disease-stage/ivC}
 
 
 
- ;see https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+(MAF)+Specification
+ {:db/ident :genomic-coordinate.assembly/GRCh37}
+ {:db/ident :genomic-coordinate.assembly/GRCh38}
+ {:db/ident :genomic-coordinate.assembly/NCBI36}
+ {:db/ident :genomic-coordinate.assembly/NCBI35}
+ {:db/ident :genomic-coordinate.assembly/NCBI34}
 
- {:db/ident  :variant.classification/intron}
- {:db/ident  :variant.classification/UTR3}
- {:db/ident  :variant.classification/UTR5}
- {:db/ident  :variant.classification/frame-shift-del}
- {:db/ident  :variant.classification/frame-shift-ins}
- {:db/ident  :variant.classification/silent}
- {:db/ident  :variant.classification/missense}
- {:db/ident  :variant.classification/nonsense}
- {:db/ident  :variant.classification/nonstop}
- {:db/ident  :variant.classification/splice-site}
- {:db/ident  :variant.classification/splice-region} ;this is not actually in the specification
- {:db/ident  :variant.classification/RNA}
- {:db/ident  :variant.classification/flank5}
- {:db/ident  :variant.classification/flank3}
- {:db/ident  :variant.classification/in-frame-ins}
- {:db/ident  :variant.classification/in-frame-del}
- {:db/ident  :variant.classification/transl-start-site}
- {:db/ident  :variant.classification/IGR}
- {:db/ident  :variant.classification/intron}
- {:db/ident  :variant.classification/targeted-region}
+
 
  ;see https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+(MAF)+Specification
- {:db/ident  :variant.type/ins}
- {:db/ident  :variant.type/del}
- {:db/ident  :variant.type/snp}
- {:db/ident  :variant.type/dnp}
- {:db/ident  :variant.type/tnp}
- {:db/ident  :variant.type/onp}
- {:db/ident  :variant.type/consolidated}
- {:db/ident  :variant.type/indel}
+
+ {:db/ident :variant.classification/intron}
+ {:db/ident :variant.classification/UTR3}
+ {:db/ident :variant.classification/UTR5}
+ {:db/ident :variant.classification/frame-shift-del}
+ {:db/ident :variant.classification/frame-shift-ins}
+ {:db/ident :variant.classification/silent}
+ {:db/ident :variant.classification/missense}
+ {:db/ident :variant.classification/nonsense}
+ {:db/ident :variant.classification/nonstop}
+ {:db/ident :variant.classification/splice-site}
+ {:db/ident :variant.classification/splice-region}          ;this is not actually in the specification
+ {:db/ident :variant.classification/RNA}
+ {:db/ident :variant.classification/flank5}
+ {:db/ident :variant.classification/flank3}
+ {:db/ident :variant.classification/in-frame-ins}
+ {:db/ident :variant.classification/in-frame-del}
+ {:db/ident :variant.classification/transl-start-site}
+ {:db/ident :variant.classification/IGR}
+ {:db/ident :variant.classification/intron}
+ {:db/ident :variant.classification/targeted-region}
+
+ ;see https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+(MAF)+Specification
+ {:db/ident :variant.type/ins}
+ {:db/ident :variant.type/del}
+ {:db/ident :variant.type/snp}
+ {:db/ident :variant.type/dnp}
+ {:db/ident :variant.type/tnp}
+ {:db/ident :variant.type/onp}
+ {:db/ident :variant.type/consolidated}
+ {:db/ident :variant.type/indel}
 
 
  ; see https://docs.gdc.cancer.gov/Data/File_Formats/MAF_Format/
  ; --- removed with variant feature type ---
- {:db/ident  :variant.feature/transcript}
- {:db/ident  :variant.feature/regulatory}
- {:db/ident  :variant.feature/motif}
+ {:db/ident :variant.feature/transcript}
+ {:db/ident :variant.feature/regulatory}
+ {:db/ident :variant.feature/motif}
 
- {:db/ident  :variant.impact/high}
- {:db/ident  :variant.impact/moderate}
- {:db/ident  :variant.impact/low}
- {:db/ident  :variant.impact/modifier}
-
-
- {:db/ident  :analysis.type/diff-expression}
- {:db/ident  :analysis.type/diff-methylation}
- {:db/ident  :analysis.type/pathway-enrichment}
- {:db/ident  :analysis.type/geneset-enrichment}
- {:db/ident  :analysis.type/clustering}
-
- {:db/ident  :assay.technology/mass-cytometry}
- {:db/ident  :assay.technology/flow-cytometry}
- {:db/ident  :assay.technology/PCR}
- {:db/ident  :assay.technology/qPCR}
- {:db/ident  :assay.technology/dPCR}
- {:db/ident  :assay.technology/ATAC-seq}
- {:db/ident  :assay.technology/RNA-seq}
- {:db/ident  :assay.technology/DNA-seq}
- {:db/ident  :assay.technology/impact-targeted-panel}
- {:db/ident  :assay.technology/foundation-targeted-panel}
- {:db/ident  :assay.technology/IF}
- {:db/ident  :assay.technology/WES}
- {:db/ident  :assay.technology/WGS}
- {:db/ident  :assay.technology/rRNA-16S-sequencing}
- {:db/ident  :assay.technology/TCR-seq}
- {:db/ident  :assay.technology/luminex}
- {:db/ident  :assay.technology/expression-array}
- {:db/ident  :assay.technology/autoantibody-array}
- {:db/ident  :assay.technology/SNP-array}
- {:db/ident  :assay.technology/nanostring}
- {:db/ident  :assay.technology/olink}
- {:db/ident  :assay.technology/ELISA}
- {:db/ident  :assay.technology/vectra}
- {:db/ident  :assay.technology/IMC}
- {:db/ident  :assay.technology/MIBI}
- {:db/ident  :assay.technology/IHC}
- {:db/ident  :assay.technology/CODEX}
- {:db/ident  :assay.technology/miscellaneous}
- {:db/ident  :assay.technology/autoantibody-targeted-panel}
+ {:db/ident :variant.impact/high}
+ {:db/ident :variant.impact/moderate}
+ {:db/ident :variant.impact/low}
+ {:db/ident :variant.impact/modifier}
 
 
- {:db/ident  :therapy.previous/naive}
- {:db/ident  :therapy.previous/chemotherapy}
- {:db/ident  :therapy.previous/pd1-pdl1}
- {:db/ident  :therapy.previous/ctla4}
- {:db/ident  :therapy.previous/targeted-therapy}
- {:db/ident  :therapy.previous/car-t}
- {:db/ident  :therapy.previous/surgery}
- {:db/ident  :therapy.previous/radiation}
- {:db/ident  :therapy.previous/treated}
+ {:db/ident :analysis.type/diff-expression}
+ {:db/ident :analysis.type/diff-methylation}
+ {:db/ident :analysis.type/pathway-enrichment}
+ {:db/ident :analysis.type/geneset-enrichment}
+ {:db/ident :analysis.type/clustering}
+
+ {:db/ident :assay.technology/mass-cytometry}
+ {:db/ident :assay.technology/flow-cytometry}
+ {:db/ident :assay.technology/PCR}
+ {:db/ident :assay.technology/qPCR}
+ {:db/ident :assay.technology/dPCR}
+ {:db/ident :assay.technology/ATAC-seq}
+ {:db/ident :assay.technology/RNA-seq}
+ {:db/ident :assay.technology/DNA-seq}
+ {:db/ident :assay.technology/impact-targeted-panel}
+ {:db/ident :assay.technology/foundation-targeted-panel}
+ {:db/ident :assay.technology/IF}
+ {:db/ident :assay.technology/WES}
+ {:db/ident :assay.technology/WGS}
+ {:db/ident :assay.technology/rRNA-16S-sequencing}
+ {:db/ident :assay.technology/TCR-seq}
+ {:db/ident :assay.technology/luminex}
+ {:db/ident :assay.technology/expression-array}
+ {:db/ident :assay.technology/autoantibody-array}
+ {:db/ident :assay.technology/SNP-array}
+ {:db/ident :assay.technology/nanostring}
+ {:db/ident :assay.technology/olink}
+ {:db/ident :assay.technology/ELISA}
+ {:db/ident :assay.technology/vectra}
+ {:db/ident :assay.technology/IMC}
+ {:db/ident :assay.technology/MIBI}
+ {:db/ident :assay.technology/IHC}
+ {:db/ident :assay.technology/CODEX}
+ {:db/ident :assay.technology/miscellaneous}
+ {:db/ident :assay.technology/autoantibody-targeted-panel}
+
+
+ {:db/ident :therapy.previous/naive}
+ {:db/ident :therapy.previous/chemotherapy}
+ {:db/ident :therapy.previous/pd1-pdl1}
+ {:db/ident :therapy.previous/ctla4}
+ {:db/ident :therapy.previous/targeted-therapy}
+ {:db/ident :therapy.previous/car-t}
+ {:db/ident :therapy.previous/surgery}
+ {:db/ident :therapy.previous/radiation}
+ {:db/ident :therapy.previous/treated}
 
 
  ; Also use for screening, as this represents time before the beginning
  ; of any specific study or treatment
- {:db/ident  :timepoint.type/baseline}
+ {:db/ident :timepoint.type/baseline}
 
  ; use this for timepoints that represent tumor assessment without any treatment administration
- {:db/ident  :timepoint.type/tumor-assessment}
+ {:db/ident :timepoint.type/tumor-assessment}
 
- {:db/ident  :timepoint.type/surgery}
+ {:db/ident :timepoint.type/surgery}
 
- {:db/ident  :timepoint.type/follow-up}
+ {:db/ident :timepoint.type/follow-up}
 
  ; Unless more information is available, any study outcome e.g. PFS should be attached
  ; to the :timepoint/eos timepoint
- {:db/ident  :timepoint.type/eos}
- {:db/ident  :timepoint.type/eot}
- {:db/ident  :timepoint.type/on-treatment}
- {:db/ident  :timepoint.type/diagnosis}
+ {:db/ident :timepoint.type/eos}
+ {:db/ident :timepoint.type/eot}
+ {:db/ident :timepoint.type/on-treatment}
+ {:db/ident :timepoint.type/diagnosis}
 
- {:db/ident  :study-day.reference-event/enrollment}
- {:db/ident  :study-day.reference-event/diagnosis}
- {:db/ident  :study-day.reference-event/surgery}]
+ {:db/ident :study-day.reference-event/enrollment}
+ {:db/ident :study-day.reference-event/diagnosis}
+ {:db/ident :study-day.reference-event/surgery}]

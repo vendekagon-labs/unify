@@ -274,19 +274,18 @@
 (defn resolve-ref-uid
   "Resolves reference uids."
   [parsed-cfg schema job target-kind value]
-  (let [uid-attribute (metamodel/need-uid? schema target-kind)
-        resolved-ref-val (ref-uid parsed-cfg schema job target-kind value)]
+  (let [resolved-ref-val (ref-uid parsed-cfg schema job target-kind value)]
     (when-not resolved-ref-val
       (throw (ex-info "Could not resolve UID attribute and value."
                       {:config/ref-uid {:target-kind      target-kind
-                                        :uid-attribute    uid-attribute
-                                        :resolved-uid-val resolved-ref-val
-                                        :raw-uid-value    value}})))
-    (if (metamodel/ref-data? schema target-kind)
-      [(metamodel/kind-context-id schema target-kind) resolved-ref-val]
-      ;; Unbundles the constructed uid, repackage to conform to:
-      ;; ["dataset-name" "path specifier"]
-      (let [dataset-name (get-in parsed-cfg [:dataset :dataset/name])]
+                                        :resolved-ref-val resolved-ref-val
+                                        :raw-ref-val      value}})))
+    (if-let [global-id-attr (metamodel/global-id schema target-kind)]
+      (if (metamodel/ref-data? schema target-kind)
+        [global-id-attr resolved-ref-val]
+        {global-id-attr resolved-ref-val})
+      (let [uid-attribute (metamodel/need-uid? schema target-kind)
+            dataset-name (get-in parsed-cfg [:dataset :dataset/name])]
         {uid-attribute [dataset-name resolved-ref-val]}))))
 
 
@@ -388,26 +387,25 @@
                            (get enriched-entity attr-key))
               uid-map (merge
                         node
-                        {context-id-attr raw-id-val})
-              resolved-uid (cond
-                             ;; if UID is synthetic, use synthetic attribute to compute UID.
-                             ;; uses cached parent if no reverse ref, or substitutes reverse
-                             ;; ref data and recomputes UID if not.
-                             synthetic?
-                             (if-let [replace-map (reverse-ref-uid-map job enriched-entity)]
-                               (uid-attr-val schema parsed-cfg uid-map replace-map)
-                               {uid-attr [(first cached-parent-uid)
-                                          (prepend (second cached-parent-uid) raw-id-val)]})
+                        {context-id-attr raw-id-val})]
+          (cond
+            ;; if UID is synthetic, use synthetic attribute to compute UID.
+            ;; uses cached parent if no reverse ref, or substitutes reverse
+            ;; ref data and recomputes UID if not.
+            synthetic?
+            (if-let [replace-map (reverse-ref-uid-map job enriched-entity)]
+              (uid-attr-val schema parsed-cfg uid-map replace-map)
+              {uid-attr [(first cached-parent-uid)
+                         (prepend (second cached-parent-uid) raw-id-val)]})
 
-                             ;; for all other UIDs, if we have a cached parent UID, prepend it.
-                             cached-parent-uid
-                             {uid-attr [(first cached-parent-uid)
-                                        (prepend (second cached-parent-uid) raw-id-val)]}
+            ;; for all other UIDs, if we have a cached parent UID, prepend it.
+            cached-parent-uid
+            {uid-attr [(first cached-parent-uid)
+                       (prepend (second cached-parent-uid) raw-id-val)]}
 
-                             ;; if not, compute UID from schema context.
-                             :else
-                             (uid-attr-val schema parsed-cfg uid-map {}))]
-          resolved-uid)))))
+            ;; if not, compute UID from schema context.
+            :else
+            (uid-attr-val schema parsed-cfg uid-map {})))))))
 
 
 
