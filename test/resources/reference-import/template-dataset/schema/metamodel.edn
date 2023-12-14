@@ -1,54 +1,45 @@
 [
  ;; Entity metadata:
  [{:unify.kind/name       :dataset
-   :unify.kind/attr       :dataset/name
    :unify.kind/context-id :dataset/name}
 
   {:unify.kind/name       :assay
-   :unify.kind/attr       :assay/name
    :unify.kind/context-id :assay/name
    :unify.kind/need-uid   :assay/uid
    :unify.kind/parent     :dataset}
 
   {:unify.kind/name       :clinical-observation-set
-   :unify.kind/attr       :clinical-observation-set/name
    :unify.kind/context-id :clinical-observation-set/name
    :unify.kind/parent     :dataset
    :unify.kind/need-uid   :clinical-observation-set/uid}
 
   {:unify.kind/name       :measurement-set
-   :unify.kind/attr       :measurement-set/name
    :unify.kind/context-id :measurement-set/name
    :unify.kind/parent     :assay
    :unify.kind/need-uid   :measurement-set/uid}
 
   {:unify.kind/name       :tcr
-   :unify.kind/attr       :tcr/id
    :unify.kind/context-id :tcr/id
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :tcr/uid}
 
   {:unify.kind/name       :cell-population
-   :unify.kind/attr       :cell-population/name
    :unify.kind/context-id :cell-population/name
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :cell-population/uid}
 
   {:unify.kind/name       :single-cell
-   :unify.kind/attr       :single-cell/id
    :unify.kind/context-id :single-cell/id
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :single-cell/uid}
 
   {:unify.kind/name       :otu
-   :unify.kind/attr       :otu/id
    :unify.kind/context-id :otu/id
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :otu/uid}
 
   {:unify.kind/name                      :measurement
    :unify.kind/parent                    :measurement-set
-   :unify.kind/attr                      :measurement/sample
    :unify.kind/context-id                :measurement/id
    :unify.kind/need-uid                  :measurement/uid
    :unify.kind/synthetic-attr-name       :measurement/id
@@ -77,26 +68,22 @@
 
   {:unify.kind/name                              :measurement-matrix
    :unify.kind/parent                            :measurement-set
-   :unify.kind/attr                              :measurement-matrix/name
    :unify.kind/context-id                        :measurement-matrix/name
    :unify.kind.matrix-blob/storage-key-attribute :measurement-matrix/backing-file
    :unify.kind.matrix-blob/data-type-attribute   :measurement-matrix/measurement-type
    :unify.kind/need-uid                          :measurement-matrix/uid}
 
   {:unify.kind/name       :sample
-   :unify.kind/attr       :sample/id
    :unify.kind/parent     :dataset
    :unify.kind/context-id :sample/id
    :unify.kind/need-uid   :sample/uid}
 
   {:unify.kind/name       :subject
-   :unify.kind/attr       :subject/id
    :unify.kind/parent     :dataset
    :unify.kind/context-id :subject/id
    :unify.kind/need-uid   :subject/uid}
 
   {:unify.kind/name                      :clinical-observation
-   :unify.kind/attr                      :clinical-observation/subject
    :unify.kind/parent                    :clinical-observation-set
    :unify.kind/need-uid                  :clinical-observation/uid
    :unify.kind/context-id                :clinical-observation/id
@@ -109,13 +96,6 @@
                                            :unify.kind.sythetic-attr-components/name :clinical-observation/study-day}]}
 
   {:unify.kind/name                      :adverse-event
-   ;; NOTE: This :unify.kind/attr should be revisited
-   ;; because this entity kind has a synthetic ID (no domain identity), there is
-   ;; no obvious option for :unify.kind/attr. The choice of subject means the
-   ;; "ae must have a subject" validation is irrelevant, but without an external
-   ;; identifier, this is potentially the best we can do.
-   ;; Worth noting that this is the same situation with clinical-observation :unify.kind/attr
-   :unify.kind/attr                      :adverse-event/subject
    :unify.kind/parent                    :clinical-observation-set
    :unify.kind/need-uid                  :adverse-event/uid
    :unify.kind/context-id                :adverse-event/id
@@ -138,25 +118,21 @@
 
 
   {:unify.kind/name       :timepoint
-   :unify.kind/attr       :timepoint/id
    :unify.kind/parent     :dataset
    :unify.kind/context-id :timepoint/id
    :unify.kind/need-uid   :timepoint/uid}
 
   {:unify.kind/name       :study-day
-   :unify.kind/attr       :study-day/id
    :unify.kind/parent     :dataset
    :unify.kind/context-id :study-day/id
    :unify.kind/need-uid   :study-day/uid}
 
   {:unify.kind/name       :treatment-regimen
-   :unify.kind/attr       :treatment-regimen/name
    :unify.kind/context-id :treatment-regimen/name
    :unify.kind/need-uid   :treatment-regimen/uid
    :unify.kind/parent     :dataset}
 
   {:unify.kind/name                      :drug-regimen
-   :unify.kind/attr                      :drug-regimen/drug
    :unify.kind/parent                    :treatment-regimen
    :unify.kind/context-id                :drug-regimen/id
    :unify.kind/need-uid                  :drug-regimen/uid
@@ -167,7 +143,6 @@
                                            :unify.kind.sythetic-attr-components/name :drug-regimen/cycle-length}]}
 
   {:unify.kind/name                      :therapy
-   :unify.kind/attr                      :therapy/treatment-regimen
    :unify.kind/parent                    :subject
    :unify.kind/context-id                :therapy/id
    :unify.kind/need-uid                  :therapy/uid
@@ -179,99 +154,81 @@
 
 
   {:unify.kind/name       :atac-peak
-   :unify.kind/attr       :atac-peak/name
    :unify.kind/context-id :atac-peak/name
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :atac-peak/uid}
 
   {:unify.kind/name       :gene
-   :unify.kind/attr       :gene/hgnc-symbol
    :unify.kind/context-id :gene/hgnc-symbol
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :protein
-   :unify.kind/attr       :protein/uniprot-name
    :unify.kind/context-id :protein/uniprot-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name                   :epitope
-   :unify.kind/attr                   :epitope/id
    :unify.kind/context-id             :epitope/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :genomic-coordinate
-   :unify.kind/attr                   :genomic-coordinate/id
    :unify.kind/context-id             :genomic-coordinate/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :cnv
-   :unify.kind/attr                   :cnv/id
    :unify.kind/context-id             :cnv/id
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name                   :variant
-   :unify.kind/attr                   :variant/id
    :unify.kind/context-id             :variant/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :neo-antigen
-   :unify.kind/attr                   :neo-antigen/mut-peptide
    :unify.kind/context-id             :neo-antigen/id
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name       :chr-acc-reg
-   :unify.kind/attr       :chr-acc-reg/genomic-coordinates
    :unify.kind/context-id :chr-acc-reg/genomic-coordinates
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :cell-type
-   :unify.kind/attr       :cell-type/co-name
    :unify.kind/context-id :cell-type/co-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :so-sequence-feature
-   :unify.kind/attr       :so-sequence-feature/name
    :unify.kind/context-id :so-sequence-feature/name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :drug
-   :unify.kind/attr       :drug/preferred-name
    :unify.kind/context-id :drug/preferred-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :comorbidity
-   :unify.kind/attr       :comorbidity/name
    :unify.kind/context-id :comorbidity/name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :meddra-disease
-   :unify.kind/attr       :meddra-disease/preferred-name
    :unify.kind/context-id :meddra-disease/preferred-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :gdc-anatomic-site
-   :unify.kind/attr       :gdc-anatomic-site/name
    :unify.kind/context-id :gdc-anatomic-site/name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :gene-product
-   :unify.kind/attr       :gene-product/id
    :unify.kind/context-id :gene-product/id
    :unify.kind/ref-data   true}
 
   {:unify.kind/name                   :nanostring-signature
-   :unify.kind/attr                   :nanostring-signature/name
    :unify.kind/context-id             :nanostring-signature/name
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name                   :clinical-trial
-   :unify.kind/attr                   :clinical-trial/nct-number
    :unify.kind/context-id             :clinical-trial/nct-number
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}]

@@ -38,11 +38,6 @@
   :db/cardinality   :db.cardinality/one
   :db/doc           "Name of a kind of entity in the system"}
 
- {:db/ident         :unify.kind/attr
-  :db/valueType     :db.type/keyword
-  :db/cardinality   :db.cardinality/one
-  :db/doc           "Distinguishing attribute of this kind of entity, must be a domain schema attribute"}
-
  {:db/ident         :unify.kind/context-id
   :db/valueType     :db.type/keyword
   :db/cardinality   :db.cardinality/one

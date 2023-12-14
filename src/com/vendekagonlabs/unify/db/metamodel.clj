@@ -76,12 +76,6 @@
   [schema kind-name]
   (get-in (kind-by-name schema kind-name) [:unify.kind/context-id :db/ident]))
 
-(defn kind-attr
-  "Returns the context-id (locally identifying attribute) for the specified kind"
-  [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:unify.kind/attr :db/ident]))
-
-
 (defn ref-data?
   "Indicates whether the specified kind is reference data (cross-study data)"
   [schema kind-name]
