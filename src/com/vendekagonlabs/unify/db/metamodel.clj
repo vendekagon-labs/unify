@@ -95,16 +95,16 @@
   "Returns the target attribute name (as a kw) for the synthesized value if this kind
   requires a synthetic attribute. returns nil for kinds that don't require a synthetic attribute."
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-attr-name :db/ident]))
+  (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-composite-id :db/ident]))
 
 (defn synthetic-attr-components
   "Returns the vector of attribute names whose values are used to synthesize the synthetic
   attribute value."
   [schema kind-name]
-  (let [c (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-attr-components])]
+  (let [c (get-in (kind-by-name schema kind-name) [:unify.kind/synthetic-composite-components])]
     (mapv
-      #(:unify.kind.sythetic-attr-components/name %)
-      (sort-by :unify.kind.synthetic-attr-components/idx c))))
+      #(:unify.kind.synthetic-composite-id/attribute %)
+      (sort-by :unify.kind.synthetic-composite-id/index c))))
 
 (defn enum-ident?
   "Returns true if the provided ident is in the enums index in the schema."

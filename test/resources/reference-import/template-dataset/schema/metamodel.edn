@@ -38,33 +38,33 @@
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :otu/uid}
 
-  {:unify.kind/name                      :measurement
-   :unify.kind/parent                    :measurement-set
-   :unify.kind/context-id                :measurement/id
-   :unify.kind/need-uid                  :measurement/uid
-   :unify.kind/synthetic-attr-name       :measurement/id
-   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
-                                           :unify.kind.sythetic-attr-components/name :measurement/sample}
-                                          {:unify.kind.synthetic-attr-components/idx 1
-                                           :unify.kind.sythetic-attr-components/name :measurement/region-of-interest}
-                                          {:unify.kind.synthetic-attr-components/idx 2
-                                           :unify.kind.sythetic-attr-components/name :measurement/gene-product}
-                                          {:unify.kind.synthetic-attr-components/idx 3
-                                           :unify.kind.sythetic-attr-components/name :measurement/variant}
-                                          {:unify.kind.synthetic-attr-components/idx 4
-                                           :unify.kind.sythetic-attr-components/name :measurement/cnv}
-                                          {:unify.kind.synthetic-attr-components/idx 5
-                                           :unify.kind.sythetic-attr-components/name :measurement/epitope}
-                                          {:unify.kind.synthetic-attr-components/idx 6
-                                           :unify.kind.sythetic-attr-components/name :measurement/tcr}
-                                          {:unify.kind.synthetic-attr-components/idx 7
-                                           :unify.kind.sythetic-attr-components/name :measurement/cell-population}
-                                          {:unify.kind.synthetic-attr-components/idx 8
-                                           :unify.kind.sythetic-attr-components/name :measurement/atac-peak}
-                                          {:unify.kind.synthetic-attr-components/idx 9
-                                           :unify.kind.sythetic-attr-components/name :measurement/nanostring-signature}
-                                          {:unify.kind.synthetic-attr-components/idx 10
-                                           :unify.kind.sythetic-attr-components/name :measurement/otu}]}
+  {:unify.kind/name                           :measurement
+   :unify.kind/parent                         :measurement-set
+   :unify.kind/context-id                     :measurement/id
+   :unify.kind/need-uid                       :measurement/uid
+   :unify.kind/synthetic-composite-id         :measurement/id
+   :unify.kind/synthetic-composite-components [{:unify.kind.synthetic-composite-id/index     0
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/sample}
+                                               {:unify.kind.synthetic-composite-id/index     1
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/region-of-interest}
+                                               {:unify.kind.synthetic-composite-id/index     2
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/gene-product}
+                                               {:unify.kind.synthetic-composite-id/index     3
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/variant}
+                                               {:unify.kind.synthetic-composite-id/index     4
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/cnv}
+                                               {:unify.kind.synthetic-composite-id/index     5
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/epitope}
+                                               {:unify.kind.synthetic-composite-id/index     6
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/tcr}
+                                               {:unify.kind.synthetic-composite-id/index     7
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/cell-population}
+                                               {:unify.kind.synthetic-composite-id/index     8
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/atac-peak}
+                                               {:unify.kind.synthetic-composite-id/index     9
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/nanostring-signature}
+                                               {:unify.kind.synthetic-composite-id/index     10
+                                                :unify.kind.synthetic-composite-id/attribute :measurement/otu}]}
 
   {:unify.kind/name                              :measurement-matrix
    :unify.kind/parent                            :measurement-set
@@ -83,37 +83,37 @@
    :unify.kind/context-id :subject/id
    :unify.kind/need-uid   :subject/uid}
 
-  {:unify.kind/name                      :clinical-observation
-   :unify.kind/parent                    :clinical-observation-set
-   :unify.kind/need-uid                  :clinical-observation/uid
-   :unify.kind/context-id                :clinical-observation/id
-   :unify.kind/synthetic-attr-name       :clinical-observation/id
-   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
-                                           :unify.kind.sythetic-attr-components/name :clinical-observation/subject}
-                                          {:unify.kind.synthetic-attr-components/idx 1
-                                           :unify.kind.sythetic-attr-components/name :clinical-observation/timepoint}
-                                          {:unify.kind.synthetic-attr-components/idx 2
-                                           :unify.kind.sythetic-attr-components/name :clinical-observation/study-day}]}
+  {:unify.kind/name                           :clinical-observation
+   :unify.kind/parent                         :clinical-observation-set
+   :unify.kind/need-uid                       :clinical-observation/uid
+   :unify.kind/context-id                     :clinical-observation/id
+   :unify.kind/synthetic-composite-id         :clinical-observation/id
+   :unify.kind/synthetic-composite-components [{:unify.kind.synthetic-composite-id/index     0
+                                                :unify.kind.synthetic-composite-id/attribute :clinical-observation/subject}
+                                               {:unify.kind.synthetic-composite-id/index     1
+                                                :unify.kind.synthetic-composite-id/attribute :clinical-observation/timepoint}
+                                               {:unify.kind.synthetic-composite-id/index     2
+                                                :unify.kind.synthetic-composite-id/attribute :clinical-observation/study-day}]}
 
-  {:unify.kind/name                      :adverse-event
-   :unify.kind/parent                    :clinical-observation-set
-   :unify.kind/need-uid                  :adverse-event/uid
-   :unify.kind/context-id                :adverse-event/id
-   :unify.kind/synthetic-attr-name       :adverse-event/id
-   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/subject}
-                                          {:unify.kind.synthetic-attr-components/idx 1
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/timepoint}
-                                          {:unify.kind.synthetic-attr-components/idx 2
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/meddra-adverse-event}
-                                          {:unify.kind.synthetic-attr-components/idx 3
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/ctcae-grade}
-                                          {:unify.kind.synthetic-attr-components/idx 4
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/verbatim-adverse-event}
-                                          {:unify.kind.synthetic-attr-components/idx 5
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/ae-start-relative-day}
-                                          {:unify.kind.synthetic-attr-components/idx 6
-                                           :unify.kind.sythetic-attr-components/name :adverse-event/ae-causality}]}
+  {:unify.kind/name                           :adverse-event
+   :unify.kind/parent                         :clinical-observation-set
+   :unify.kind/need-uid                       :adverse-event/uid
+   :unify.kind/context-id                     :adverse-event/id
+   :unify.kind/synthetic-composite-id         :adverse-event/id
+   :unify.kind/synthetic-composite-components [{:unify.kind.synthetic-composite-id/index     0
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/subject}
+                                               {:unify.kind.synthetic-composite-id/index     1
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/timepoint}
+                                               {:unify.kind.synthetic-composite-id/index     2
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/meddra-adverse-event}
+                                               {:unify.kind.synthetic-composite-id/index     3
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/ctcae-grade}
+                                               {:unify.kind.synthetic-composite-id/index     4
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/verbatim-adverse-event}
+                                               {:unify.kind.synthetic-composite-id/index     5
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/ae-start-relative-day}
+                                               {:unify.kind.synthetic-composite-id/index     6
+                                                :unify.kind.synthetic-composite-id/attribute :adverse-event/ae-causality}]}
 
 
 
@@ -132,25 +132,25 @@
    :unify.kind/need-uid   :treatment-regimen/uid
    :unify.kind/parent     :dataset}
 
-  {:unify.kind/name                      :drug-regimen
-   :unify.kind/parent                    :treatment-regimen
-   :unify.kind/context-id                :drug-regimen/id
-   :unify.kind/need-uid                  :drug-regimen/uid
-   :unify.kind/synthetic-attr-name       :drug-regimen/id
-   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
-                                           :unify.kind.sythetic-attr-components/name :drug-regimen/drug}
-                                          {:unify.kind.synthetic-attr-components/idx 1
-                                           :unify.kind.sythetic-attr-components/name :drug-regimen/cycle-length}]}
+  {:unify.kind/name                           :drug-regimen
+   :unify.kind/parent                         :treatment-regimen
+   :unify.kind/context-id                     :drug-regimen/id
+   :unify.kind/need-uid                       :drug-regimen/uid
+   :unify.kind/synthetic-composite-id         :drug-regimen/id
+   :unify.kind/synthetic-composite-components [{:unify.kind.synthetic-composite-id/index     0
+                                                :unify.kind.synthetic-composite-id/attribute :drug-regimen/drug}
+                                               {:unify.kind.synthetic-composite-id/index     1
+                                                :unify.kind.synthetic-composite-id/attribute :drug-regimen/cycle-length}]}
 
-  {:unify.kind/name                      :therapy
-   :unify.kind/parent                    :subject
-   :unify.kind/context-id                :therapy/id
-   :unify.kind/need-uid                  :therapy/uid
-   :unify.kind/synthetic-attr-name       :therapy/id
-   :unify.kind/synthetic-attr-components [{:unify.kind.synthetic-attr-components/idx 0
-                                           :unify.kind.sythetic-attr-components/name :subject/therapies}
-                                          {:unify.kind.synthetic-attr-components/idx 1
-                                           :unify.kind.sythetic-attr-components/name :therapy/treatment-regimen}]}
+  {:unify.kind/name                           :therapy
+   :unify.kind/parent                         :subject
+   :unify.kind/context-id                     :therapy/id
+   :unify.kind/need-uid                       :therapy/uid
+   :unify.kind/synthetic-composite-id         :therapy/id
+   :unify.kind/synthetic-composite-components [{:unify.kind.synthetic-composite-id/index     0
+                                                :unify.kind.synthetic-composite-id/attribute :subject/therapies}
+                                               {:unify.kind.synthetic-composite-id/index     1
+                                                :unify.kind.synthetic-composite-id/attribute :therapy/treatment-regimen}]}
 
 
   {:unify.kind/name       :atac-peak

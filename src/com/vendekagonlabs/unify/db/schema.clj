@@ -82,7 +82,7 @@
                                          {:unify.kind/attr [:db/ident]}
                                          {:unify.kind/context-id [:db/ident]}
                                          {:unify.kind/need-uid [:db/ident]}
-                                         {:unify.kind/synthetic-attr-name [:db/ident]}])
+                                         {:unify.kind/synthetic-composite-id [:db/ident]}])
                          :where [?e :unify.kind/name]] db)))
 
 (defn get-all-schema
