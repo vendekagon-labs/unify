@@ -43,6 +43,11 @@
   :db/cardinality :db.cardinality/one
   :db/doc         "Locally identifying attribute, must be a domain schema attribute"}
 
+ {:db/ident       :unify.kind/global-id
+  :db/valueType   :db.type/keyword
+  :db/cardinality :db.cardinality/one
+  :db/doc         "A unique ID attribute that does not need to be generated or scoped by Unify."}
+
  {:db/ident       :unify.kind/parent
   :db/valueType   :db.type/keyword
   :db/cardinality :db.cardinality/one

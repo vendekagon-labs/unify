@@ -18,11 +18,7 @@
   as returned by the db-util/get-metamodel-and-schema function.
   Note that this includes as the first element indexes for O(1)
   access (hash-map lookup) for common queries."
-  (:require [com.vendekagonlabs.unify.util.text :refer [->str]]
-            [clojure.tools.logging :as log]
-            [com.vendekagonlabs.unify.db.indexes :as indexes]
-            [com.vendekagonlabs.unify.util.collection :as util.coll]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [com.vendekagonlabs.unify.db.schema :as db.schema]))
 
 (defn kind-by-name
@@ -74,7 +70,15 @@
 (defn kind-context-id
   "Returns the context-id (locally identifying attribute) for the specified kind"
   [schema kind-name]
-  (get-in (kind-by-name schema kind-name) [:unify.kind/context-id :db/ident]))
+  (or (get-in (kind-by-name schema kind-name) [:unify.kind/context-id :db/ident])
+      (get-in (kind-by-name schema kind-name) [:unify.kind/global-id :db/ident])))
+
+(defn global-id
+  "Returns the attribute that serves as a global-id for this entity, if it has one.
+  If it does not have a global-id, returns `nil`."
+  [schema kind-name]
+  (get-in (kind-by-name schema kind-name) [:unify.kind/global-id :db/ident]))
+
 
 (defn ref-data?
   "Indicates whether the specified kind is reference data (cross-study data)"

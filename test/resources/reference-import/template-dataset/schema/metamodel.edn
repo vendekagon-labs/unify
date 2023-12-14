@@ -159,77 +159,77 @@
    :unify.kind/need-uid   :atac-peak/uid}
 
   {:unify.kind/name       :gene
-   :unify.kind/context-id :gene/hgnc-symbol
+   :unify.kind/global-id :gene/hgnc-symbol
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :protein
-   :unify.kind/context-id :protein/uniprot-name
+   :unify.kind/global-id :protein/uniprot-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name                   :epitope
-   :unify.kind/context-id             :epitope/id
+   :unify.kind/global-id             :epitope/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :genomic-coordinate
-   :unify.kind/context-id             :genomic-coordinate/id
+   :unify.kind/global-id             :genomic-coordinate/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :cnv
-   :unify.kind/context-id             :cnv/id
+   :unify.kind/global-id             :cnv/id
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name                   :variant
-   :unify.kind/context-id             :variant/id
+   :unify.kind/global-id             :variant/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :neo-antigen
-   :unify.kind/context-id             :neo-antigen/id
+   :unify.kind/global-id             :neo-antigen/id
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name       :chr-acc-reg
-   :unify.kind/context-id :chr-acc-reg/genomic-coordinates
+   :unify.kind/global-id :chr-acc-reg/genomic-coordinates
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :cell-type
-   :unify.kind/context-id :cell-type/co-name
+   :unify.kind/global-id :cell-type/co-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :so-sequence-feature
-   :unify.kind/context-id :so-sequence-feature/name
+   :unify.kind/global-id :so-sequence-feature/name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :drug
-   :unify.kind/context-id :drug/preferred-name
+   :unify.kind/global-id :drug/preferred-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :comorbidity
-   :unify.kind/context-id :comorbidity/name
+   :unify.kind/global-id :comorbidity/name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :meddra-disease
-   :unify.kind/context-id :meddra-disease/preferred-name
+   :unify.kind/global-id :meddra-disease/preferred-name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :gdc-anatomic-site
-   :unify.kind/context-id :gdc-anatomic-site/name
+   :unify.kind/global-id :gdc-anatomic-site/name
    :unify.kind/ref-data   true}
 
   {:unify.kind/name       :gene-product
-   :unify.kind/context-id :gene-product/id
+   :unify.kind/global-id :gene-product/id
    :unify.kind/ref-data   true}
 
   {:unify.kind/name                   :nanostring-signature
-   :unify.kind/context-id             :nanostring-signature/name
+   :unify.kind/global-id             :nanostring-signature/name
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name                   :clinical-trial
-   :unify.kind/context-id             :clinical-trial/nct-number
+   :unify.kind/global-id             :clinical-trial/nct-number
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}]
 
