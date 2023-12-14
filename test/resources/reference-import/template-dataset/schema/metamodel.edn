@@ -119,7 +119,7 @@
 
   {:unify.kind/name       :timepoint
    :unify.kind/parent     :dataset
-   :unify.kind/context-id :timepoint/id
+   :unify.kind/global-id :timepoint/id
    :unify.kind/need-uid   :timepoint/uid}
 
   {:unify.kind/name       :study-day
@@ -158,78 +158,78 @@
    :unify.kind/parent     :measurement-set
    :unify.kind/need-uid   :atac-peak/uid}
 
-  {:unify.kind/name       :gene
+  {:unify.kind/name      :gene
    :unify.kind/global-id :gene/hgnc-symbol
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :protein
+  {:unify.kind/name      :protein
    :unify.kind/global-id :protein/uniprot-name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
   {:unify.kind/name                   :epitope
-   :unify.kind/global-id             :epitope/id
+   :unify.kind/global-id              :epitope/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :genomic-coordinate
-   :unify.kind/global-id             :genomic-coordinate/id
+   :unify.kind/global-id              :genomic-coordinate/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :cnv
-   :unify.kind/global-id             :cnv/id
+   :unify.kind/global-id              :cnv/id
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name                   :variant
-   :unify.kind/global-id             :variant/id
+   :unify.kind/global-id              :variant/id
    :unify.kind/ref-data               true
    :unify.kind/allow-create-on-import true}
 
   {:unify.kind/name                   :neo-antigen
-   :unify.kind/global-id             :neo-antigen/id
+   :unify.kind/global-id              :neo-antigen/id
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
-  {:unify.kind/name       :chr-acc-reg
+  {:unify.kind/name      :chr-acc-reg
    :unify.kind/global-id :chr-acc-reg/genomic-coordinates
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :cell-type
+  {:unify.kind/name      :cell-type
    :unify.kind/global-id :cell-type/co-name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :so-sequence-feature
+  {:unify.kind/name      :so-sequence-feature
    :unify.kind/global-id :so-sequence-feature/name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :drug
+  {:unify.kind/name      :drug
    :unify.kind/global-id :drug/preferred-name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :comorbidity
+  {:unify.kind/name      :comorbidity
    :unify.kind/global-id :comorbidity/name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :meddra-disease
+  {:unify.kind/name      :meddra-disease
    :unify.kind/global-id :meddra-disease/preferred-name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :gdc-anatomic-site
+  {:unify.kind/name      :gdc-anatomic-site
    :unify.kind/global-id :gdc-anatomic-site/name
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
-  {:unify.kind/name       :gene-product
+  {:unify.kind/name      :gene-product
    :unify.kind/global-id :gene-product/id
-   :unify.kind/ref-data   true}
+   :unify.kind/ref-data  true}
 
   {:unify.kind/name                   :nanostring-signature
-   :unify.kind/global-id             :nanostring-signature/name
+   :unify.kind/global-id              :nanostring-signature/name
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}
 
   {:unify.kind/name                   :clinical-trial
-   :unify.kind/global-id             :clinical-trial/nct-number
+   :unify.kind/global-id              :clinical-trial/nct-number
    :unify.kind/allow-create-on-import true
    :unify.kind/ref-data               true}]
 

@@ -474,6 +474,7 @@
                           -5 and +5 respectively"}
  {:db/ident       :timepoint/id
   :db/valueType   :db.type/string
+  :db/unique      :db.unique/identity
   :db/cardinality :db.cardinality/one
   :db/doc         "The id of the timepoint. This is unique within the dataset, but not necessarily within the database. If this timepoint
                           is associated with a treatment regimen, the id must to start with the treatment regimen followed by the
