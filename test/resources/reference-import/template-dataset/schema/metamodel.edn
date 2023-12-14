@@ -1,7 +1,7 @@
 [
  ;; Entity metadata:
  [{:unify.kind/name       :dataset
-   :unify.kind/context-id :dataset/name}
+   :unify.kind/global-id  :dataset/name}
 
   {:unify.kind/name       :assay
    :unify.kind/context-id :assay/name
