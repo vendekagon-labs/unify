@@ -1,5 +1,6 @@
+- Fix config!
+- Fix reference data fail on sequence ontology thing
 - Include basic Datomic local system topology via Docker/compose
-- Simplify metamodel, esp. re: need-uid, etc.
 - Documentation!!! esp README.md
 - Move candel to its own sysytem in test resources
 - Move dataset processing to scripts that can be run end-to-end in a test
