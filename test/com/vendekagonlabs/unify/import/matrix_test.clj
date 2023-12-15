@@ -30,7 +30,7 @@
   (str "datomic:mem://matrix-tests"))
 
 (def import-cfg-file
-  "test/resources/matrix/config.edn")
+  "test/resources/systems/candel/matrix/config.edn")
 
 (def schema-dir
   "test/resources/systems/candel/template-dataset/schema")

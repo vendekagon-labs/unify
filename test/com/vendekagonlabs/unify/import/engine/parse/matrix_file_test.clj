@@ -15,8 +15,8 @@
   (:require [com.vendekagonlabs.unify.import.engine.parse.matrix-file :as sut]
             [clojure.test :refer :all]))
 
-(def sparse-file "test/resources/matrix/short-processed-counts.tsv")
-(def bad-sparse-file "test/resources/matrix/bad-dog-no-matrix.tsv")
+(def sparse-file "test/resources/systems/candel/matrix/short-processed-counts.tsv")
+(def bad-sparse-file "test/resources/systems/candel/matrix/bad-dog-no-matrix.tsv")
 (def sparse-parse-directive
   {:indexed-by {"barcode" :measurement-matrix/single-cells
                 "hugo"    :measurement-matrix/gene-products}
@@ -24,8 +24,8 @@
    :data-type  :db.type/long
    :sparse?    true})
 
-(def dense-file "test/resources/matrix/dense-rnaseq.tsv")
-(def bad-dense-file "test/resources/matrix/dense-wrong-col-names.tsv")
+(def dense-file "test/resources/systems/candel/matrix/dense-rnaseq.tsv")
+(def bad-dense-file "test/resources/systems/candel/matrix/dense-wrong-col-names.tsv")
 (def dense-parse-directive
   {:indexed-by {"sample.id" :measurement-matrix/samples}
    :data-spec  :measurement/read-count
