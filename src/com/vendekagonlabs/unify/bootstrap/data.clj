@@ -96,7 +96,7 @@
     (remove
       (fn [{:keys [name]}]
         (let [proprietary #{:nanostring-signatures :drugs :diseases}
-              not-yet-here #{:proteins-epitopes}
+              not-yet-here #{:proteins-epitopes :so-sequence-features}
               exclude (set/union proprietary not-yet-here)]
           (exclude name)))
       datasets)))
