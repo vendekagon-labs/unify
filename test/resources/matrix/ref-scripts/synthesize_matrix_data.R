@@ -87,7 +87,7 @@ write.table(unmelt, "~/data/dense-rnaseq.tsv",
             sep = "\t")
 
 # Synthesize some fake subject data
-subjects <- read.table("~/code/pret/test/resources/reference-import/processed/subjects.txt",
+subjects <- read.table("~/code/pret/test/resources/systems/candel/processed/subjects.txt",
                        sep = "\t",
                        header = TRUE)
 

@@ -32,7 +32,7 @@
   "test/resources/tuple-import/config.edn")
 
 (def schema-dir
-  "test/resources/reference-import/template-dataset/schema")
+  "test/resources/systems/candel/template-dataset/schema")
 
 (defn bootstrap-genes []
   (first
