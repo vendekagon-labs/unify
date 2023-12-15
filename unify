@@ -1,2 +1,2 @@
 #!/bin/bash
-clojure -X com.vendekagonlabs.unify.cli/-main $*
+clojure -Mdev -m com.vendekagonlabs.unify.cli $* 
