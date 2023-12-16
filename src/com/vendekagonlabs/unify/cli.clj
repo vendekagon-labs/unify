@@ -56,8 +56,10 @@
         options-summary
         ""
         "Task:"
-        "  request-db        Creates a new Unify database. Specify the name of the database with --database"
+        "  compile-schema    Given a Unify schema def in --unify-schema, creates --schema-directory containing"
+        "                    schema.edn, metamodel.edn, and enums.edn as expected by Unify tasks."
         "                    and the schema to install with --schema-directory"
+        "  request-db        Creates a new Unify database. Specify the name of the database with --database"
         "  list-dbs          Lists information about all current databases."
         "  delete-db         Deletes the database specified by --database"
         "  prepare           Uses an import config file to generate all data needed to run an import."
