@@ -7,11 +7,14 @@
             [com.vendekagonlabs.unify.cli.error-handling :as error-handling]
             [com.vendekagonlabs.unify.db.config :as config]
             [com.vendekagonlabs.unify.bootstrap.data :as bootstrap.data]
+            [com.vendekagonlabs.unify.import :as import]
             [com.vendekagonlabs.unify.util.io :as util.io]))
 
 
+(def patient-unify-schema-file
+  "test/resources/systems/patient-dashboard/schema/unify.edn")
 (defn patient-unify-schema []
-  (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
+  (util.io/read-edn-file patient-unify-schema-file))
 
 (defn temp-datomic-uri []
   (->> (random-uuid)
@@ -57,6 +60,12 @@
         (testing "Unify metamodel transacts."
           (is (:db-after @(d/transact conn (:unify/metamodel compiled-schema)))))))))
 
+(defn- cleanup-temp-directory [dir-name]
+  (try
+    (util.io/delete-recursively dir-name)
+    (catch Exception _e
+      (println "WARN: could not delete temporary test output directory: " dir-name))))
+
 (defn- exists? [f]
   (.exists (io/file f)))
 (deftest schema-dir-tests
@@ -72,11 +81,16 @@
       (request-db test-schema-dir "temp-schema-compile-test")
       (Thread/sleep 100)
       (delete-db "temp-schema-compile-test"))
+    (cleanup-temp-directory test-schema-dir)))
     ;; cleanup at end (move to fixture)
-    (try
-      (util.io/delete-recursively test-schema-dir)
-      (catch Exception _e
-        (println "WARN: could not delete temporary test output directory: " test-schema-dir)))))
+
+(deftest unify-import-internal-api-test
+  (let [test-schema-dir "schema-compile-temp-test-2"]
+    (testing "Import API entrypoint for schema compilation works (sanity test)"
+      (is (= :success (:results (import/compile-schema
+                                  {:schema-directory test-schema-dir
+                                   :unify-schema patient-unify-schema-file})))))
+    (cleanup-temp-directory test-schema-dir)))
 
 
 (comment

@@ -18,12 +18,10 @@
             [clojure.string :as str]
             [clojure.pprint :refer [pprint]]
             [com.vendekagonlabs.unify.import :as import]
-            [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.cli.error-handling :as cli.error-handling :refer [exit]]
             [com.vendekagonlabs.unify.db :as db]
-            [com.vendekagonlabs.unify.db.schema.cache :as cache]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.util.release :as release])
   (:gen-class)
@@ -144,6 +142,16 @@
           (pprint result))))
     (exit 1 (str "ERROR: requires --database argument"))))
 
+(defn compile-schema
+  [{:keys [schema-directory unify-schema] :as arg-map}]
+  (when-not schema-directory
+    (exit 1 (str "ERROR: compile-schema requires --schema-directory argument.")))
+  (when-not (and unify-schema
+                 (util.io/exists? unify-schema))
+    (exit 1 (str "ERROR: compile-schema requires --unify-schema argument, which "
+                 "must point to an edn file containing a Unify schema specification.")))
+  (import/compile-schema arg-map))
+
 (defn prepare
   [{:keys [import-cfg-file target-dir resume overwrite
            schema-directory continue-on-error] :as arg-map}]
@@ -251,6 +259,7 @@
    ;;   "validate" validate
    ;;   "crosscheck-reference" crosscheck-reference
    "list-dbs"   list-dbs
+   "compile-schema" compile-schema
    "delete-db"  delete-db})
 
 (def allowed-tasks (set (keys tasks)))
