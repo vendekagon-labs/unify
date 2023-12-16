@@ -23,7 +23,7 @@
                      :scope     :global}
                 :attributes
                 [[:highlighted :boolean :cardinality-one "Whether to highlight medication in UI."]
-                 [:list-order :int :cardinality-one "Value used to order patient lists."]
+                 [:list-order :long :cardinality-one "Value used to order patient lists."]
                  [:title :string :cardinality-one "Medication (plain text) title."]
                  [:primary-indications {:ref-to :disease} :cardinality-many
                   "Primary indications this medication is used to treat."]

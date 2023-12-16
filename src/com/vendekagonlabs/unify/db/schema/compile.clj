@@ -133,6 +133,9 @@
           (write-schema out-file edn-data)))))
 
   (comment
+    :troubleshooting
+    (def example-schema-dsl (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
+
     ;; Working first cut
     ;; TODO: next
     ;; - create tests of outer API
@@ -146,7 +149,6 @@
     ;;
     ;; When we have verified these behaviors:
     ;;   - add a `unify compile-schema --unify-schema --schema-directory` task to run this on the CLI
-    (def example-schema-dsl (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
     (def example-id-data
       (get-in example-schema-dsl [:patient :id])
       (process-id :patient example-id-data))
