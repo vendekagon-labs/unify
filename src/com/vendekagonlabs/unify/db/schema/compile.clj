@@ -75,9 +75,9 @@
     (merge datomic-schema
            (when-let [ref-target (and (map? attr-type)
                                       (:ref-to attr-type))]
-             {:unify/metamodel [{:db/id ns-attr-kw
-                                 :unify.ref/from kind-name
-                                 :unify.ref/to ref-target}]})
+             {:unify/metamodel-refs [{:db/id ns-attr-kw
+                                      :unify.ref/from kind-name
+                                      :unify.ref/to ref-target}]})
            (when-let [enum-set (and (map? attr-type)
                                     (:enum-of attr-type))]
              {:unify/enums (mapv (comp
@@ -102,7 +102,7 @@
                    (assoc kind :unify.kind/parent parent))
         attr-schema (attributes->schema kind-name attributes)]
     (merge-with concat {:datomic/schema schema
-                        :unify/metamodel [kind-def]}
+                        :unify/metamodel-kinds [kind-def]}
                        attr-schema)))
 
 (defn ->raw-schema
@@ -117,20 +117,23 @@
 
 (defn write-schema
   [file data]
-  (spit file
-        (with-out-str
-          (pp/write data :dispatch pp/code-dispatch))))
+  (binding [*print-length* nil
+            *print-namespace-maps* false]
+    (spit file
+          (with-out-str
+            (pp/write data :dispatch pp/code-dispatch)))))
+
 (defn write-schema-dir!
   [schema-dir raw-schema]
   (io/make-parents (io/file schema-dir "schema.edn"))
   (doseq [schema-key [:datomic/schema
-                      :unify/metamodel
                       :unify/enums]]
     (when-let [edn-data (vec (get raw-schema schema-key))]
       (let [out-file (io/file schema-dir (get file-name-lookup schema-key))]
-        (binding [*print-length* nil
-                  *print-namespace-maps* false]
-          (write-schema out-file edn-data)))))
+          (write-schema out-file edn-data))))
+  (let [metamodel-content [(:unify/metamodel-kinds raw-schema)
+                           (:unify/metamodel-refs raw-schema)]]
+    (write-schema (io/file schema-dir "metamodel.edn") metamodel-content))
 
   (comment
     :troubleshooting
@@ -139,9 +142,6 @@
     ;; Working first cut
     ;; TODO: next
     ;; - create tests of outer API
-    ;; - ensure that:
-    ;;   - when we generate schema data (edn in memory), we can transact all of it in the order of:
-    ;;     - schema, enums, metamodel
     ;; - ensure that:
     ;;   - given a schema DSL definition, create a schema directory with expected files
     ;;   - starting unify processes that point to those files work as expected

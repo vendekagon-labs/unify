@@ -31,7 +31,7 @@
       (let [msg (str "Couldn't load datomic info for branch " database)]
         (throw (ex-info
                  msg
-                 {:candelabra/access {:message msg}}))))))
+                 {:remote/access {:message msg}}))))))
 
 (defn get-connection [info]
   (d/connect (:uri info)))
