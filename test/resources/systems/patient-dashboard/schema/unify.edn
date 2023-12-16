@@ -9,7 +9,9 @@
                 [[:disease {:ref-to :disease} :cardinality-many
                   "The disease this patient has been diagnosed with."]
                  [:prescription {:ref-to :prescription}
-                  :cardinality-many "Information on a prescription given to this patient."]]}
+                  :cardinality-many "Information on a prescription given to this patient."]
+                 [:age :long :cardinality-one "The age of the patient at time of entry into system."]
+                 [:sex {:enum-of [:male :female :other :unknown]} :cardinality-one "The biological sex of the patient."]]}
  :disease      {:id {:type      :string
                      :attribute :official-name
                      :scope     :global}
