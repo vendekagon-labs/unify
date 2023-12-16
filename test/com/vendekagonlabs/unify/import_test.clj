@@ -23,7 +23,7 @@
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 
-(def template-dir "test/resources/reference-import/template-dataset")
+(def template-dir "test/resources/systems/candel/template-dataset")
 
 
 (defn import-cfg-file []

@@ -18,12 +18,10 @@
             [clojure.string :as str]
             [clojure.pprint :refer [pprint]]
             [com.vendekagonlabs.unify.import :as import]
-            [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.cli.error-handling :as cli.error-handling :refer [exit]]
             [com.vendekagonlabs.unify.db :as db]
-            [com.vendekagonlabs.unify.db.schema.cache :as cache]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.util.release :as release])
   (:gen-class)
@@ -58,8 +56,10 @@
         options-summary
         ""
         "Task:"
-        "  request-db        Creates a new Unify database. Specify the name of the database with --database"
+        "  compile-schema    Given a Unify schema def in --unify-schema, creates --schema-directory containing"
+        "                    schema.edn, metamodel.edn, and enums.edn as expected by Unify tasks."
         "                    and the schema to install with --schema-directory"
+        "  request-db        Creates a new Unify database. Specify the name of the database with --database"
         "  list-dbs          Lists information about all current databases."
         "  delete-db         Deletes the database specified by --database"
         "  prepare           Uses an import config file to generate all data needed to run an import."
@@ -84,6 +84,8 @@
     "Directory where prepared data goes, transact uses the data prepare puts here."]
    [nil "--schema-directory  SCHEMA-DIRECTORY"
     "Directory containing a Unify schema (base Datomic schema + metamodel annotations)"]
+   [nil "--unify-schema      UNIFY-SCHEMA"
+    "An edn file which contains a Unify schema definition."]
    [nil "--tx-batch-size     TX-BATCH-SIZE" "Datomic transaction batch size"
     :default 50
     :parse-fn #(Integer/parseInt %)
@@ -143,6 +145,16 @@
           (println "Error deleting " database "errors: ")
           (pprint result))))
     (exit 1 (str "ERROR: requires --database argument"))))
+
+(defn compile-schema
+  [{:keys [schema-directory unify-schema] :as arg-map}]
+  (when-not schema-directory
+    (exit 1 (str "ERROR: compile-schema requires --schema-directory argument.")))
+  (when-not (and unify-schema
+                 (util.io/exists? unify-schema))
+    (exit 1 (str "ERROR: compile-schema requires --unify-schema argument, which "
+                 "must point to an edn file containing a Unify schema specification.")))
+  (import/compile-schema arg-map))
 
 (defn prepare
   [{:keys [import-cfg-file target-dir resume overwrite
@@ -251,6 +263,7 @@
    ;;   "validate" validate
    ;;   "crosscheck-reference" crosscheck-reference
    "list-dbs"   list-dbs
+   "compile-schema" compile-schema
    "delete-db"  delete-db})
 
 (def allowed-tasks (set (keys tasks)))

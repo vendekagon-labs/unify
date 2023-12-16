@@ -21,7 +21,7 @@
             [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]
             [com.vendekagonlabs.unify.util.io :as util.io]))
 
-(def import-root-dir "test/resources/reference-import/")
+(def import-root-dir "test/resources/systems/candel/small-reference-import/")
 (def ref-config-file (str import-root-dir "config.edn"))
 (def mapping-file (str import-root-dir "mappings.edn"))
 (def mappings (util.io/read-edn-file mapping-file))

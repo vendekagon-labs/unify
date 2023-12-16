@@ -87,7 +87,7 @@ write.table(unmelt, "~/data/dense-rnaseq.tsv",
             sep = "\t")
 
 # Synthesize some fake subject data
-subjects <- read.table("~/code/pret/test/resources/reference-import/processed/subjects.txt",
+subjects <- read.table("~/code/pret/test/resources/systems/candel/small-reference-import/processed/subjects.txt",
                        sep = "\t",
                        header = TRUE)
 
@@ -101,7 +101,7 @@ race <- sample(unique(subjects$RACE), length(samples), replace = TRUE)
 ethnic <- sample(unique(subjects$ETHNIC), length(samples), replace = TRUE)
 samples.df <- data.frame(subj.ids, samples, sex, age, race, ethnic)
 
-write.table(samples.df, '~/code/pret/test/resources/matrix/samples.tsv',
+write.table(samples.df, '~/code/pret/test/resources/systems/candel/matrix/samples.tsv',
             row.names = FALSE,
             col.names = TRUE,
             quote = FALSE,
@@ -109,14 +109,14 @@ write.table(samples.df, '~/code/pret/test/resources/matrix/samples.tsv',
 
 
 # make single cells file
-tab <- read.table('~/code/pret/test/resources/matrix/short-processed-counts.tsv',
+tab <- read.table('~/code/pret/test/resources/systems/candel/matrix/short-processed-counts.tsv',
                   sep = '\t',
                   header = TRUE)
 
 # we make a new file just to get rid of duplicates from barcode x gene product
 barcodes <- unique(tab$barcode)
 
-write.table(barcodes, '~/code/pret/test/resources/matrix/cell-barcodes.tsv',
+write.table(barcodes, '~/code/pret/test/resources/systems/candel/matrix/cell-barcodes.tsv',
             sep = '\t',
             row.names = FALSE,
             col.names = TRUE,
@@ -131,7 +131,7 @@ cleaned <- na.omit(tab)
 
 # rewrite cleaned single cell file
 write.table(cleaned,
-            '~/code/pret/test/resources/matrix/short-processed-counts.tsv',
+            '~/code/pret/test/resources/systems/candel/matrix/short-processed-counts.tsv',
             row.names = FALSE,
             col.names = TRUE,
             quote = FALSE,
@@ -151,7 +151,7 @@ unmelt <- dcast(cleaned, sample.id ~ hugo, fill = 0.0)
 # unmelt <- data.table(cleaned)[, `Var.2`:=NULL]
 
 write.table(unmelt,
-            '~/code/pret/test/resources/matrix/dense-rnaseq.tsv',
+            '~/code/pret/test/resources/systems/candel/matrix/dense-rnaseq.tsv',
             row.names = FALSE,
             col.names = TRUE,
             quote = FALSE,

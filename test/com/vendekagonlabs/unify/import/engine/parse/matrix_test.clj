@@ -21,11 +21,11 @@
 
 
 (def unify-schema (schema/get-metamodel-and-schema))
-(def config-file "test/resources/matrix/config.edn")
+(def config-file "test/resources/systems/candel/matrix/config.edn")
 (def config-map (util.io/read-edn-file config-file))
 (def parsed-cfg
   (parse.config/parse-config-map unify-schema config-map))
-(def mappings (util.io/read-edn-file "test/resources/matrix/mappings.edn"))
+(def mappings (util.io/read-edn-file "test/resources/systems/candel/matrix/mappings.edn"))
 (def mappings (parse.mapping/mappings-edn->lookup mappings))
 
 (def job-context
@@ -39,7 +39,7 @@
    :unify/ns-node-ctx                   [:dataset :dataset/assays 0
                                          :assay/measurement-sets 0
                                          :measurement-set/measurement-matrices 0]
-   :unify.matrix/input-file             "test/resources/matrix/short-processed-counts.tsv"
+   :unify.matrix/input-file             "test/resources/systems/candel/matrix/short-processed-counts.tsv"
    :unify.matrix/format                 :unify.matrix.format/sparse
    :unify.matrix/indexed-by             {"barcode" :measurement-matrix/single-cells
                                          "hugo"    :measurement-matrix/gene-products}
@@ -52,7 +52,7 @@
    :unify/ns-node-ctx                   [:dataset :dataset/assays 0
                                          :assay/measurement-sets 0
                                          :measurement-set/measurement-matrices 1]
-   :unify.matrix/input-file             "test/resources/matrix/dense-rnaseq.tsv"
+   :unify.matrix/input-file             "test/resources/systems/candel/matrix/dense-rnaseq.tsv"
    :unify.matrix/format                 :unify.matrix.format/dense
    :unify.matrix/column-attribute       :measurement-matrix/gene-products
    :unify.matrix/indexed-by             {"sample.id" :measurement-matrix/samples}

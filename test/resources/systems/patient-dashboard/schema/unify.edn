@@ -1,0 +1,63 @@
+{:dataset      {:id {:type :string
+                     :attribute :name
+                     :scope     :global}}
+ :patient      {:id {:type      :string
+                     :attribute :id
+                     :scope     :context}
+                :parent :dataset
+                :attributes
+                [[:disease {:ref-to :disease} :cardinality-many
+                  "The disease this patient has been diagnosed with."]
+                 [:prescription {:ref-to :prescription}
+                  :cardinality-many "Information on a prescription given to this patient."]
+                 [:age :long :cardinality-one "The age of the patient at time of entry into system."]
+                 [:sex {:enum-of [:male :female :other :unknown]} :cardinality-one "The biological sex of the patient."]]}
+ :disease      {:id {:type      :string
+                     :attribute :official-name
+                     :scope     :global}
+                :attributes
+                [[:common-comorbidities {:ref-to :disease} :cardinality-many
+                  "Common comorbidities that occur with this disease."]]}
+ :medication   {:id {:type      :string
+                     :attribute :ontology-name
+                     :scope     :global}
+                :attributes
+                [[:highlighted :boolean :cardinality-one "Whether to highlight medication in UI."]
+                 [:list-order :long :cardinality-one "Value used to order patient lists."]
+                 [:title :string :cardinality-one "Medication (plain text) title."]
+                 [:primary-indications {:ref-to :disease} :cardinality-many
+                  "Primary indications this medication is used to treat."]
+                 [:off-label-uses {:ref-to :disease} :cardinality-many
+                  "Approved off-label uses for this medication."]]}
+ :prescription {:id {:type      :string
+                     :attribute :uuid
+                     :scope     :global
+                     :doc       "Arbitrarily assigned UUID, generated when prescription ingested into website."}
+                :parent :dataset
+                :attributes
+                [[:prescribed-by {:ref-to :physician} :cardinality-one "Prescribing physician"]
+                 [:prescribed-to {:ref-to :patient} :cardinality-one "Patient prescribed to."]
+                 [:medication {:ref-to :medication} :cardinality-one "The prescribed medication"]
+                 [:dose :float :cardinality-one "The dose in :prescription/dose-units measurement taken at each interval."]
+                 [:dose-units :string :cardinality-one "The dose at which this medicine should be taken."]
+                 [:freetext-dose-interval :string :cardinality-one "Free text description of how often drug should be taken"]
+                 [:start-date :instant :cardinality-one
+                  "The date on which this prescription was ordered."]
+                 [:stop-date :instant :cardinality-one
+                  "The last date on which this prescription was taken."]]}
+ :physician    {:id {:type      :string
+                     :attribute :id
+                     :scope     :global}
+                :attributes
+                [[:full-name :string :cardinality-one
+                  "This physician's full name as matches professional use"]
+                 [:treats-diseases {:ref-to :disease} :cardinality-many
+                  "The diseases this physician treats."]
+                 [:institutions {:ref-to :institution} :cardinality-many "Institutions which this physician is affiliated with."]]}
+ :institution  {:id {:type      :string
+                     :attribute :institution/id
+                     :scope     :global}
+                :attributes
+                [[:name :string :cardinality-one "The full legal name for this institution"]
+                 [:us-location {:tuple-of [:string :enum]} :cardinality-one
+                  "The [City, State] tuple where this institution is located, if in the US."]]}}

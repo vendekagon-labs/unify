@@ -17,6 +17,7 @@
             [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.db.schema :as db.schema]
+            [com.vendekagonlabs.unify.db.schema.compile :as compile]
             [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
             [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
             [com.vendekagonlabs.unify.import.tx-data :as tx-data]
@@ -129,6 +130,15 @@
                  ::anomalies/message  (.getMessage e)
                  ::anomalies/ex-data  (ex-data e)}]})))
 
+(defn compile-schema
+  "Given an edn file that conforms to the Unify schema definition specification, will
+  create a schema directory with the schema.edn, metamodel.edn, and enums.edn that fulfill
+  the requested schema as per the spec."
+  [{:keys [schema-directory unify-schema]}]
+  (let [unify-schema-data (util.io/read-edn-file unify-schema)
+        compiled-schema (compile/->raw-schema unify-schema-data)]
+    (compile/write-schema-dir! schema-directory compiled-schema)
+    {:results :success}))
 
 (defn crosscheck-references
   "Checks all reference data in the tx-data dir of target-dir to see if it asserts anything
