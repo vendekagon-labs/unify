@@ -82,6 +82,8 @@
     "Directory where prepared data goes, transact uses the data prepare puts here."]
    [nil "--schema-directory  SCHEMA-DIRECTORY"
     "Directory containing a Unify schema (base Datomic schema + metamodel annotations)"]
+   [nil "--unify-schema      UNIFY-SCHEMA"
+    "An edn file which contains a Unify schema definition."]
    [nil "--tx-batch-size     TX-BATCH-SIZE" "Datomic transaction batch size"
     :default 50
     :parse-fn #(Integer/parseInt %)
