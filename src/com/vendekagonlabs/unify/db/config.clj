@@ -24,40 +24,41 @@
 (def aws-region
   (wrap-config
     "UNIFY_AWS_REGION"
-    "candel.awsRegion"
+    "unify.awsRegion"
     "us-east-1"))
 
 (def ddb-table
   (wrap-config
     "UNIFY_DDB_TABLE"
-    "candel.ddbTable"
-    "candel-prod"))
+    "unify.ddbTable"
+    "unify-prod"))
 
 (def reference-data-bucket
   (wrap-config
     "UNIFY_REFERENCE_DATA_BUCKET"
-    "candel.referenceDataBucket"
+    "unify.referenceDataBucket"
     "unify-processed-reference-data-prod"))
 
 (def matrix-bucket
   (wrap-config
     "UNIFY_MATRIX_BUCKET"
-    "candel.matrixBucket"
-    "candel-matrix"))
+    "unify.matrixBucket"
+    "unify-matrix"))
 
 (def matrix-dir
   (wrap-config
     "UNIFY_MATRIX_DIR"
-    "candel.matrixDir"
+    "unify.matrixDir"
     "matrix-store"))
 
 (def matrix-backend
   (wrap-config
     "UNIFY_MATRIX_BACKEND"
-    "candel.matrixBackend"
-    "s3"))
+    "unify.matrixBackend"
+    "file"))
 
-;; don't default base-uri, only used to override, nil puna/when check for
-;; conrol flow when not present
 (defn base-uri []
-  (System/getenv "UNIFY_BASE_URI"))
+  (wrap-config
+    "UNIFY_BASE_URI"
+    "unify.baseURI"
+    "datomic:dev://localhost:4334/"))
