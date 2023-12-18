@@ -14,51 +14,50 @@
 (ns com.vendekagonlabs.unify.db.config)
 
 
-(defn wrap-config
+(defn resolve-config
   [env property default]
-  (fn []
-    (or (System/getenv env)
-        (System/getProperty property)
-        default)))
+  (or (System/getenv env)
+      (System/getProperty property)
+      default))
 
 (def aws-region
-  (wrap-config
+  (resolve-config
     "UNIFY_AWS_REGION"
     "unify.awsRegion"
     "us-east-1"))
 
 (def ddb-table
-  (wrap-config
+  (resolve-config
     "UNIFY_DDB_TABLE"
     "unify.ddbTable"
     "unify-prod"))
 
 (def reference-data-bucket
-  (wrap-config
+  (resolve-config
     "UNIFY_REFERENCE_DATA_BUCKET"
     "unify.referenceDataBucket"
     "unify-processed-reference-data-prod"))
 
 (def matrix-bucket
-  (wrap-config
+  (resolve-config
     "UNIFY_MATRIX_BUCKET"
     "unify.matrixBucket"
     "unify-matrix"))
 
 (def matrix-dir
-  (wrap-config
+  (resolve-config
     "UNIFY_MATRIX_DIR"
     "unify.matrixDir"
     "matrix-store"))
 
 (def matrix-backend
-  (wrap-config
+  (resolve-config
     "UNIFY_MATRIX_BACKEND"
     "unify.matrixBackend"
     "file"))
 
 (defn base-uri []
-  (wrap-config
+  (resolve-config
     "UNIFY_BASE_URI"
     "unify.baseURI"
     "datomic:dev://localhost:4334/"))
