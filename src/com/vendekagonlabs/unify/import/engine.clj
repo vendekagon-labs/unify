@@ -59,10 +59,10 @@
 (defn record-stream->chan
   "Returns a map with file header as :header and channel from which records contained
   in file cane be taken."
-  [rdr]
+  [rdr sep]
   (let [ch (a/chan 10000 (map (fn trim-whitespace [[row line-no]]
                                 [(mapv str/trim row) line-no])))]
-    (a/go-loop [tsv-lines (csv/read-csv rdr :separator \tab)
+    (a/go-loop [tsv-lines (csv/read-csv rdr :separator sep)
                 line-no 1]
       (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
         (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
@@ -131,7 +131,8 @@
               writer (clojure.java.io/writer out-f)]
     (let [out-ch (a/chan 10000)
           done-ch (a/chan)
-          {:keys [header channel]} (record-stream->chan rdr)
+          sep (if (:unify/input-csv-file job) \, \tab)
+          {:keys [header channel]} (record-stream->chan rdr sep)
           exit+cleanup (fn exit+cleanup [err-val]
                          (a/close! out-ch)
                          (a/close! channel)
