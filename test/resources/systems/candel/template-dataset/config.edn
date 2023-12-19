@@ -242,7 +242,7 @@
                                                    ; The therapy entity links subjects to treatment-regimens (see below) which are things like arms of clinical trials, which many subjects are on.
                                                    ; The wick package contains helper functions to generate all this data for the simple case in which each subject has only a single therapy
                                                    :therapies        {; This input file will have one line per subject-therapy combination
-                                                                      :unify/input-tsv-file  "processed/rizvi-therapies.txt"
+                                                                      :unify/input-csv-file  "processed/rizvi-therapies.txt"
                                                                       ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
                                                                       ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
                                                                       :treatment-regimen "regimen"

@@ -13,7 +13,7 @@
 ;; limitations under the License.
 
 (ns com.vendekagonlabs.unify.import.engine
-  (:require [clojure.data.csv :as csv]
+  (:require [charred.api :as csv]
             [clojure.edn :as edn]
             [clojure.java.io :as jio]
             [clojure.set :as set]
@@ -59,10 +59,10 @@
 (defn record-stream->chan
   "Returns a map with file header as :header and channel from which records contained
   in file cane be taken."
-  [rdr]
+  [rdr sep]
   (let [ch (a/chan 10000 (map (fn trim-whitespace [[row line-no]]
                                 [(mapv str/trim row) line-no])))]
-    (a/go-loop [tsv-lines (csv/read-csv rdr :separator \tab)
+    (a/go-loop [tsv-lines (csv/read-csv rdr :separator sep)
                 line-no 1]
       (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
         (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
@@ -103,7 +103,8 @@
   (let [req-cols (into #{} (get-req-column-names job))
         hdr-set (into #{} header)
         missing-cols (seq (set/difference req-cols hdr-set))
-        in-file (:unify/input-tsv-file job)]
+        in-file (or (:unify/input-tsv-file job)
+                    (:unify/input-csv-file job))]
     (when missing-cols
       (a/close! channel)
       (Thread/sleep 500)
@@ -130,7 +131,8 @@
               writer (clojure.java.io/writer out-f)]
     (let [out-ch (a/chan 10000)
           done-ch (a/chan)
-          {:keys [header channel]} (record-stream->chan rdr)
+          sep (if (:unify/input-csv-file job) \, \tab)
+          {:keys [header channel]} (record-stream->chan rdr sep)
           exit+cleanup (fn exit+cleanup [err-val]
                          (a/close! out-ch)
                          (a/close! channel)
@@ -204,7 +206,8 @@
    and calls the process-file fn to do the work"
   [full-import-ctx job target-dir]
   (let [outfile-prefix (:unify/out-file-prefix job)
-        in-file (clojure.java.io/file (:unify/input-tsv-file job))
+        in-file (clojure.java.io/file (or (:unify/input-tsv-file job)
+                                          (:unify/input-csv-file job)))
         in-f-name (.getName in-file)
         out-f-path (str target-dir
                         (when-not (clojure.string/ends-with? target-dir "/") "/")
@@ -232,7 +235,8 @@
                      (catch Exception e
                        (merge (ex-data e)
                               {::anom/category ::anom/fault
-                               :async/file     (:unify/input-tsv-file job)}))))
+                               :async/file     (or (:unify/input-tsv-file job)
+                                                   (:unify/input-csv-file job))}))))
         results (doall (map exec-job jobs))]
     (if-let [errors (seq (filter ::anom/category results))]
       (let [errored-file (:async/file (first errors))]
@@ -252,6 +256,7 @@
   ;; are going to be small (typed in by humans), though due to ugliness should probably fix
   ;; before shipping... using "input-file" name independent of namespace maybe?
   (let [files (concat (keep :unify/input-tsv-file jobs)
+                      (keep :unify/input-csv-file jobs)
                       (keep :unify.matrix/input-file jobs))]
     (when-let [not-found (seq (keep (fn [file]
                                       (let [fname (str (when (text/filename-relative? file)
