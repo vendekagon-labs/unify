@@ -13,7 +13,7 @@
 ;; limitations under the License.
 
 (ns com.vendekagonlabs.unify.import.engine
-  (:require [clojure.data.csv :as csv]
+  (:require [charred.api :as csv]
             [clojure.edn :as edn]
             [clojure.java.io :as jio]
             [clojure.set :as set]

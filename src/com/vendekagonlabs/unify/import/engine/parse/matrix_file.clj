@@ -12,7 +12,7 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import.engine.parse.matrix-file
-  (:require [clojure.data.csv :as csv]
+  (:require [charred.api :as csv]
             [clojure.spec-alpha2 :as s]
             [clojure.java.io :as jio]
             [com.vendekagonlabs.unify.import.engine.parse.data :as parse.data]))
