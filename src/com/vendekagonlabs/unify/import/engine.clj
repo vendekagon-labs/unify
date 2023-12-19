@@ -103,7 +103,8 @@
   (let [req-cols (into #{} (get-req-column-names job))
         hdr-set (into #{} header)
         missing-cols (seq (set/difference req-cols hdr-set))
-        in-file (:unify/input-tsv-file job)]
+        in-file (or (:unify/input-tsv-file job)
+                    (:unify/input-csv-file job))]
     (when missing-cols
       (a/close! channel)
       (Thread/sleep 500)
@@ -204,7 +205,8 @@
    and calls the process-file fn to do the work"
   [full-import-ctx job target-dir]
   (let [outfile-prefix (:unify/out-file-prefix job)
-        in-file (clojure.java.io/file (:unify/input-tsv-file job))
+        in-file (clojure.java.io/file (or (:unify/input-tsv-file job)
+                                          (:unify/input-csv-file job)))
         in-f-name (.getName in-file)
         out-f-path (str target-dir
                         (when-not (clojure.string/ends-with? target-dir "/") "/")
@@ -232,7 +234,8 @@
                      (catch Exception e
                        (merge (ex-data e)
                               {::anom/category ::anom/fault
-                               :async/file     (:unify/input-tsv-file job)}))))
+                               :async/file     (or (:unify/input-tsv-file job)
+                                                   (:unify/input-csv-file job))}))))
         results (doall (map exec-job jobs))]
     (if-let [errors (seq (filter ::anom/category results))]
       (let [errored-file (:async/file (first errors))]
@@ -252,6 +255,7 @@
   ;; are going to be small (typed in by humans), though due to ugliness should probably fix
   ;; before shipping... using "input-file" name independent of namespace maybe?
   (let [files (concat (keep :unify/input-tsv-file jobs)
+                      (keep :unify/input-csv-file jobs)
                       (keep :unify.matrix/input-file jobs))]
     (when-let [not-found (seq (keep (fn [file]
                                       (let [fname (str (when (text/filename-relative? file)

@@ -30,7 +30,8 @@
 
 (def unify-key-whitelist #{:unify/constants :unify/value :unify/variables
                            :unify/reverse :unify/precomputed
-                           :unify/rev-variable :unify/input-tsv-file :unify/import :unify/variable
+                           :unify/rev-variable :unify/input-tsv-file
+                           :unify/input-csv-file :unify/import :unify/variable
                            :unify/rev-attr :unify/many-delimiter :unify/many-variable
                            :unify/na :unify/omit-if-na
                            :unify/glob :unify.glob/directory :unify.glob/pattern
@@ -107,6 +108,7 @@
       ;; if we end up supporting more formats than tsv -> datoms and tsv -> s3,
       ;; we may want to make this pruning/separation more generic.
       (prune-nodes-by-key :unify/input-tsv-file)
+      (prune-nodes-by-key :unify/input-csv-file)
       (prune-nodes-by-key :unify.matrix/input-file)
       flatten-nil-vecs
       remove-nils))
@@ -315,10 +317,12 @@
     ;; to parse.data/uid-attr-val instead of synthetic-uid. Why? I also have no
     ;; idea.
     (not (or (contains? node :unify/input-tsv-file)
+             (contains? node :unify/input-csv-file)
              (= context-type :unify/reverse)
              (= context-type :unify/constants)
              (= context-type :unify/variables)
-             (= context-type :unify/input-tsv-file)))))
+             (= context-type :unify/input-tsv-file)
+             (= context-type :unify/input-csv-file)))))
 
 (defn- skip-uid?
   [node]
@@ -369,11 +373,12 @@
        reverse))
 
 (defn add-parent-ref
-  "Adds parent refs to directives (containing :unify/input-tsv-file) and specifies output file prefix
+  "Adds parent refs to directives (containing :unify/input-*-file) and specifies output file prefix
   to indicate that children/dependent data should be transacted after parent directives."
   [schema parsed-cfg node]
   ;; theoretically this could be name check now.
   (if-not (or (:unify/input-tsv-file node)
+              (:unify/input-csv-file node)
               (:unify.matrix/input-file node))
     node
     (if (:unify/reverse node)
@@ -492,20 +497,27 @@
   "Returns a seq of directives (maps that contain :unify/input-tsv-file) from
   a (possibly multiply-nested) map"
   [cfg-dir m]
-  (let [all-maps-list (coll/all-nested-maps m :unify/input-tsv-file)
-        rm-fun (fn [[_ v]] (and (map? v) (:unify/input-tsv-file v)))]
+  (let [all-maps-list (concat (coll/all-nested-maps m :unify/input-tsv-file)
+                              (coll/all-nested-maps m :unify/input-csv-file))
+        nested-directive? (fn [[_ v]] (and (map? v) (or (:unify/input-tsv-file v)
+                                                        (:unify/input-csv-file v))))]
     (->> all-maps-list
-         (map #(into {} (remove rm-fun %)))
+         (map #(into {} (remove nested-directive? %)))
          ;; if we have multiple files from parsed glob pattern, then we
          ;; make a directive map for each.
          (mapcat (fn [d-map]
-                   (let [input-file-spec (:unify/input-tsv-file d-map)]
+                   ;; note: if we end up with more files beyond csv/tsv, we need to extract
+                   ;;       this into a multimethod or something similar
+                   (let [input-file-kw (if (:unify/input-csv-file d-map)
+                                         :unify/input-csv-file
+                                         :unify/input-tsv-file)
+                         input-file-spec (get d-map input-file-kw)]
                      (if-not (map? input-file-spec)
-                       [(assoc d-map :unify/input-tsv-file (maybe->absolute-path cfg-dir input-file-spec))]
+                       [(assoc d-map input-file-kw (maybe->absolute-path cfg-dir input-file-spec))]
                        (let [{:keys [unify.glob/directory unify.glob/pattern]} input-file-spec
                              abs-dir (maybe->absolute-path cfg-dir directory)
                              matched-files (util.io/glob abs-dir pattern)
-                             returned (mapv #(assoc d-map :unify/input-tsv-file %)
+                             returned (mapv #(assoc d-map input-file-kw %)
                                             matched-files)]
                          (if (seq returned)
                            returned
