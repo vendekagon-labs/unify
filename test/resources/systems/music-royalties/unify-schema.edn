@@ -1,0 +1,53 @@
+{:dataset     {:id {:type :string
+                    :attribute :name
+                    :scope     :global}
+               :attributes
+               [[:summary :string :cardinality-one
+                 "Description of dataset."]]}
+ :artist      {:id {:type      :string
+                    :attribute :name
+                    :scope     :global}
+               :parent :dataset
+               :attributes
+               [[:genre-scope :string :cardinality-one
+                 "The rough name of the genre(s) that I target with this artist."]]}
+ :track        {:id {:type :string
+                     :attribute :name
+                     :scope     :global}
+                :parent :dataset
+                :attributes
+                [[:isrc :string :cardinality-one
+                  "The ISRC (International Standard Recording Code) that uniquely identifies this track."]
+                 [:artists {:ref-to :artist} :cardinality-many
+                  "The main artists that appear on this track."]]}
+ :release      {:id {:type :string
+                     :attribute :name
+                     :scope     :global}
+                :parent :dataset
+                :attributes
+                [[:catalog-number :string :cardinality-one
+                  "The UPC or other unique identifying catalog number for this release."]
+                 [:type {:enum-of [:album :single :ep :other]} :cardinality-one
+                  "What kind of release this is."]
+                 [:artists {:ref-to :artist} :cardinality-many
+                  "The main artists for this release (album, EP, or single level)."]]}
+ :store {:id {:type :string
+              :scope :global
+              :attribute :name}
+         :parent :dataset
+         :attributes
+         [[:full-name :string :cardinality-one "Expanded full-name of store."]]}
+ :royalty {:id {:type :string
+                :scope :context
+                :attribute :id}
+           :parent :dataset
+           :attributes
+           [[:release {:ref-to :release} :cardinality-one
+             "The release with which this royalty payment was associated."]
+            [:track {:ref-to :track} :cardinality-one
+             "The track with which this royalty payment was associated."]
+            [:type {:enum-of [:streaming :purchase :license]} :cardinality-one
+             "The platform/nature of royalty (streaming, purchase, license)."]
+            [:store {:ref-to :store} :cardinality-one
+             "The store, platform, service, etc. via which this royalty was earned."]]}}
+ 
