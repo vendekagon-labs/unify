@@ -20,37 +20,37 @@
       (System/getProperty property)
       default))
 
-(def aws-region
+(defn aws-region []
   (resolve-config
     "UNIFY_AWS_REGION"
     "unify.awsRegion"
     "us-east-1"))
 
-(def ddb-table
+(defn ddb-table []
   (resolve-config
     "UNIFY_DDB_TABLE"
     "unify.ddbTable"
     "unify-prod"))
 
-(def reference-data-bucket
+(defn reference-data-bucket []
   (resolve-config
     "UNIFY_REFERENCE_DATA_BUCKET"
     "unify.referenceDataBucket"
     "unify-processed-reference-data-prod"))
 
-(def matrix-bucket
+(defn matrix-bucket []
   (resolve-config
     "UNIFY_MATRIX_BUCKET"
     "unify.matrixBucket"
     "unify-matrix"))
 
-(def matrix-dir
+(defn matrix-dir []
   (resolve-config
     "UNIFY_MATRIX_DIR"
     "unify.matrixDir"
     "matrix-store"))
 
-(def matrix-backend
+(defn matrix-backend []
   (resolve-config
     "UNIFY_MATRIX_BACKEND"
     "unify.matrixBackend"
