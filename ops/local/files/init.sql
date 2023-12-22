@@ -1,3 +1,4 @@
+CREATE ROLE unify LOGIN PASSWORD 'unify';
 CREATE TABLE datomic_kvs
 (
  id text NOT NULL,

@@ -14,7 +14,7 @@ services:
     networks:
       - datomic-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "datomic"]
+      test: ["CMD", "pg_isready", "-U", "unify"]
       interval: 5s
       timeout: 5s
       retries: 5
