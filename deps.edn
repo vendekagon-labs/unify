@@ -30,7 +30,8 @@
 
  :paths ["src" "resources"]
  :aliases {:dev {:extra-paths ["dev" "test"]
-                 :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}}}
+                 :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}
+                              org.postgresql/postgresql {:mvn/version "42.7.1"}}}
            :repl-server {:exec-fn clojure.core.server/start-server
                          :extra-paths ["dev" "test"]
                          :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}} 
