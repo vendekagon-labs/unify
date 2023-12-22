@@ -1,0 +1,2 @@
+#!/bin/bash
+UNIFY_BASE_URI="datomic:sql://?jdbc:postgresql://localhost:5432/unify?user=unify&password=unify" clojure -Mdev -m com.vendekagonlabs.unify.cli $* 

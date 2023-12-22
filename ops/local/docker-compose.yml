@@ -1,0 +1,58 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: unify
+      POSTGRES_PASSWORD: unify
+      POSTGRES_DB: unify
+    ports:
+      - 5432:5432
+    volumes:
+      - ./files/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - datomic-storage-data:/var/lib/postgresql/data
+    networks:
+      - datomic-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "unify"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+
+  transactor:
+    image: datomic:1.0.7075-java17 
+    build: 
+      context: ./images/transactor/
+      dockerfile: Dockerfile
+    ports:
+      - 4334:4334
+    volumes:
+      - datomic-transactor-logs:/opt/datomic/logs
+    configs:
+      - transactor.properties
+    networks:
+      - datomic-network
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:9999/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+configs:
+  transactor.properties:
+    file: ./files/sql-transactor.properties
+
+networks:
+  datomic-network:
+    driver: bridge
+
+volumes:
+  datomic-storage-data:
+  datomic-transactor-logs:

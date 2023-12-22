@@ -13,6 +13,7 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.db.backend
   (:require [datomic.api :as d]
+            [clojure.string :as str]
             [com.vendekagonlabs.unify.db.config :as db.config]))
 
 
@@ -21,13 +22,22 @@
        (db.config/aws-region) "/"
        (db.config/ddb-table) "/"))
 
-(defn db-base-uri []
-  (or (db.config/base-uri)
-      (ddb-base-uri)))
+(defn db-name->uri [db-name]
+  (let [base-uri (or (db.config/base-uri)
+                     (ddb-base-uri))]
+    (if-not (str/includes? base-uri "datomic:sql")
+      ;; for most stores, db-name just goes at the end of the URI
+      (str base-uri db-name)
+      ;; for sql stores, db-name goes b/t datomic prefix and
+      ;; the jdbc url portion.
+      (str "datomic:sql://" db-name (subs base-uri 14 (count base-uri))))))
+
+(let [s "datomic:sql://?something"]
+   (subs s 14 (count s)))
 
 (defn request-db
   [database]
-  (let [uri (str (db-base-uri) database)
+  (let [uri (db-name->uri database)
         result (d/create-database uri)]
     (if result
       {:db-name  database
@@ -37,7 +47,7 @@
 
 (defn delete-db
   [database]
-  (let [uri (str (db-base-uri) database)
+  (let [uri (db-name->uri database)
         result (d/delete-database uri)]
     (if result
       {:success  true
@@ -51,11 +61,11 @@
   Returns the uri, {:error ...} or throws an exception if the user doesn't have
   access permissions to the branch database."
   [database]
-  {:uri (str (db-base-uri) database)})
+  {:uri (db-name->uri database)})
 
 (defn list-dbs []
   (try
-    (d/get-database-names (str (db-base-uri) "*"))
+    (d/get-database-names (db-name->uri "*"))
     (catch Exception e
       {:error (.getMessage e)})))
 

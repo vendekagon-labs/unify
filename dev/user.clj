@@ -12,7 +12,8 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns user
-  (:require [datomic.api :as d]
+  (:require [com.vendekagonlabs.unify.db.config :as config]
+            [datomic.api :as d]
             [clojure.data.csv :as csv]
             [clojure.data.json :as json]
             [clojure.java.io :as io]
@@ -37,7 +38,7 @@
 
 
 (defn unify [& args]
-  (with-redefs [backend/db-base-uri
+  (with-redefs [config/base-uri
                 (fn [] "datomic:mem://")
                 err/exit
                 (fn [code msg]
