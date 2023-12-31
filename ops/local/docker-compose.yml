@@ -45,6 +45,28 @@ services:
       postgres:
         condition: service_healthy
 
+  query-service:
+    image: vendekagonlabs/datomic-query-service
+    environment:
+      DATOMIC_BASE_URI: "datomic:dev://localhost:4334/"
+      BEARER_TOKEN: "dev"
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8988/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    restart: always
+    networks:
+      - datomic-network
+    ports:
+      - 8988:80
+    depends_on:
+      postgres:
+        condition: service_healthy
+      transactor:
+        condition: service_healthy
+
 configs:
   transactor.properties:
     file: ./files/sql-transactor.properties
