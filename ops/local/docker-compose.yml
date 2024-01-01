@@ -48,7 +48,8 @@ services:
   query-service:
     image: vendekagonlabs/datomic-query-service
     environment:
-      DATOMIC_BASE_URI: "datomic:dev://localhost:4334/"
+      # TODO: change this to postgres URL after fixing base URI code path
+      DATOMIC_BASE_URI: "datomic:dev://transactor:4334/"
       BEARER_TOKEN: "dev"
     healthcheck:
       test: ["CMD", "curl", "http://localhost:80/health"]
@@ -73,10 +74,8 @@ services:
       - datomic-network
     ports:
       - 8899:8899 
-    volumes:
-      - ../../test/resources/systems/candel/template-dataset/schema:/schema/unify
     environment:
-      UNIFY_SCHEMA_DIRECTORY: /schema/unify/
+      DATOMIC_URI: datomic:sql://unify-example?jdbc:postgresql://postgres:5432/unify?user=unify&password=unify
     healthcheck:
       test: ["CMD", "curl", "http://localhost:8899/health"]
       interval: 30s
