@@ -74,7 +74,7 @@ services:
     ports:
       - 8899:8899 
     volumes:
-      - ./unify-schema-dir:/schema/unify
+      - ../../test/resources/systems/candel/template-dataset/schema:/schema/unify
     environment:
       UNIFY_SCHEMA_DIRECTORY: /schema/unify/
     healthcheck:
@@ -102,4 +102,3 @@ networks:
 volumes:
   datomic-storage-data:
   datomic-transactor-logs:
-  unify-schema-dir:
