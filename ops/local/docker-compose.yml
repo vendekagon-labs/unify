@@ -73,9 +73,10 @@ services:
     networks:
       - datomic-network
     ports:
-      - 8899:8899 
+      - 8899:80 
     environment:
       DATOMIC_URI: datomic:sql://unify-example?jdbc:postgresql://postgres:5432/unify?user=unify&password=unify
+      SERVICE_PORT: 80
     healthcheck:
       test: ["CMD", "curl", "http://localhost:8899/health"]
       interval: 30s
