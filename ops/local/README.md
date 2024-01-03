@@ -8,6 +8,9 @@ backed service.
 You will need to download a recent version of [Docker](https://docs.docker.com/get-docker/)
 for your platform, which should have `docker-compose` bundled with it.
 
+For local development and running Unify outside of compose, you might want to
+alias `transactor` to 127.0.0.1 in your `/etc/hosts` file.
+
 ## Starting and Stopping the local dev system
 
 You can start or stop the system with the wrapping scripts in `util/`
