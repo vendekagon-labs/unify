@@ -48,8 +48,7 @@ services:
   query-service:
     image: vendekagonlabs/datomic-query-service
     environment:
-      # TODO: change this to postgres URL after fixing base URI code path
-      DATOMIC_BASE_URI: "datomic:dev://transactor:4334/"
+      BASE_DATOMIC_URI: datomic:sql://?jdbc:postgresql://postgres:5432/unify?user=unify&password=unify
       BEARER_TOKEN: "dev"
     healthcheck:
       test: ["CMD", "curl", "http://localhost:80/health"]
