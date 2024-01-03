@@ -17,8 +17,8 @@ if len(sys.argv) > 1:
 # Otherwise, minimal default query counts number of patients in the database.
 else:
     print("Using default query")
-    q = {":find": [["count", "?m"]],
-         ":where": [["?m", ":measurement/gene-product"]]}
+    q = {":find": [["count", "?g"]],
+         ":where": [["?g", ":gene/hgnc-symbol"]]}
     req_body = {"query": q,
                 "timeout": 30000}
 
