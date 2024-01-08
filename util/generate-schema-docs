@@ -1,0 +1,10 @@
+#!/bin/bash
+# one arg: name of database in local Unify system.
+echo "Generating schema for $1 using local Unify system."
+echo "NOTE: this script will fail if you have not started a local Unify system,"
+echo "eg. with: util/start-local-system"
+echo
+
+RESP=$(curl -s -X post http://localhost:8899/render/$1)
+echo "Schema docs generated! Navigate to: http://localhost:8899/${RESP:25}"
+
