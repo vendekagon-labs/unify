@@ -123,8 +123,7 @@
 
 (defn init
   "Loads all base schema, enums, and metamodel into database if necessary."
-  [datomic-uri & {:keys [skip-bootstrap
-                         schema-directory
+  [datomic-uri & {:keys [schema-directory
                          seed-data-directory
                          include-proprietary]}]
   (let [_ (d/create-database datomic-uri)
@@ -177,9 +176,7 @@
 
       (= version-outcome :compatible)
       (do (log/info "Compatible schema installed, applying necessary updates.")
-          (init datomic-uri
-                :skip-bootstrap true
-                :schema-directory schema-directory)
+          (init datomic-uri :schema-directory schema-directory)
           datomic-uri)
 
       (= version-outcome :incompatible)

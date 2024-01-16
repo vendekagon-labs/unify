@@ -24,8 +24,7 @@
   [schema-dir]
   (let [db-uri (mem-uri)
         ;; init installs the schema
-        _ (db/init db-uri :skip-bootstrap true
-                   :schema-directory schema-dir)
+        _ (db/init db-uri :schema-directory schema-dir)
         conn (d/connect db-uri)
         db (d/db conn)
         updated-schema (schema/get-metamodel-and-schema db)]
