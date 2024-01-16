@@ -15,6 +15,7 @@
   (:require [clojure.edn :as edn]
             [clojure.data.csv :as data.csv]
             [clojure.java.io :as io]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import :as import]))
 
 (defmacro thrown->ex-data
@@ -41,6 +42,15 @@
     (let [csv-stream (data.csv/read-csv rdr :separator \tab)]
       {:header (first csv-stream)
        :data   (into [] (take n (rest csv-stream)))})))
+
+(defn bootstrap-genes []
+  (let [candel-ref-data-dir "test/resources/systems/candel/reference-data"
+        ref-data-index (io/file candel-ref-data-dir "index.edn")
+        ref-data (util.io/read-edn-file ref-data-index)]
+    (->> ref-data-index
+         (util.io/read-edn-file)
+         (filter #(= :genes (:name %)))
+         (first))))
 
 (defn run-import
   "Runs a complete, end-to-end import of unify data. Wrapper for tests only."
