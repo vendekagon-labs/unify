@@ -1,7 +1,73 @@
 (ns com.vendekagonlabs.unify.db.schema.compile
   (:require [clojure.java.io :as io]
+            [clojure.spec.alpha :as s]
             [clojure.pprint :as pp]
             [com.vendekagonlabs.unify.util.io :as util.io]))
+
+
+
+(defn kw-no-ns? [kw]
+  (s/and (keyword? kw)
+         (not (namespace kw))))
+
+(s/def ::simple-datomic-attr-type
+  #{:bigdec :bigint :boolean :double :float :instant :keyword
+    :long :string :symbol :tuple :uuid :uri :bytes})
+
+(s/def ::tuple-of
+  (s/coll-of kw-no-ns? :kind vector?))
+(s/def ::tuple-type-def
+  (s/keys :req-un [::tuple-of]))
+
+(s/keys ::ref-to kw-no-ns?)
+(s/def ::ref-type-def
+  (s/keys :req-un [::ref-to]))
+(s/def ::enum-of
+  (s/coll-of kw-no-ns? :kind vector?))
+(s/def ::enum-type-def
+  (s/keys :req-un [::enum-of]))
+(s/def ::type-def
+  (s/or :simple-type ::simple-datomic-attr-type
+        :unify-type (s/and (s/map-of kw-no-ns? some?)
+                           (s/or :tuple-def ::tuple-type-def
+                                 :ref-def ::ref-type-def
+                                 :enum-def ::enum-type-def))))
+
+(s/def ::attribute-def
+  (s/cat :attr-kw kw-no-ns?
+         :attr-type ::type-def
+         :cardinality #{:cardinality-one :cardinality-many}
+         :doc-string string?))
+(s/def ::attributes
+  (s/coll-of ::attribute-def :kind vector?))
+
+(s/def ::attribute kw-no-ns?)
+
+(s/def ::parent kw-no-ns?)
+(s/def ::type #{:string :long :uuid :big-int :uri})
+(s/def ::scope #{:context :global})
+(s/def ::id
+  (s/keys :req-un [::type ::attribute ::scope]))
+
+(s/def ::entity-kind-def
+  (s/keys :req-un [::id]
+          :opt-un [::parent ::attributes]))
+
+(s/def ::entity-kind-name kw-no-ns?)
+(s/def ::unify-schema
+  (s/map-of ::entity-kind-name ::entity-kind-def))
+
+(defn validate! [schema-data]
+  (when-not (s/valid? ::unify-schema schema-data)
+    (let [error (s/explain-str ::unify-schema schema-data)]
+      (throw (ex-info (str "Unify schema definition did not match spec!\n"
+                           "Provide a map of entity kind keywords to defs, which must contain an id,"
+                           "typically contain a vector of attributes, and possibly name a parent entity.\n"
+                           "Attribute defs are a vector of: [attr-name attr-kind cardinality doc-string]\n"
+                           "Spec failure:\n" error)
+                      {:unify-schema-compilation/edn-spec-failure error})))))
+
+
 
 (defn add-namespace
   "Namespaces a keyword `kw` with the `ns-val` which can either be a string,
@@ -92,9 +158,8 @@
     (apply merge-with concat processed-attributes)))
 
 (defn process-kind
-  "Enrich kind data with parent if present
-  Construct attributes
-  Add any ref annotations to ref attributes"
+  "Enrich kind data with parent if present, construct attributes maps,
+  add any ref annotations to ref attributes"
   [kind-name {:keys [id parent attributes] :as _kind-def}]
   (let [{:keys [schema kind]} (process-id kind-name id)
         kind-def (if-not parent
@@ -135,39 +200,11 @@
                            (:unify/metamodel-refs raw-schema)]]
     (write-schema (io/file schema-dir "metamodel.edn") metamodel-content))
 
+
   (comment
     :troubleshooting
-    (def example-schema-dsl (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
 
-    ;; Working first cut
-    ;; TODO: next
-    ;; - create tests of outer API
-    ;; - ensure that:
-    ;;   - given a schema DSL definition, create a schema directory with expected files
-    ;;   - starting unify processes that point to those files work as expected
-    ;;   - unify can prepare and transact data that conforms to the schema def in the unify schema dsl
-    ;;
-    ;; When we have verified these behaviors:
-    ;;   - add a `unify compile-schema --unify-schema --schema-directory` task to run this on the CLI
-    (def example-id-data
-      (get-in example-schema-dsl [:patient :id])
-      (process-id :patient example-id-data))
-    (def raw-schema-example
-      (->raw-schema example-schema-dsl))
-    (write-schema-dir! "temp-blah" raw-schema-example)
-    (keys raw-schema-example)
-    (pp/pprint (:datomic/schema raw-schema-example))
-    (pp/pprint (:unify/metamodel raw-schema-example))
-    (pp/pprint (:unify/enums raw-schema-example))
-    (:unify/metamodel raw-schema-example)
-    (namespace :patient/sex)
-    (namespace :patient)
-    (mapv (partial add-namespace :patient/sex) [:male :female :other :unknown])
-
-    (process-kind :patient (:patient example-schema-dsl))
-    (process-kind :physician (:physician example-schema-dsl))
-    (process-kind :medication (:medication example-schema-dsl))
-    (process-kind :prescription (:prescription example-schema-dsl))
-
-    (attributes->schema :patient (get-in example-schema-dsl [:patient :attributes]))))
-
+    (def example-schema-dsl
+      (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
+    (s/valid? ::unify-schema example-schema-dsl)
+    (s/explain ::unify-schema example-schema-dsl)))
