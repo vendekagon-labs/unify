@@ -137,6 +137,7 @@
   [{:keys [schema-directory unify-schema]}]
   (let [unify-schema-data (util.io/read-edn-file unify-schema)
         compiled-schema (compile/->raw-schema unify-schema-data)]
+    (compile/validate! unify-schema-data)
     (compile/write-schema-dir! schema-directory compiled-schema)
     {:results :success}))
 
