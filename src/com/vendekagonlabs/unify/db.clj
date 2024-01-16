@@ -12,12 +12,12 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.db
-  (:require [datomic.api :as d]
+  (:require [com.vendekagonlabs.unify.util.io :as util.io]
+            [datomic.api :as d]
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.db.backend :as backend]
             [com.vendekagonlabs.unify.db.query :as dq]
             [com.vendekagonlabs.unify.db.transact :as db.tx]
-            [com.vendekagonlabs.unify.bootstrap.data :as bootstrap.data]
             [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db.schema :as schema]
             [clojure.java.io :as io]
@@ -70,9 +70,11 @@
 (defn fulfilled?
   "Given a validation map, returns `true` if this database fulfills validation
   described in map. A validation map consists of a query and its expected results."
-  [db {:keys [query expected]}]
-  (= (dq/q+retry query db)
-     expected))
+  [db {:keys [count entity-id]}]
+  (let [query `[:find (count ?e) .
+                :where
+                [?e ~entity-id]]]
+    (= count (dq/q+retry query db))))
 
 
 (defn apply-schema [schema-directory datomic-uri]
@@ -103,11 +105,27 @@
            [_ :unify.schema/version ?v]]
          db)))
 
+(defn install-seed-data
+  [conn seed-data-dir {:keys [include-proprietary] :as _opts}]
+  (let [index-file (io/file seed-data-dir "index.edn")
+        index-data (util.io/read-edn-file index-file)
+        seed-data-index (if-not include-proprietary
+                          (remove :proprietary index-data)
+                          index-data)]
+    (doseq [dataset seed-data-index]
+      (if-not (fulfilled? (d/db conn) dataset)
+        (let [{:keys [name files]} dataset]
+          (log/info ::bootstrap-data "Dataset " name " not present, installing.")
+          (doseq [f files]
+            (println "\n" (.toString f) "\n")
+            (transact-bootstrap-data conn (io/file seed-data-dir f))))
+        (log/info ::bootstrap-data "Dataset " (:name dataset) " already present, skipping.")))))
+
 (defn init
   "Loads all base schema, enums, and metamodel into database if necessary."
   [datomic-uri & {:keys [skip-bootstrap
                          schema-directory
-                         seed-data-dir
+                         seed-data-directory
                          include-proprietary]}]
   (let [_ (d/create-database datomic-uri)
         _ (do
@@ -115,24 +133,10 @@
         conn (d/connect datomic-uri)
         _ (log/info "Connected to database")]
     (apply-schema schema-directory datomic-uri)
-    (when-not skip-bootstrap
-      (doseq [dataset (if-not include-proprietary
-                        (bootstrap.data/open-datasets)
-                        (bootstrap.data/all-datasets))]
-        (println "\nDataset: " dataset "\n")
-        (if-not (fulfilled? (d/db conn) dataset)
-          (let [{:keys [name]} dataset
-                version (version datomic-uri)
-                files (if seed-data-dir
-                        (map #(io/file seed-data-dir %) (dataset :files))
-                        (bootstrap.data/maybe-download version dataset))]
-            (log/info ::bootstrap-data "Dataset " name " not present, installing.")
-            (doseq [f files]
-              (println "\n" (.toString f) "\n")
-              (transact-bootstrap-data conn f)))
-          (log/info ::bootstrap-data "Dataset " (:name dataset) " already present, skipping."))))
+    (when seed-data-directory
+      (install-seed-data conn seed-data-directory
+                         {:include-proprietary include-proprietary}))
     datomic-uri))
-
 
 (defn version->map
   [version-str]

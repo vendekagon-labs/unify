@@ -84,6 +84,8 @@
     "Directory where prepared data goes, transact uses the data prepare puts here."]
    [nil "--schema-directory  SCHEMA-DIRECTORY"
     "Directory containing a Unify schema (base Datomic schema + metamodel annotations)"]
+   [nil "--seed-data-directory SEED-DATA-DIRECTORY"
+    "Directory containing data that should be added to a new database on creation."]
    [nil "--unify-schema      UNIFY-SCHEMA"
     "An edn file which contains a Unify schema definition."]
    [nil "--tx-batch-size     TX-BATCH-SIZE" "Datomic transaction batch size"
@@ -109,7 +111,8 @@
 
 (defn request-db
   [{:keys [database
-           schema-directory] :as args}]
+           schema-directory
+           seed-data-directory] :as _args}]
   (if-not database
     (exit 1 (str "ERROR: request-db requires a --database argument"))
     (try
@@ -118,7 +121,10 @@
           (exit 1 (str "ERROR: request-db failed with: " result))
           (let [db-info (db/fetch-info database)
                 uri (:uri db-info)]
-            (db/init uri :schema-directory schema-directory)
+            (db/init uri
+                     :schema-directory schema-directory
+                     :seed-data-directory seed-data-directory)
+
             (println "Request successful, created database" (:db-name result))))
         :success)
       (catch Exception e
