@@ -19,40 +19,25 @@
             [com.vendekagonlabs.unify.bootstrap.data :as bootstrap.data]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.test-util :as tu]
-            [com.vendekagonlabs.unify.db :as db]
-            [com.vendekagonlabs.unify.import :as import]))
+            [com.vendekagonlabs.unify.db :as db]))
 
-(def tmp-dir
-  "tuple-tmp-output")
-
-(def datomic-uri
-  (str "datomic:mem://tuple-tests"))
-
-(def import-cfg-file
-  "test/resources/systems/candel/tuple-import/config.edn")
-
-(def schema-dir
-  "test/resources/systems/candel/template-dataset/schema")
-
-(defn bootstrap-genes []
-  (first
-    (filter #(= :genes (:name %)) (bootstrap.data/all-datasets))))
+(def tmp-dir "tuple-tmp-output")
+(def datomic-uri (str "datomic:mem://tuple-tests"))
+(def import-cfg-file "test/resources/systems/candel/tuple-import/config.edn")
+(def schema-dir "test/resources/systems/candel/template-dataset/schema")
 
 (defn setup []
   (log/info "Initializing in-memory tuple test db.")
   (db/init datomic-uri
-           :skip-bootstrap true
            :schema-directory schema-dir)
 
   (log/info "Bootstrap gene/HGNC data only.")
   (let [conn (d/connect datomic-uri)
-        version (db/version datomic-uri)
-        genes-data (bootstrap-genes)]
-    (bootstrap.data/maybe-download version genes-data)
+        genes-data (tu/bootstrap-genes)]
     (doseq [f (:files genes-data)]
       (db/transact-bootstrap-data
         conn
-        (io/file bootstrap.data/seed-data-dir f)))))
+        (io/file "test/resources/systems/candel/reference-data" f)))))
 
 (defn teardown []
   (log/info "Ending tuple test and deleting db.")

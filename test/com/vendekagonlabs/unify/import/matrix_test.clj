@@ -38,9 +38,6 @@
 (defn- config []
   (util.io/read-edn-file import-cfg-file))
 
-(defn bootstrap-genes []
-  (first
-    (filter #(#{:genes} (:name %)) (bootstrap.data/all-datasets))))
 
 (defn count-matrix-files
   [db]
@@ -80,18 +77,13 @@
 
 (defn setup []
   (log/info "Initializing in-memory matrix test db.")
-  (db/init datomic-uri
-           :skip-bootstrap true
-           :schema-directory schema-dir)
-  (log/info "Bootstrap gene/HGNC data only.")
+  (db/init datomic-uri :schema-directory schema-dir)
   (let [conn (d/connect datomic-uri)
-        version (db/version datomic-uri)
-        genes-data (bootstrap-genes)]
-    (bootstrap.data/maybe-download version genes-data)
+        genes-data (tu/bootstrap-genes)]
     (doseq [f (:files genes-data)]
       (db/transact-bootstrap-data
         conn
-        (io/file bootstrap.data/seed-data-dir f)))))
+        (io/file "test/resources/systems/candel/reference-data" f)))))
 
 (defn teardown []
   (log/info "Ending matrix test and deleting db.")

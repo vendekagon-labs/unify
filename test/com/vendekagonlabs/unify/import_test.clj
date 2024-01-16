@@ -23,32 +23,28 @@
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 
-(def template-dir "test/resources/systems/candel/template-dataset")
+(def candel-dir "test/resources/systems/candel")
+(def template-dir (str candel-dir "/template-dataset"))
+(def schema-directory (str template-dir "/schema"))
+(def seed-data-directory (str candel-dir "/reference-data"))
+(def import-cfg-file (str template-dir "/config.edn"))
+(def datomic-uri "datomic:mem://int-tests")
+(def tmp-dir "tmp-output")
 
-
-(defn import-cfg-file []
-  (str template-dir "/config.edn"))
-
-(defn schema-directory []
-  (str template-dir "/schema"))
 
 (def dataset-name
   (memoize
     (fn []
-      (-> (import-cfg-file)
+      (-> import-cfg-file
           (util.io/read-edn-file)
           (get-in [:dataset :name])))))
 
-(def datomic-uri
-  (str "datomic:mem://int-tests"))
-
-(def tmp-dir "tmp-output")
 
 (defn setup []
   (log/info "Initializing in-memory integration test db.")
-  ;; TODO: a better end-to-end test for user contract would run request-db
-  ;; via the CLI equivalent entrypoint.
-  (db/init datomic-uri :schema-directory (schema-directory))
+  (db/init datomic-uri
+           :schema-directory schema-directory
+           :seed-data-directory seed-data-directory)
   ;; TODO: Temp fix for drug ordering issue with template dataset.
   (let [conn (d/connect datomic-uri)]
     @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])
@@ -67,8 +63,8 @@
     (let [import-result (tu/run-import
                           {:target-dir           tmp-dir
                            :datomic-uri          datomic-uri
-                           :import-cfg-file      (import-cfg-file)
-                           :schema-directory     (schema-directory)
+                           :import-cfg-file      import-cfg-file
+                           :schema-directory     schema-directory
                            :disable-remote-calls true
                            :tx-batch-size        50})]
       (testing "Import runs to completion without throwing."
