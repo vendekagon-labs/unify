@@ -5,45 +5,44 @@
             [com.vendekagonlabs.unify.util.io :as util.io]))
 
 
-
-(defn kw-no-ns? [kw]
-  (s/and (keyword? kw)
-         (not (namespace kw))))
+(defn unnamespaced-keyword? [kw]
+  (and (keyword? kw)
+       (not (namespace kw))))
 
 (s/def ::simple-datomic-attr-type
   #{:bigdec :bigint :boolean :double :float :instant :keyword
     :long :string :symbol :tuple :uuid :uri :bytes})
 
 (s/def ::tuple-of
-  (s/coll-of kw-no-ns? :kind vector?))
+  (s/coll-of unnamespaced-keyword? :kind vector?))
 (s/def ::tuple-type-def
   (s/keys :req-un [::tuple-of]))
 
-(s/keys ::ref-to kw-no-ns?)
+(s/keys ::ref-to unnamespaced-keyword?)
 (s/def ::ref-type-def
   (s/keys :req-un [::ref-to]))
 (s/def ::enum-of
-  (s/coll-of kw-no-ns? :kind vector?))
+  (s/coll-of unnamespaced-keyword? :kind vector?))
 (s/def ::enum-type-def
   (s/keys :req-un [::enum-of]))
 (s/def ::type-def
   (s/or :simple-type ::simple-datomic-attr-type
-        :unify-type (s/and (s/map-of kw-no-ns? some?)
+        :unify-type (s/and (s/map-of unnamespaced-keyword? some?)
                            (s/or :tuple-def ::tuple-type-def
                                  :ref-def ::ref-type-def
                                  :enum-def ::enum-type-def))))
 
 (s/def ::attribute-def
-  (s/cat :attr-kw kw-no-ns?
+  (s/cat :attr-kw unnamespaced-keyword?
          :attr-type ::type-def
          :cardinality #{:cardinality-one :cardinality-many}
          :doc-string string?))
 (s/def ::attributes
   (s/coll-of ::attribute-def :kind vector?))
 
-(s/def ::attribute kw-no-ns?)
+(s/def ::attribute unnamespaced-keyword?)
 
-(s/def ::parent kw-no-ns?)
+(s/def ::parent unnamespaced-keyword?)
 (s/def ::type #{:string :long :uuid :big-int :uri})
 (s/def ::scope #{:context :global})
 (s/def ::id
@@ -53,7 +52,7 @@
   (s/keys :req-un [::id]
           :opt-un [::parent ::attributes]))
 
-(s/def ::entity-kind-name kw-no-ns?)
+(s/def ::entity-kind-name unnamespaced-keyword?)
 (s/def ::unify-schema
   (s/map-of ::entity-kind-name ::entity-kind-def))
 
@@ -203,6 +202,8 @@
 
   (comment
     :troubleshooting
+
+    (unnamespaced-keyword? :this/here)
 
     (def example-schema-dsl
       (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
