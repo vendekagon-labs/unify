@@ -356,13 +356,13 @@
       results)
     (catch Exception e
       (let [data (ex-data e)
-            unifyty-data (text/->pretty-string data)
+            pretty-data (text/->pretty-string data)
             err-fname "PRET_ERROR_DUMP"]
         (log/error "Engine encountered exception while generating entity data, error state in file: "
                    err-fname)
         (io/write-edn-file err-fname
                            (str "Error Message:\n" (.getMessage e)
-                                "\n\nException Information:\n" unifyty-data
+                                "\n\nException Information:\n" pretty-data
                                 "\nException Stack Trace:\n  - " (text/stacktrace->string e)))
         (throw e)))))
 
