@@ -348,6 +348,7 @@
   (println unify-ascii)
   (try
     (println "version:" (release/version))
+    (println "--------------------------------------")
     (let [arg-map (validate-args args)
           {:keys [exit-message ok?]} arg-map]
       (if exit-message
@@ -357,6 +358,7 @@
               task-args (merge parsed options)
               task-fn (get tasks task)
               task-results (task-fn task-args)]
+          (println "--------------------------------------")
           (println "Took" (elapsed start (Date.)) "seconds")
           (if (:errors task-results)
             (exit 1 (str "Task: " task " failed "))

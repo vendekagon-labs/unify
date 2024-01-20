@@ -1,0 +1,12 @@
+#!/bin/bash
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Must provide two positional arguments:"
+    echo "1. database name that already exists in the Unify local system"
+    echo "2. database backup URI to backup to (e.g. file:/// or s3:// location)"
+    exit 1
+fi
+
+util/helpers/ensure-datomic
+pushd .datomic/datomic-pro-*
+bin/datomic -Xmx4g -Xms4g backup-db "datomic:sql://$1?jdbc:postgresql://localhost:5432/unify?user=unify&password=unify" $2
+
