@@ -39,3 +39,4 @@ datomic-config.edn
 test/resources/perf-benchmark
 .Rproj.user
 *.Rproj
+.datomic

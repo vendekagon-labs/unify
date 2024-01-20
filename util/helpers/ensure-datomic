@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ -d /.datomic ]; then
+  echo "Directory exists."
+  exit 0
+fi
+mkdir .datomic
+pushd .datomic
+wget -O datomic.zip https://datomic-pro-downloads.s3.amazonaws.com/1.0.7075/datomic-pro-1.0.7075.zip
+unzip datomic.zip
+rm datomic.zip
+popd
