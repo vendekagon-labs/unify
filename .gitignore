@@ -40,3 +40,4 @@ test/resources/perf-benchmark
 .Rproj.user
 *.Rproj
 .datomic
+.unify

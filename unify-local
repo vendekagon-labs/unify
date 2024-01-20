@@ -1,2 +1,7 @@
 #!/bin/bash
-UNIFY_BASE_URI="datomic:sql://?jdbc:postgresql://localhost:5432/unify?user=unify&password=unify" clojure -Mdev -m com.vendekagonlabs.unify.cli $* 
+base_uri="datomic:sql://?jdbc:postgresql://localhost:5432/unify?user=unify&password=unify"
+matrix_backend="file"
+matrix_dir=".unify/matrix-files"
+
+UNIFY_BASE_URI=$base_uri UNIFY_MATRIX_BACKEND=$matrix_backend UNIFY_MATRIX_DIR=$matrix_dir clojure -Mdev -m com.vendekagonlabs.unify.cli $*
+
