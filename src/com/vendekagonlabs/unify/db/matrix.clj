@@ -41,8 +41,8 @@
         _ (io/make-parents (str matrix-write-dir "/---"))
         matrix-files (file-conventions/matrix-filenames working-dir)]
     (doseq [matrix-file matrix-files]
-      (let [src-path (file-conventions/in-matrix-dir working-dir matrix-file)
-            dest-path (str matrix-write-dir matrix-file)]
+      (let [src-path (io/file (file-conventions/in-matrix-dir working-dir matrix-file))
+            dest-path (io/file matrix-write-dir matrix-file)]
         (io/copy src-path dest-path)))
     true))
 
