@@ -51,7 +51,7 @@
                                   :data-type  db-value-type
                                   :sparse?    true}
                                  ;; when not sparse, add column-attribute/target
-                                 ;; for dense matrix column interunifyation
+                                 ;; for dense matrix column interpretation
                                  (when (not= :unify.matrix.format/sparse format)
                                    {:sparse? false
                                     :target  column-attribute})))

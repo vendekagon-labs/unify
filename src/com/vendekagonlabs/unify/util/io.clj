@@ -60,7 +60,7 @@
 
 (defn write-edn-file
   "Makes parent folders (if necessary) and spits directly into f is data is a string, otherwise writes
-   ->unifyty-string of data."
+   ->pretty-string of data."
   [f data]
   (make-parents f)
   (spit f (if (string? data)
@@ -124,7 +124,7 @@
 
 (defn local-tar-name
   "Vets and returns a valid 'local' tar name. Specifically translates any
-   ':' symbols into '-' because the ':' is interunifyed by tar to be a remote
+   ':' symbols into '-' because the ':' is interpreted by tar to be a remote
    file which causes local untar! to fail during an import."
   [target-name]
   (s/replace target-name #":" "-"))
