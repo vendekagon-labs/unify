@@ -12,7 +12,8 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.db
-  (:require [com.vendekagonlabs.unify.util.io :as util.io]
+  (:require [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [datomic.api :as d]
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.db.backend :as backend]
@@ -168,21 +169,22 @@
 (defn ensure-db
   "Returns map with schema included as a key, will throw at Datomic call level if
   unable to connect to database. Will also throw if versions are incompatible."
-  [schema-directory datomic-uri]
-  (let [version-outcome (compare-schema-version schema-directory datomic-uri)]
+  [working-dir datomic-uri]
+  (let [import-schema-dir (file-conventions/working-dir-schema-dir working-dir)
+        version-outcome (compare-schema-version import-schema-dir datomic-uri)]
     (cond
       (= version-outcome :identical)
       datomic-uri
 
       (= version-outcome :compatible)
       (do (log/info "Compatible schema installed, applying necessary updates.")
-          (init datomic-uri :schema-directory schema-directory)
+          (init datomic-uri :schema-directory import-schema-dir)
           datomic-uri)
 
       (= version-outcome :incompatible)
       (throw (ex-info "Version of candel schema in database is not compatible."
                       {:candel.schema/version {:db/version    (version datomic-uri)
-                                               :unify/version (schema/version schema-directory)}})))))
+                                               :unify/version (schema/version import-schema-dir)}})))))
 
 
 (defn contains-txn?

@@ -69,6 +69,12 @@
   [target-dir]
   (str (tx-data-folder target-dir) sep "diff"))
 
+(defn working-dir-schema-dir
+  "Returns the folder path for the schema-dir cached in the working
+  directory."
+  [target-dir]
+  (str target-dir sep "schema"))
+
 (defn diff-tx-dir [target-dir]
   (let [f (str target-dir sep "tx-data" sep "diff" sep "tx-data")]
     (pio/mkdirs! f)

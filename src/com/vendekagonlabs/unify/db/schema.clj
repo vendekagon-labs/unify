@@ -143,3 +143,12 @@
         (filter :unify.schema/version)
         (first)
         (:unify.schema/version))))
+
+(defn copy-schema-dir!
+  "Copies the Unify managed schema files from one directory to another.
+  Used by prepare, to save a reference schema in a working directory."
+  [src-dir dest-dir]
+  (util.io/mkdirs! dest-dir)
+  (doseq [schema-file ["schema.edn" "metamodel.edn" "enums.edn"]]
+    (io/copy (io/file src-dir schema-file)
+             (io/file dest-dir schema-file))))

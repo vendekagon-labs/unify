@@ -12,7 +12,8 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import
-  (:require [com.vendekagonlabs.unify.util.io :as util.io]
+  (:require [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [cognitect.anomalies :as anomalies]
             [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db :as db]
@@ -56,6 +57,8 @@
                                                  continue-on-error)
         txn-data-pre-process (tx-data/make-transaction-data! target-dir
                                                              tx-batch-size)]
+    (db.schema/copy-schema-dir! schema-directory
+                                (file-conventions/working-dir-schema-dir target-dir))
     (log/info (str "Data files prepared: \n" (->pretty-string (map #(get-in % [:job :unify/input-tsv-file]) import-result))
                    "TX data prepared: \n " (->pretty-string txn-data-pre-process)))
     (if-let [errors (seq (filter ::anomalies/category import-result))]
@@ -71,11 +74,10 @@
            resume
            skip-annotations
            disable-remote-calls
-           schema-directory
            update
            diff-suffix]}]
   (println "Transacting prepared tx-data from directory:\n" target-dir "\ninto datomic db at:\n" datomic-uri)
-  (let [ensured-datomic-config (db/ensure-db schema-directory datomic-uri)
+  (let [ensured-datomic-config (db/ensure-db target-dir datomic-uri)
         tx-result-map (tx-data/transact-import-data! target-dir
                                                      ensured-datomic-config
                                                      ;; TODO this shouldn't be
@@ -145,8 +147,8 @@
   "Checks all reference data in the tx-data dir of target-dir to see if it asserts anything
   about unique reference ids that differs from what's already in the database. Returns list
   of differences (if any)."
-  [{:keys [target-dir datomic-uri schema-directory]}]
+  [{:keys [target-dir datomic-uri]}]
   (let [_tx-data-dir (str target-dir "/" "tx-data")
-        ensured-cfg (db/ensure-db schema-directory datomic-uri)
+        ensured-cfg (db/ensure-db target-dir datomic-uri)
         ref-files (conventions/ref-tx-data-filenames target-dir)]
     (mapcat (partial upsert-coord/report-upserts ensured-cfg) ref-files)))
