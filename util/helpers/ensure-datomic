@@ -1,9 +1,9 @@
 #!/bin/bash
-if [ -d /.datomic ]; then
-  echo "Detected previously cached Datomic at ./datomic, skipping download."
+if [ -d .datomic ]; then
+  echo "Detected previously cached Datomic at .datomic, skipping download."
   exit 0
 fi
-echo "No previously cached Datomic detected at ./datomic, downloading."
+echo "No previously cached Datomic detected at .datomic, downloading."
 mkdir .datomic
 pushd .datomic
 wget -O datomic.zip https://datomic-pro-downloads.s3.amazonaws.com/1.0.7075/datomic-pro-1.0.7075.zip
