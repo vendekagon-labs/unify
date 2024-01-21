@@ -24,7 +24,7 @@
        (str/starts-with? (namespace x) ns)))
 
 (defn ->pretty-string
-  "Returns a unifyty string of x."
+  "Returns a pretty string of x."
   [x]
   (with-out-str (pprint x)))
 
