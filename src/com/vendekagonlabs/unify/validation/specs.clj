@@ -352,7 +352,7 @@
                                      :measurement/uid
                                      :measurement/sample]))
 
-(s/def :unify/import (s/schema [:import/name :import/user]))
+(s/def :unify/import (s/schema [:unify.import/name :unify.import/user]))
 (s/def ::import (s/select :unify/import [*]))
 
 (s/def :unify/drug-regimen (s/schema [:drug-regimen/uid

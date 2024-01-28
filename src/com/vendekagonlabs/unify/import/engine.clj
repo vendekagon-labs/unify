@@ -332,7 +332,7 @@
                            :schema      schema
                            :mapping     mapping-lookup
                            :resume      resume?
-                           :import-name (:import/name import-entity)}
+                           :import-name (:unify.import/name import-entity)}
 
           _ (io/write-edn-file (str target-dir "/import-job.edn") import-entity)
           import-file (str target-dir "/import-job.edn")

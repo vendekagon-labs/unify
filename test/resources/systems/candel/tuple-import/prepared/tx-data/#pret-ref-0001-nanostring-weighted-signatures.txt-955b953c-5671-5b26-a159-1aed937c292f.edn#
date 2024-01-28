@@ -1,11 +1,11 @@
-({:db/id "datomic.tx", :import/tx-id "051279b4-0731-4d87-b4d9-4f9cea9e0782", :import/import [:import/name "tuple-import"]}
+({:db/id "datomic.tx", :unify.import.tx/id "051279b4-0731-4d87-b4d9-4f9cea9e0782", :unify.import.tx/import [:unify.import/name "tuple-import"]}
  {:pret/annotations #:pret.annotation{:filename "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt", :line-number 2}, :nanostring-signature/name "IO360/myeloid", :nanostring-signature/xgenes ["ITGAM" "0.3"]}
  {:pret/annotations #:pret.annotation{:filename "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt", :line-number 3}, :nanostring-signature/name "IO360/myeloid", :nanostring-signature/xgenes ["TLR4" "0.4"]}
  {:pret/annotations #:pret.annotation{:filename "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt", :line-number 4}, :nanostring-signature/name "IO360/myeloid", :nanostring-signature/xgenes ["ILIB" "0.5"]}
  {:pret/annotations #:pret.annotation{:filename "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt", :line-number 5}, :nanostring-signature/name "IO360/myeloid", :nanostring-signature/xgenes ["CSFIR" "0.7"]}
  {:pret/annotations #:pret.annotation{:filename "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt", :line-number 6}, :nanostring-signature/name "IO360/Mast cells", :nanostring-signature/xgenes ["MS4A2" "0.80"]}
  )
-({:db/id "datomic.tx", :import/tx-id "e7484414-d223-41eb-91d9-25a3a6db4b0f", :import/import [:import/name "tuple-import"]}
+({:db/id "datomic.tx", :unify.import.tx/id "e7484414-d223-41eb-91d9-25a3a6db4b0f", :unify.import.tx/import [:unify.import/name "tuple-import"]}
  
  {:pret/annotations #:pret.annotation{:filename "/misc/repos/pici/pret/test/resources/tuple-import/original/nanostring-weighted-signatures.txt", :line-number 7},
   :nanostring-signature/name "IO360/Mast cells"

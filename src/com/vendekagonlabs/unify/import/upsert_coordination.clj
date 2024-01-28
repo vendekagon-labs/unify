@@ -20,7 +20,7 @@
             [clojure.edn :as edn]
             [com.vendekagonlabs.unify.db.query :as dq]))
 
-(def ignored-entity-keys #{:import/import :db/id :import/tx-id :unify/annotations})
+(def ignored-entity-keys #{:unify.import.tx/import :db/id :unify.import.tx/id :unify/annotations})
 
 (def ent-q
   '[:find ?e ?i ?a ?v

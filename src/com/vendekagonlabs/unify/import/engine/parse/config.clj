@@ -664,10 +664,10 @@
                       {:config-file/invalid-unify-import-keys
                        {:keys-present  (-> cfg-map :unify/import keys)
                         :keys-required #{:user :name :mappings}}})))
-    {:import/user           user
+    {:unify.import/user           user
      :import/schema-version schema-version
      :import/unify-version  unify-version
-     :import/name           import-name}))
+     :unify.import/name           import-name}))
 
 (defn cfg-map->matrix-directives
   "Returns all matrix parsing directives specified in the import config, w/annotations in the map

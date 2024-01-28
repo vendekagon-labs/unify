@@ -50,15 +50,15 @@
 (s/def ::valid-tx-data
   (s/and (s/coll-of ::valid-tx-form)))
 
-(s/def :import/tx-id str-uuid?)
+(s/def :unify.import.tx/id str-uuid?)
 
-(s/def :import/import
+(s/def :unify.import.tx/import
   (s/and #(vector? %)
-         #(= (first %) :import/name)
+         #(= (first %) :unify.import/name)
          #(string? (second %))))
 
 (s/def ::metadata
-  (s/and (s/keys :req [:import/tx-id :import/import])
+  (s/and (s/keys :req [:unify.import.tx/id :unify.import.tx/import])
          ::valid-tx-form))
 
 
@@ -87,20 +87,20 @@
 
 
 (defn create-txn-metadata
-  "Return the :import/tx-id and :import/import transaction metadata for the given
+  "Return the :unify.import.tx/id and :unify.import.tx/import transaction metadata for the given
   UUID and import-name"
   [import-name]
   {:db/id         "datomic.tx"
-   :import/tx-id (str (UUID/randomUUID))
-   :import/import [:import/name import-name]})
+   :unify.import.tx/id (str (UUID/randomUUID))
+   :unify.import.tx/import [:unify.import/name import-name]})
 
 
 (defn process-one-file!
   "Lazily process filename-in, one element at a time.
   Emit the data as batches of size 'batch' entities to filename-out.
-  Each batch will also include a :import/tx-id UUID and :import/import reference to the import entity
+  Each batch will also include a :unify.import.tx/id UUID and :unify.import.tx/import reference to the import entity
 
-  'ctx' is a map containing at least the :import/name for the current import job
+  'ctx' is a map containing at least the :unify.import/name for the current import job
   'batch' is the number of entities per transaction"
   [import-job-name filename-in filename-out batch]
   (with-open [in (PushbackReader. (io/reader filename-in))
@@ -130,7 +130,7 @@
 
   'ent-file-path' is path to a folder containing entity-map files
   'tx-data-path' is output path for transaction data files
-  'ctx' is a map containing at least :import/name for the current import job
+  'ctx' is a map containing at least :unify.import/name for the current import job
   'batch' is the size (# of entities) batches to create"
   [import-job-name ent-file-path batch]
   (log/info "Generating transaction data from entity data.")
@@ -152,16 +152,16 @@
   "Read the import-cfg file, add txn metadata to the data literal and output the
   import entity first as a single transaction, followed by a transaction for the annotated
   literal data map
-  Return the :import/name of the job"
+  Return the :unify.import/name of the job"
   [working-dir]
   (let [in-file-path (conventions/import-cfg-job-path working-dir)
         out-file-path (conventions/tx-import-cfg-job-path working-dir)
         cfg-file-data (edn/read-string (str "[" (slurp in-file-path) "]"))
         import-ent (first cfg-file-data)
-        import-job-name (:import/name import-ent)
+        import-job-name (:unify.import/name import-ent)
         processed-import-ent {:db/id         "datomic.tx"
-                              :import/import (assoc import-ent :db/id "temp-import-ent")
-                              :import/tx-id (str (UUID/randomUUID))}
+                              :unify.import.tx/import (assoc import-ent :db/id "temp-import-ent")
+                              :unify.import.tx/id (str (UUID/randomUUID))}
         all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
         literal-data (conj (hash-uids (list (second cfg-file-data)) all-uids)
                            (create-txn-metadata import-job-name))]
@@ -212,7 +212,7 @@
                           base-tx-seq))
             uuid-set (ic/successful-uuid-set (d/db conn) import-name {:invalidate false})]
         (reduce (fn [results tx]
-                  (if-not (uuid-set (:import/tx-id (first tx)))
+                  (if-not (uuid-set (:unify.import.tx/id (first tx)))
                     (conj results (sync+retry conn tx 3000 10))
                     results))
                 []

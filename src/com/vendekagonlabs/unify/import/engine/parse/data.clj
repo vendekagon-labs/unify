@@ -669,7 +669,7 @@
               ;; attribute. This allows validation to identify those entities
               ;; that are a part of an import and later use.
               import-metadata (if (reference-data-entity? schema base-entity)
-                                {:unify.import/most-recent [:import/name import-name]}
+                                {:unify.import/most-recent [:unify.import/name import-name]}
                                 {})]
           ;; uncomment this and start-time to log per-record nanosec record perf
           ;;(log/debug ::record (:unify/node-kind job) "computed in "

@@ -160,7 +160,7 @@
       (map
         (fn [ref-data]
           (assoc ref-data
-            :unify.import/most-recent [:import/name import-name]))
+            :unify.import/most-recent [:unify.import/name import-name]))
         ref-data))))
 
 (defn rewrite-ref-file!
@@ -182,11 +182,11 @@
    metadata."
   [import-name target-dir]
   (let [import-ent (get (ffirst (conventions/job-entity target-dir))
-                        :import/import)
+                        :unify.import.tx/import)
         import-tx [{:db/id         "datomic.tx"
-                    :import/import (assoc import-ent :db/id "temp-import-ent"
-                                                     :import/name import-name)
-                    :import/tx-id (uuid/random)}]
+                    :unify.import.tx/import (assoc import-ent :db/id "temp-import-ent"
+                                                              :unify.import/name import-name)
+                    :unify.import.tx/id (uuid/random)}]
         full-path (conventions/in-diff-tx-dir target-dir "import-job.edn")]
     (log/info "Writing diff import job to: " full-path)
     (pprint import-tx (io/writer full-path))))

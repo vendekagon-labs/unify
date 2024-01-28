@@ -178,7 +178,7 @@
    subdir of the given path."
   [target-dir]
   (let [data (job-entity target-dir)
-        import-job-name (get-in (ffirst data) [:import/import :import/name])]
+        import-job-name (get-in (ffirst data) [:unify.import.tx/import :unify.import/name])]
     import-job-name))
 
 (defn dataset-name

@@ -188,13 +188,13 @@
 
 
 (defn contains-txn?
-  "Does the database contain the id (ie. :import/tx-id)"
+  "Does the database contain the id (ie. :unify.import.tx/id)"
   [db tx-id]
   (some?
     (ffirst (d/q '[:find ?e
                    :in $ ?id
                    :where
-                   [?e :import/tx-id ?id]] db tx-id))))
+                   [?e :unify.import.tx/id ?id]] db tx-id))))
 
 (defn head
   "Returns metadata about the last transaction:
@@ -210,14 +210,14 @@
                   [?tx :db/txInstant]]
                 db))
         txn-data (d/touch (d/entity db (first txn)))
-        import-name (if (contains? txn-data :import/import)
-                      (-> (d/touch (d/entity db (-> (:import/import txn-data)
+        import-name (if (contains? txn-data :unify.import.tx/import)
+                      (-> (d/touch (d/entity db (-> (:unify.import.tx/import txn-data)
                                                     :db/id)))
-                          :import/name)
+                          :unify.import/name)
                       (throw (ex-info "No datasets transacted"
                                       {:error :no-imports-on-database})))]
     {:timestamp   (:db/txInstant txn-data)
-     :tx-id      (:import/tx-id txn-data)
+     :tx-id      (:unify.import.tx/id txn-data)
      :import-name import-name}))
 
 (defn ordered-imports
@@ -229,7 +229,7 @@
   [db]
   (->> (d/q '[:find ?name ?tx
               :where
-              [_ :import/name ?name ?tx]]
+              [_ :unify.import/name ?name ?tx]]
             db)
        (map
          (fn [[name tx-id]]
