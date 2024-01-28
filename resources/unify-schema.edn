@@ -27,6 +27,15 @@
   :db/valueType   :db.type/string
   :db/cardinality :db.cardinality/one
   :db/doc         "The dataset this import creates or modifies."}
+ {:db/ident       :unify.import/unify-version
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc         "The version of unify used to import this entity."}
+ {:db/ident       :unify.import/schema-version
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc         "The schema version under which this import was completed."}
+
 
  ;; Import transaction metadata (annotated per tx run by Unify)
  {:db/ident       :unify.import.tx/id
@@ -140,16 +149,6 @@
   :db/valueType   :db.type/keyword
   :db/cardinality :db.cardinality/one
   :db/doc         "target of a ref attribute, must be a :kind/name"}
-
- {:db/ident       :import/unify-version
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/doc         "The version of unify used to import this entity."}
-
- {:db/ident       :import/schema-version
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/doc         "The schema version under which this import was completed."}
 
 
  ;; Similar to :db/tupleTypes but allows unify kinds

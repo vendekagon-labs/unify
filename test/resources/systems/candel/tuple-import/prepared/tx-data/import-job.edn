@@ -1,7 +1,7 @@
 ({:db/id "datomic.tx",
   :unify.import.tx/import
   {:unify.import/user "test-user",
-   :import/schema-version "0.3.0",
+   :unify.import/schema-version "0.3.0",
    :import/pret-version "0.2.161",
    :unify.import/name "tuple-import",
    :db/id "temp-import-ent"},

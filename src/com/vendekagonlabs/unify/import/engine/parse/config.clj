@@ -665,8 +665,8 @@
                        {:keys-present  (-> cfg-map :unify/import keys)
                         :keys-required #{:user :name :mappings}}})))
     {:unify.import/user           user
-     :import/schema-version schema-version
-     :import/unify-version  unify-version
+     :unify.import/schema-version schema-version
+     :unify.import/unify-version  unify-version
      :unify.import/name           import-name}))
 
 (defn cfg-map->matrix-directives
