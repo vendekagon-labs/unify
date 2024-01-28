@@ -24,7 +24,7 @@
   :db/cardinality :db.cardinality/one
   :db/doc         "User executing the import, created as part of the import entity"}
  {:db/ident       :unify.import/dataset
-  :db/valueType   :db.type/string
+  :db/valueType   :db.type/ref
   :db/cardinality :db.cardinality/one
   :db/doc         "The dataset this import creates or modifies."}
  {:db/ident       :unify.import/unify-version

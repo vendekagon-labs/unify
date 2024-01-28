@@ -604,13 +604,16 @@
 (defn cfg-map->dataset-entity
   "Given a schema, mapping lookup, and a parsed config map, return the data literal
   map for the :dataset (data about import/config, without jobs/directives)."
-  [schema mapping parsed-cfg-map]
-  (->> parsed-cfg-map
-       (remove-directives)
-       (enrich-cfg-literal-data schema mapping)
-       (:dataset)
-       (drop-unify-keys)
-       (drop-nil-elems)))
+  [schema mapping parsed-cfg-map import-entity]
+  (let [import-name (:unify.import/name import-entity)]
+    (->> parsed-cfg-map
+         (remove-directives)
+         (enrich-cfg-literal-data schema mapping)
+         (:dataset)
+         (drop-unify-keys)
+         (drop-nil-elems)
+         (merge {:unify.import/_dataset
+                 [:unify.import/name import-name]}))))
 
 
 (def molten-kws #{:unify/variables :unify/variable :unify/value})
@@ -683,43 +686,3 @@
                   (update-in mtx-job [:unify.matrix/input-file]
                              (partial maybe->absolute-path import-root-dir))))
            (strip-contextual)))))
-
-
-(comment
-  :schema-parsing-example-workflow
-
-  (require '[com.vendekagonlabs.unify.util.io :as util.io])
-  (def unify-schema (schema/get-metamodel-and-schema))
-  ;; -- point to diferent root dir
-  (def import-root-dir "/Users/bkamphaus/azure-datasets/template/")
-  (def config-file (str import-root-dir "/config.edn"))
-  (def config-edn (util.io/read-edn-file config-file))
-  (def mapping (util.io/read-edn-file (str import-root-dir "/mappings.edn")))
-  (def parsed-cfg-map (parse-config-map unify-schema config-edn))
-  (def parsed-cfg+uids (enrich-cfg-literal-data unify-schema mapping parsed-cfg-map))
-  (def ex-jobs
-    (cfg-map->directives unify-schema mapping import-root-dir parsed-cfg-map))
-  (keys (first ex-jobs))
-  (map :unify/parent-uid ex-jobs))
-
-(comment
-  :test-parsing-matrix-config
-  (require '[com.vendekagonlabs.unify.util.io :as util.io])
-  (require '[clojure.pprint :as pp])
-  (def unify-schema (schema/get-metamodel-and-schema))
-  (def import-root-dir "/Users/bkamphaus/code/unify/test/resources/matrix/")
-  (def config-file (str import-root-dir "/config.edn"))
-  (def config-edn (util.io/read-edn-file config-file))
-  (def mapping (util.io/read-edn-file (str import-root-dir "/mappings.edn")))
-  (def parsed-cfg-map (parse-config-map unify-schema config-edn))
-  (def dataset-entity (cfg-map->dataset-entity unify-schema mapping parsed-cfg-map))
-  (pp/pprint dataset-entity)
-  (def import-entity (cfg-map->import-entity config-edn))
-  (pp/pprint parsed-cfg-map)
-  (def matrix-directives (cfg-map->matrix-directives unify-schema mapping import-root-dir parsed-cfg-map))
-  (pp/pprint matrix-directives)
-  (count matrix-directives)
-  (def directives (cfg-map->directives unify-schema mapping import-root-dir parsed-cfg-map))
-  (pp/pprint directives))
-
-

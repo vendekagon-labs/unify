@@ -202,21 +202,20 @@
 (defn- transact-one-file-sync!
   "Synchronously transact a single file of transaction data."
   [conn f-path {:keys [import-name diff-suffix] :as opts}]
-  (let [job-opts (assoc opts :job? true)]
-    (with-open [in (PushbackReader. (io/reader f-path))]
-      (let [base-tx-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
-                             (take-while #(not= % ::eof)))
-            tx-seq (if-not diff-suffix
-                     base-tx-seq
-                     (map (partial diff-renames {:diff-suffix diff-suffix})
-                          base-tx-seq))
-            uuid-set (ic/successful-uuid-set (d/db conn) import-name {:invalidate false})]
-        (reduce (fn [results tx]
-                  (if-not (uuid-set (:unify.import.tx/id (first tx)))
-                    (conj results (sync+retry conn tx 3000 10))
-                    results))
-                []
-                tx-seq)))))
+  (with-open [in (PushbackReader. (io/reader f-path))]
+    (let [base-tx-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
+                           (take-while #(not= % ::eof)))
+          tx-seq (if-not diff-suffix
+                   base-tx-seq
+                   (map (partial diff-renames {:diff-suffix diff-suffix})
+                        base-tx-seq))
+          uuid-set (ic/successful-uuid-set (d/db conn) import-name {:invalidate false})]
+      (reduce (fn [results tx]
+                (if-not (uuid-set (:unify.import.tx/id (first tx)))
+                  (conj results (sync+retry conn tx 3000 10))
+                  results))
+              []
+              tx-seq))))
 
 (defn run-import-job-file!
   "Transact the import-cfg literal file."
