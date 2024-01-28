@@ -50,7 +50,7 @@
 (s/def ::valid-tx-data
   (s/and (s/coll-of ::valid-tx-form)))
 
-(s/def :import/txn-id str-uuid?)
+(s/def :import/tx-id str-uuid?)
 
 (s/def :import/import
   (s/and #(vector? %)
@@ -58,7 +58,7 @@
          #(string? (second %))))
 
 (s/def ::metadata
-  (s/and (s/keys :req [:import/txn-id :import/import])
+  (s/and (s/keys :req [:import/tx-id :import/import])
          ::valid-tx-form))
 
 
@@ -87,18 +87,18 @@
 
 
 (defn create-txn-metadata
-  "Return the :import/txn-id and :import/import transaction metadata for the given
+  "Return the :import/tx-id and :import/import transaction metadata for the given
   UUID and import-name"
   [import-name]
   {:db/id         "datomic.tx"
-   :import/txn-id (str (UUID/randomUUID))
+   :import/tx-id (str (UUID/randomUUID))
    :import/import [:import/name import-name]})
 
 
 (defn process-one-file!
   "Lazily process filename-in, one element at a time.
   Emit the data as batches of size 'batch' entities to filename-out.
-  Each batch will also include a :import/txn-id UUID and :import/import reference to the import entity
+  Each batch will also include a :import/tx-id UUID and :import/import reference to the import entity
 
   'ctx' is a map containing at least the :import/name for the current import job
   'batch' is the number of entities per transaction"
@@ -161,7 +161,7 @@
         import-job-name (:import/name import-ent)
         processed-import-ent {:db/id         "datomic.tx"
                               :import/import (assoc import-ent :db/id "temp-import-ent")
-                              :import/txn-id (str (UUID/randomUUID))}
+                              :import/tx-id (str (UUID/randomUUID))}
         all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
         literal-data (conj (hash-uids (list (second cfg-file-data)) all-uids)
                            (create-txn-metadata import-job-name))]
@@ -212,7 +212,7 @@
                           base-tx-seq))
             uuid-set (ic/successful-uuid-set (d/db conn) import-name {:invalidate false})]
         (reduce (fn [results tx]
-                  (if-not (uuid-set (:import/txn-id (first tx)))
+                  (if-not (uuid-set (:import/tx-id (first tx)))
                     (conj results (sync+retry conn tx 3000 10))
                     results))
                 []

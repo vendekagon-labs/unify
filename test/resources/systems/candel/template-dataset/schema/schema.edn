@@ -1704,14 +1704,7 @@
   :db/valueType   :db.type/string
   :db/cardinality :db.cardinality/one
   :db/doc         "User executing the import, created as part of the import entity"}
- {:db/ident       :import/bucket
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/unique      :db.unique/value
-  :db/doc         "Bucket ID of the storage location for the import data and config files"}
-
-
- {:db/ident       :import/txn-id
+ {:db/ident       :import/tx-id
   :db/valueType   :db.type/string
   :db/cardinality :db.cardinality/one
   :db/unique      :db.unique/value

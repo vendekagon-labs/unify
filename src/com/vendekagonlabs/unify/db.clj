@@ -188,19 +188,19 @@
 
 
 (defn contains-txn?
-  "Does the database contain the id (ie. :import/txn-id)"
-  [db txn-id]
+  "Does the database contain the id (ie. :import/tx-id)"
+  [db tx-id]
   (some?
     (ffirst (d/q '[:find ?e
                    :in $ ?id
                    :where
-                   [?e :import/txn-id ?id]] db txn-id))))
+                   [?e :import/tx-id ?id]] db tx-id))))
 
 (defn head
   "Returns metadata about the last transaction:
 
   {:timestamp ...
-   :txn-id ...
+   :tx-id ...
    :import-name ...}"
   [db]
   (let [txn (ffirst
@@ -217,14 +217,14 @@
                       (throw (ex-info "No datasets transacted"
                                       {:error :no-imports-on-database})))]
     {:timestamp   (:db/txInstant txn-data)
-     :txn-id      (:import/txn-id txn-data)
+     :tx-id      (:import/tx-id txn-data)
      :import-name import-name}))
 
 (defn ordered-imports
   "Returns all import entity data. The import entity is the first entity to be
   imported during transact. They are ordered by date and have the form:
   {:name ...
-   :txn-id <transaction entity id>
+   :tx-id <transaction entity id>
    :timestamp ...}"
   [db]
   (->> (d/q '[:find ?name ?tx

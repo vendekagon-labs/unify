@@ -186,7 +186,7 @@
         import-tx [{:db/id         "datomic.tx"
                     :import/import (assoc import-ent :db/id "temp-import-ent"
                                                      :import/name import-name)
-                    :import/txn-id (uuid/random)}]
+                    :import/tx-id (uuid/random)}]
         full-path (conventions/in-diff-tx-dir target-dir "import-job.edn")]
     (log/info "Writing diff import job to: " full-path)
     (pprint import-tx (io/writer full-path))))
