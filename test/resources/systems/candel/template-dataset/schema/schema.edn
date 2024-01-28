@@ -1693,37 +1693,6 @@
   :db/cardinality :db.cardinality/many
   :db/doc         "Synonyms for the comorbidity"}
 
- ;;Import metadata
-
- {:db/ident       :import/name
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/unique      :db.unique/value
-  :db/doc         "Globally unique import name, created as part of the import entity"}
- {:db/ident       :import/user
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/doc         "User executing the import, created as part of the import entity"}
- {:db/ident       :import/bucket
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/unique      :db.unique/value
-  :db/doc         "Bucket ID of the storage location for the import data and config files"}
-
-
- {:db/ident       :import/txn-id
-  :db/valueType   :db.type/string
-  :db/cardinality :db.cardinality/one
-  :db/unique      :db.unique/value
-  :db/doc         "Globally unique transaction ID, added to each transaction within an import job (batching)"}
- {:db/ident       :import/import
-  :db/valueType   :db.type/ref
-  :db/cardinality :db.cardinality/one
-  :db/doc         "reference to the import entity, added to each transaction within an import job (batching)"}
-
-
-
-
  ;; Drug
  {:db/ident       :drug/preferred-name
   :db/valueType   :db.type/string

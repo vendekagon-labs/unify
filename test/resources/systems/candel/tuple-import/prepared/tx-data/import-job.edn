@@ -1,9 +1,9 @@
 ({:db/id "datomic.tx",
-  :import/import
-  {:import/user "test-user",
-   :import/schema-version "0.3.0",
+  :unify.import.tx/import
+  {:unify.import/user "test-user",
+   :unify.import/schema-version "0.3.0",
    :import/pret-version "0.2.161",
-   :import/name "tuple-import",
+   :unify.import/name "tuple-import",
    :db/id "temp-import-ent"},
-  :import/txn-id "442d0ba3-ca85-4ce0-9621-094038713554"})
-({:db/id "datomic.tx", :import/txn-id "91d4821b-9bea-43fc-bcff-64a7fc653827", :import/import [:import/name "tuple-import"]} #:dataset{:name "tuplemania"})
+  :unify.import.tx/id "442d0ba3-ca85-4ce0-9621-094038713554"})
+({:db/id "datomic.tx", :unify.import.tx/id "91d4821b-9bea-43fc-bcff-64a7fc653827", :unify.import.tx/import [:unify.import/name "tuple-import"]} #:dataset{:name "tuplemania"})

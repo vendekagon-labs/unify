@@ -15,13 +15,13 @@
                {:name    :import-exists
                 :query   [:find ?dname
                           :where
-                          [?i :import/name ?dname]]
+                          [?i :unify.import/name ?dname]]
                 :allowed [["pici0002-import1"]]}
                {:name    :all-import-txes--annotated
                 :query   [:find (count ?tx)
                           :where
-                          [?i :import/name "pici0002-import1"]
-                          [?tx :import/import ?i]]
+                          [?i :unify.import/name "pici0002-import1"]
+                          [?tx :unify.import.tx/import ?i]]
                 :allowed [[182]]}
                {:name    :sample-count
                 :query   [:find (count ?s)

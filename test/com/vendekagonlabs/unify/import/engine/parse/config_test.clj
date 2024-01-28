@@ -115,8 +115,9 @@
   (testing "Matrix config parsing sanity checks:"
     (let [unify-schema (schema/get-metamodel-and-schema)
           parsed-cfg-map (parse.config/parse-config-map unify-schema matrix-config)
-          dataset-entity (parse.config/cfg-map->dataset-entity unify-schema matrix-mapping parsed-cfg-map)
           import-entity (parse.config/cfg-map->import-entity matrix-config)
+          dataset-entity (parse.config/cfg-map->dataset-entity unify-schema matrix-mapping
+                                                               parsed-cfg-map import-entity)
           record-directives (parse.config/cfg-map->directives
                               unify-schema
                               matrix-mapping

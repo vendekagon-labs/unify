@@ -89,20 +89,20 @@
 (defn- tx-present?
   "Returns `nil` (falsy) if tx not present in db, otherwise map with info
   on tx. Lookup is by uid on tx-data batch, also returns `nil` of tx-batch
-  is not annotated with `:import/txn-id` (meaning no skip check can be made)"
+  is not annotated with `:unify.import.tx/id` (meaning no skip check can be made)"
   [db tx-batch]
-  (when-let [tx-uid (:import/txn-id (first tx-batch))]
+  (when-let [tx-uid (:unify.import.tx/id (first tx-batch))]
     (let [tx-q-res (db.query/q+retry '[:find ?tx
-                                       :in $ ?txn-id
+                                       :in $ ?tx-id
                                        :where
-                                       [?tx :import/txn-id ?txn-id]]
+                                       [?tx :unify.import.tx/id ?tx-id]]
                                      db tx-uid)]
       ;; this allows e.g. anomaly check on tx result map to work
       ;; TODO: but, should it maybe try to figure out info on transaction
       ;; and report that db state, as though it were tx result?
       (when-let [tx-eid (ffirst tx-q-res)]
         {:tx-ent-id     tx-eid
-         :import/txn-id tx-uid}))))
+         :unify.import.tx/id tx-uid}))))
 
 
 (defn strip-annotations [tx-elem]
@@ -207,16 +207,16 @@
         tx-tx (first tx-batch)
         flat-txes (rest tx-batch)]
     (cons (-> tx-tx
-              (update-in [:import/txn-id] append-diff-suffix)
-              (#(if (get-in % [:import/import :import/name])
-                  (update-in % [:import/import :import/name] append-diff-suffix)
-                  (update-in % [:import/import 1] append-diff-suffix))))
+              (update-in [:unify.import.tx/id] append-diff-suffix)
+              (#(if (get-in % [:unify.import.tx/import :unify.import/name])
+                  (update-in % [:unify.import.tx/import :unify.import/name] append-diff-suffix)
+                  (update-in % [:unify.import.tx/import 1] append-diff-suffix))))
           (map
             (fn renames [tx-map]
               (->> (for [[a v] tx-map]
                      (let [attr-name (name a)]
                        (cond
-                         (or (= :import/name a)
+                         (or (= :unify.import/name a)
                              (= :dataset/name a))
                          [a (append-diff-suffix v)]
 
@@ -225,7 +225,7 @@
                               [(append-diff-suffix dataset) path])]
 
                          (= :unify.import/most-recent a)
-                         [a [:import/name (append-diff-suffix (second v))]]
+                         [a [:unify.import/name (append-diff-suffix (second v))]]
 
                          (and (coll? v))
                          [a (cond
@@ -276,9 +276,9 @@
                           ;; affecting transducers but be sub-collection fns)
                           txn-uuid-set (ic/successful-uuid-set db import-name {:invalidate false})
                           base-xform (remove (fn [tx-batch]
-                                               (when-let [batch-txn-id (-> tx-batch first :import/txn-id)]
-                                                 (when (txn-uuid-set batch-txn-id)
-                                                   (log/debug "Skipping transaction: " batch-txn-id)
+                                               (when-let [batch-tx-id (-> tx-batch first :unify.import.tx/id)]
+                                                 (when (txn-uuid-set batch-tx-id)
+                                                   (log/debug "Skipping transaction: " batch-tx-id)
                                                    true))))
                           xform (if (and dataset-name diff-suffix)
                                   (comp base-xform (map (partial diff-renames opts)))

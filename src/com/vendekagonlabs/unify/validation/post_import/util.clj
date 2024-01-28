@@ -106,7 +106,7 @@
              (map #(d/pull db pull-form %)))]
     (sequence
       xf
-      (d/datoms db :vaet [:import/name import-name] :unify.import/most-recent))))
+      (d/datoms db :vaet [:unify.import/name import-name] :unify.import/most-recent))))
 
 (defn dataset-entity
   "Returns the dataset entity with the given name."

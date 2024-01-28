@@ -19,7 +19,6 @@
             [com.vendekagonlabs.unify.test-util :as tu]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.util.io :as util.io]
-            [com.vendekagonlabs.unify.import :as import]
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 
