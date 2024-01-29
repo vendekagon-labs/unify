@@ -323,16 +323,16 @@
 
           mapping-lookup (parse.mapping/mappings-edn->lookup (edn/read-string (slurp mapping-file-path)))
           parsed-cfg (parse.config/parse-config-map schema cfg-map)
-          dataset-entity (parse.config/cfg-map->dataset-entity schema mapping-lookup parsed-cfg)
-          jobs (parse.config/cfg-map->directives schema mapping-lookup cfg-root-dir parsed-cfg)
           import-entity (parse.config/cfg-map->import-entity cfg-map)
+          dataset-entity (parse.config/cfg-map->dataset-entity schema mapping-lookup parsed-cfg import-entity)
+          jobs (parse.config/cfg-map->directives schema mapping-lookup cfg-root-dir parsed-cfg)
           matrix-jobs (parse.config/cfg-map->matrix-directives schema mapping-lookup cfg-root-dir parsed-cfg)
 
           full-import-ctx {:parsed-cfg  parsed-cfg
                            :schema      schema
                            :mapping     mapping-lookup
                            :resume      resume?
-                           :import-name (:import/name import-entity)}
+                           :import-name (:unify.import/name import-entity)}
 
           _ (io/write-edn-file (str target-dir "/import-job.edn") import-entity)
           import-file (str target-dir "/import-job.edn")

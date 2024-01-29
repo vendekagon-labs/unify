@@ -16,13 +16,13 @@
             [com.vendekagonlabs.unify.db.query :as dq]))
 
 (defn import-entity-txn-eid
-  "Return the txn-id for the import entity defined by the job
+  "Return the tx-id for the import entity defined by the job
   named import-name"
   [db import-name]
   (let [result (ffirst (dq/q+retry '[:find ?import
                                      :in $ ?import-name
                                      :where
-                                     [?import :import/name ?import-name]]
+                                     [?import :unify.import/name ?import-name]]
                                    db import-name))]
     result))
 
@@ -34,31 +34,31 @@
     '[:find ?uuid
       :in $ ?import-name
       :where
-      [?import :import/name ?import-name]
-      [?txn :import/import ?import]
-      [?txn :import/txn-id ?uuid]])
+      [?import :unify.import/name ?import-name]
+      [?txn :unify.import.tx/import ?import]
+      [?txn :unify.import.tx/id ?uuid]])
 
   (def all-tx-uuids
     '[:find ?uuid
       :in $
       :where
-      [?txn :import/txn-id ?uuid]]))
+      [?txn :unify.import.tx/id ?uuid]]))
 
 (def first-import-tx-q
   '[:find ?tx
     :in $ ?name
     :where
-    [_ :import/name ?name ?tx]])
+    [_ :unify.import/name ?name ?tx]])
 
 (def after-tx-q
   '[:find ?uuid
     :in $ ?start-tx
     :where
     [(> ?tx ?start-tx)]
-    [?tx :import/txn-id ?uuid]])
+    [?tx :unify.import.tx/id ?uuid]])
 
 (defn imported-uuids-q
-  "Return all txn-ids for transactions put into the database after the start of
+  "Return all tx-ids for transactions put into the database after the start of
   the job named import-name"
   [db import-name]
   (let [first-import-tx (ffirst (dq/q+retry first-import-tx-q db import-name))]

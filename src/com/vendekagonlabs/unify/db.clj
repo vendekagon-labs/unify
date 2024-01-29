@@ -188,19 +188,19 @@
 
 
 (defn contains-txn?
-  "Does the database contain the id (ie. :import/txn-id)"
-  [db txn-id]
+  "Does the database contain the id (ie. :unify.import.tx/id)"
+  [db tx-id]
   (some?
     (ffirst (d/q '[:find ?e
                    :in $ ?id
                    :where
-                   [?e :import/txn-id ?id]] db txn-id))))
+                   [?e :unify.import.tx/id ?id]] db tx-id))))
 
 (defn head
   "Returns metadata about the last transaction:
 
   {:timestamp ...
-   :txn-id ...
+   :tx-id ...
    :import-name ...}"
   [db]
   (let [txn (ffirst
@@ -210,26 +210,26 @@
                   [?tx :db/txInstant]]
                 db))
         txn-data (d/touch (d/entity db (first txn)))
-        import-name (if (contains? txn-data :import/import)
-                      (-> (d/touch (d/entity db (-> (:import/import txn-data)
+        import-name (if (contains? txn-data :unify.import.tx/import)
+                      (-> (d/touch (d/entity db (-> (:unify.import.tx/import txn-data)
                                                     :db/id)))
-                          :import/name)
+                          :unify.import/name)
                       (throw (ex-info "No datasets transacted"
                                       {:error :no-imports-on-database})))]
     {:timestamp   (:db/txInstant txn-data)
-     :txn-id      (:import/txn-id txn-data)
+     :tx-id      (:unify.import.tx/id txn-data)
      :import-name import-name}))
 
 (defn ordered-imports
   "Returns all import entity data. The import entity is the first entity to be
   imported during transact. They are ordered by date and have the form:
   {:name ...
-   :txn-id <transaction entity id>
+   :tx-id <transaction entity id>
    :timestamp ...}"
   [db]
   (->> (d/q '[:find ?name ?tx
               :where
-              [_ :import/name ?name ?tx]]
+              [_ :unify.import/name ?name ?tx]]
             db)
        (map
          (fn [[name tx-id]]
