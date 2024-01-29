@@ -36,6 +36,9 @@
               [?tx :unify.import.tx/import ?i]]
             db import-name)))
 
+(defn filter-tx-datoms
+  [attr-set tx-info])
+
 (defn dataset->entity-ids
   [db dataset-name]
   ;; TODO: `first` logic will have to change after diff merge, maybe just
@@ -44,7 +47,10 @@
         schema (schema/get-metamodel-and-schema db)
         txes (import->txes db import)
         start-tx (reduce min txes)
-        stop-tx (inc (reduce max txes))]))
+        kind-ids (set (schema->kind-ids schema))
+        stop-tx (inc (reduce max txes))
+        filter-ids (partial filter-tx-datoms kind-ids)]))
+    ;; TODO: argh, need extra step for attrs->ids
     ;; and then filter tx-range to start and tx positions
     ;; then scan over and find all assertions of unique kind ids
     ;; then batch transactions of N size of retractEntity tx fn call
