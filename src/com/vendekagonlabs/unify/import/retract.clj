@@ -1,21 +1,35 @@
 (ns com.vendekagonlabs.unify.import.retract
   (:require [com.vendekagonlabs.unify.db.schema :as schema]
-            [com.vendekagonlabs.unify.db :as db]))
+            [com.vendekagonlabs.unify.db :as db]
+            [datomic.api :as d]))
 
 
 (defn schema->kind-ids
+  "Given a schema, returns all id attributes for every kind defined in
+  the schema.
+
+  _Note_: it may make sense to move this into metamodel namespace, if
+  it proves to be generally useful."
   [schema]
   (->> schema
        (first)  ; index by kinds is first pos of schema
        (:index/kinds)
-       (remove (fn [[_ ent]]
-                 (:unify.kind/ref-data ent)))
+       ;; for now, let's retract reference data from import,
+       ;; it's not yet clear to me if reference data should be exempt
+       ;; from dataset retraction, as use in CANDEL drifted from its
+       ;; original design here. Most likely, this should be a
+       ;; user option.
+       #_(remove (fn [[_ ent]]
+                   (:unify.kind/ref-data ent)))
        (map (fn [[_ ent]]
               (or (get-in ent [:unify.kind/need-uid :db/ident])
                   (get-in ent [:unify.kind/global-id :db/ident]))))
        (remove :dataset/name)))
 
 (defn dataset->imports
+  "Given a `db` and the name of a dataset, finds all imports
+  that created or modified that dataset, and are currently
+  extant (i.e. not retracted) in the present db view."
   [db dataset-name]
   (map first
        (d/q '[:find ?import-name
@@ -27,6 +41,10 @@
             db dataset-name)))
 
 (defn import->txes
+  "Given an import, returns all transaction entities that were
+  part of that import. Note, this behavior depends on Unify
+  tx annotations and cannot be applied outside Unify managed batch
+  imports."
   [db import-name]
   (map first
        (d/q '[:find ?tx
@@ -37,23 +55,36 @@
             db import-name)))
 
 (defn filter-tx-datoms
-  [attr-set tx-info])
+  "Given a db, `set` of attrs, and tx-info as per each element returned
+  from datomic.api/tx-range, returns only those datoms from the tx that
+  refer to attributes in the attr-set."
+  [db attr-set {:keys [data] :as _tx-info}]
+  (let [attr-vals (mapv (fn [[_e a v]]
+                          [(:db/ident (d/pull db '[:db/ident] a))
+                           v])
+                        data)]
+    (filterv (fn [[a]]
+               (attr-set a))
+             attr-vals)))
 
-(defn dataset->entity-ids
-  [db dataset-name]
+(defn dataset->retractions
+  "Given a db and log (both from a datomic.api/conn) as well as a dataset-name,
+  returns all unify kind entity ids asserted as part of the import."
+  [db log dataset-name]
   ;; TODO: `first` logic will have to change after diff merge, maybe just
   ;;       throw and rule out retract in that case?
   (let [import (first (dataset->imports db dataset-name))
         schema (schema/get-metamodel-and-schema db)
+        kind-ids (set (schema->kind-ids schema))
         txes (import->txes db import)
         start-tx (reduce min txes)
-        kind-ids (set (schema->kind-ids schema))
         stop-tx (inc (reduce max txes))
-        filter-ids (partial filter-tx-datoms kind-ids)]))
-    ;; TODO: argh, need extra step for attrs->ids
-    ;; and then filter tx-range to start and tx positions
-    ;; then scan over and find all assertions of unique kind ids
-    ;; then batch transactions of N size of retractEntity tx fn call
+        tx-seq (d/tx-range log start-tx stop-tx)]
+    (->> tx-seq
+         (mapcat (partial filter-tx-datoms db (set kind-ids)))
+         (map (fn [lookup-ref]
+                [:db.fn/retractEntity lookup-ref]))
+         (partition-all 100))))
 
 (comment
   :db-setup
@@ -65,16 +96,21 @@
 (comment
   :queries
   (require '[datomic.api :as d])
-  (def imports
-    (dataset->imports db "matrix-test"))
+  (def retractions
+    (dataset->retractions db (d/log conn) "matrix-test"))
+  (doseq [tx retractions]
+    @(d/transact conn tx))
+  (def db2 (d/db conn))
 
-  (def txes (import->txes db (first imports)))
-  (def lower-tx (reduce min txes))
-  (def upper-tx (reduce max txes))
-  (def tx-seq (d/tx-range (d/log conn) lower-tx (inc upper-tx)))
-  (:data (first tx-seq)))
+  (d/q '[:find ?assay :in $
+         :where
+         [?d :dataset/name "matrix-test"]
+         [?d :dataset/assays ?a]
+         [?a :assay/name ?assay]]
+       (d/history db2)))
+
 
 (comment
   :schema-info
   (def schema (schema/get-metamodel-and-schema db))
-  (schema->kind-ids schema))
+  (def kind-ids (schema->kind-ids schema)))
