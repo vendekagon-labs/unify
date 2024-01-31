@@ -1,6 +1,7 @@
 (ns com.vendekagonlabs.unify.import.retract
   (:require [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.db :as db]
+            [com.vendekagonlabs.unify.db.transact :as transact]
             [datomic.api :as d]))
 
 
@@ -73,7 +74,7 @@
   [db log dataset-name]
   ;; TODO: `first` logic will have to change after diff merge, maybe just
   ;;       throw and rule out retract in that case?
-  (let [import (first (dataset->imports db dataset-name))
+  (let [import (last (dataset->imports db dataset-name))
         schema (schema/get-metamodel-and-schema db)
         kind-ids (set (schema->kind-ids schema))
         txes (import->txes db import)
@@ -86,6 +87,19 @@
                 [:db.fn/retractEntity lookup-ref]))
          (partition-all 100))))
 
+(defn retract-dataset
+  [db-info dataset-name]
+  (let [conn (db/get-connection db-info)
+        log (d/log conn)
+        db (d/db conn)
+        txes (dataset->retractions db log dataset-name)
+        annotated-txes (map (fn [tx-batch]
+                              (concat [:db/add :db.part/tx
+                                       :unify.import.tx/id (str (random-uuid))]
+                                      tx-batch))
+                            txes)]
+    (transact/async-transact-w-retry conn annotated-txes {:skip-annotations true})))
+
 (comment
   :db-setup
   (def db-name "retract-test")
@@ -94,8 +108,16 @@
   (def conn (db/get-connection db-info)))
 
 (comment
-  :queries
+  :retract-test
+  (retract-dataset db-info "matrix-test")
+
+  ;; :queries
   (require '[datomic.api :as d])
+  (d/q '[:find ?dname
+         :where
+         [?d :dataset/name ?dname]]
+       db)
+
   (def retractions
     (dataset->retractions db (d/log conn) "matrix-test"))
   (doseq [tx retractions]
