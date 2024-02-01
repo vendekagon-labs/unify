@@ -23,6 +23,7 @@
             [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
             [com.vendekagonlabs.unify.import.tx-data :as tx-data]
             [com.vendekagonlabs.unify.import.engine :as engine]
+            [com.vendekagonlabs.unify.import.retract :as retract]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
             [com.vendekagonlabs.unify.import.upsert-coordination :as upsert-coord]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
@@ -69,7 +70,6 @@
   "Process txn data files into Datomic from target-dir, datomic-config, and tx-batch-size.
   If update is true then diff transaction files are used during this import."
   [{:keys [target-dir
-           database
            datomic-uri
            resume
            skip-annotations
@@ -152,3 +152,13 @@
         ensured-cfg (db/ensure-db target-dir datomic-uri)
         ref-files (conventions/ref-tx-data-filenames target-dir)]
     (mapcat (partial upsert-coord/report-upserts ensured-cfg) ref-files)))
+
+(defn retract
+  "Retracts a dataset (Datomic retractions, where the dataset remains in
+  Datomic's history)"
+  [{:keys [database dataset]}]
+  (let [db-info (db/fetch-info database)
+        retract-result (retract/retract-dataset db-info dataset)]
+    (if (:completed retract-result)
+      {:results retract-result}
+      {:errors retract-result})))

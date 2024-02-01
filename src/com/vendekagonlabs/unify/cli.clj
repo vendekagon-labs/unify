@@ -66,6 +66,7 @@
         "                    Requires --import-config, --working-directory and --schema-directory args."
         ;;        "  diff              Generates all changes required to update an existing dataset to match the target."
         ;;"                    Requires --working-directory and --database arguments."
+        "  retract           Retracts dataset indicated by --dataset from --database"
         "  transact          Transacts all data (as created by prepare) for an import job --working-directory"
         "                    into database specified by --database."
         "                    Optionally use --update to transact updated changes instead of prepared transactions."
@@ -93,6 +94,7 @@
     :parse-fn #(Integer/parseInt %)
     :validate [#(< 20 % 200) "Transaction batch size must be between 20 and 200 in length."]]
    [nil "--database          DATABASE-NAME" "The name of the database to perform command against."]
+   [nil "--dataset           DATASET-NAME" "The name of the dataset to be retracted."]
    ;; --overwrite option disabled for now as it exhibits inconsistent behavior on different OSes, directory structures.
    ; [nil "--overwrite" "When set on prepare, will delete and rewrite working directory if it already exists."]
    [nil "--resume" "When set, will resume a previously started transact command."
@@ -205,6 +207,16 @@
       (println "Completed " (get-in returned [:results :completed])
                " transactions, entire import job at " target-dir))))
 
+(defn retract
+  [{:keys [database datomic-uri dataset] :as args}]
+  (when-not (and datomic-uri database)
+    (exit 1 "ERROR: retract requires a valid database argument passed via --database param."))
+  (let [result (import/retract args)]
+    (if-let [errors (:errors result)]
+      (println "Retract encountered errors:" errors)
+      (println "Completed " (get-in result [:results :completed])
+               "retractions to remove dataset:" dataset))))
+
 
 #_(defn diff
     [{:keys [target-dir resume datomic-uri skip-annotations database] :as ctx}]
@@ -264,6 +276,7 @@
 (def tasks
   {"request-db" request-db
    "prepare"    prepare
+   "retract"    retract
    ;;   "diff" diff
    "transact"   transact
    ;;   "validate" validate

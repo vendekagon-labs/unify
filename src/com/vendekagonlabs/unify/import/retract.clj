@@ -154,7 +154,7 @@
 
 (comment
   :db-setup
-  (def db-name "retract-test")
+  (def db-name "mydb")
   (def db-info (db/fetch-info db-name))
   (def db (db/latest-db db-info))
   (def conn (db/get-connection db-info)))
