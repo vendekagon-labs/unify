@@ -32,14 +32,26 @@
   that created or modified that dataset, and are currently
   extant (i.e. not retracted) in the present db view."
   [db dataset-name]
-  (map first
-       (d/q '[:find ?import-name
-              :in $ ?dataset-name
+  (d/q '[:find ?import-name ?tx
+         :in $ ?dataset-name
+         :where
+         [?d :dataset/name ?dataset-name]
+         [?ui :unify.import/name ?import-name ?tx]
+         [?ui :unify.import/dataset ?d]]
+       db dataset-name))
+
+(defn retractable?
+  "Given a db and dataset name, determines whether or
+  not the dataset in question is in a valid state to be retracted.
+
+  _Note_: at present, only checks to see if dataset exists. In
+  future, might be extended to diff'd datasets, TBD."
+  [db dataset]
+  (seq (d/q '[:find ?d
+              :in $ ?dataset
               :where
-              [?d :dataset/name ?dataset-name]
-              [?ui :unify.import/name ?import-name]
-              [?ui :unify.import/dataset ?d]]
-            db dataset-name)))
+              [?d :dataset/name ?dataset]]
+            db dataset)))
 
 (defn import->txes
   "Given an import, returns all transaction entities that were
@@ -74,10 +86,11 @@
   [db log dataset-name]
   ;; TODO: `first` logic will have to change after diff merge, maybe just
   ;;       throw and rule out retract in that case?
-  (let [import (last (dataset->imports db dataset-name))
+  (let [imports (dataset->imports db dataset-name)
+        latest-import (first (apply max-key second imports))
         schema (schema/get-metamodel-and-schema db)
         kind-ids (set (schema->kind-ids schema))
-        txes (import->txes db import)
+        txes (import->txes db latest-import)
         start-tx (reduce min txes)
         stop-tx (inc (reduce max txes))
         tx-seq (d/tx-range log start-tx stop-tx)]
@@ -92,6 +105,10 @@
   (let [conn (db/get-connection db-info)
         log (d/log conn)
         db (d/db conn)
+        _ (when-not (retractable? db dataset-name)
+            (throw (ex-info (str "Could not retract dataset: " dataset-name
+                                 " -- does this dataset exist?")
+                            {:retract/invalid-dataset-name dataset-name})))
         txes (dataset->retractions db log dataset-name)
         annotated-txes (map (fn [tx-batch]
                               (concat [:db/add :db.part/tx
@@ -123,6 +140,8 @@
   (doseq [tx retractions]
     @(d/transact conn tx))
   (def db2 (d/db conn))
+
+  (retractable? db "matrix-test")
 
   (d/q '[:find ?assay :in $
          :where
