@@ -1,6 +1,7 @@
 (ns com.vendekagonlabs.unify.import.retract
   (:require [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.db :as db]
+            [clojure.core.async :as a]
             [com.vendekagonlabs.unify.db.transact :as transact]
             [datomic.api :as d]))
 
@@ -100,6 +101,38 @@
                 [:db.fn/retractEntity lookup-ref]))
          (partition-all 100))))
 
+(defn pipeline-retractions!
+  [db-info tx-data-batch]
+  (let [conn (db/get-connection db-info)
+        src-ch (a/chan 100)
+        to-ch (a/chan 100)
+        done-ch (a/chan)]
+    ;; load tx seq onto chan
+    (a/go
+      (a/onto-chan! src-ch tx-data-batch))
+    ;; print '.' as txes progress
+    (a/go-loop [total 0]
+      (when (zero? (mod total 10))
+        (print ".") (flush))
+      (if-let [c (a/<! to-ch)]
+        (recur (inc total))
+        (a/>! done-ch {:completed total})))
+    ;; pipeline txes from src collection through print go-loop via to-ch,
+    ;; return done-ch which indicates completion with a blocking take
+    (a/pipeline-blocking 1
+                         to-ch
+                         (comp
+                           (map (fn [tx-data]
+                                  (prn tx-data)
+                                  tx-data))
+                           (map (fn [tx-data]
+                                  (transact/async-transact-w-retry conn tx-data
+                                                                   {:skip-annotations true}))))
+                         src-ch)
+    {:result done-ch
+     :stop   (fn [] (a/close! to-ch))}))
+
+
 (defn retract-dataset
   [db-info dataset-name]
   (let [conn (db/get-connection db-info)
@@ -111,11 +144,13 @@
                             {:retract/invalid-dataset-name dataset-name})))
         txes (dataset->retractions db log dataset-name)
         annotated-txes (map (fn [tx-batch]
-                              (concat [:db/add :db.part/tx
-                                       :unify.import.tx/id (str (random-uuid))]
-                                      tx-batch))
-                            txes)]
-    (transact/async-transact-w-retry conn annotated-txes {:skip-annotations true})))
+                              (conj tx-batch
+                                    [:db/add :db.part/tx
+                                     :unify.import.tx/id (str (random-uuid))]))
+                            txes)
+        pipeline-result (pipeline-retractions! db-info annotated-txes)]
+    (when-let [result (a/<!! (:result pipeline-result))]
+      result)))
 
 (comment
   :db-setup
@@ -133,7 +168,7 @@
   (d/q '[:find ?dname
          :where
          [?d :dataset/name ?dname]]
-       db)
+       (db/latest-db db-info))
 
   (def retractions
     (dataset->retractions db (d/log conn) "matrix-test"))
