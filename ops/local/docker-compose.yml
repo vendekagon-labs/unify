@@ -6,8 +6,9 @@ services:
       POSTGRES_USER: unify
       POSTGRES_PASSWORD: unify
       POSTGRES_DB: unify
+      PGPORT: 4335
     ports:
-      - 5432:5432
+      - 4335:4335
     volumes:
       - ./files/init.sql:/docker-entrypoint-initdb.d/init.sql
       - datomic-storage-data:/var/lib/postgresql/data
@@ -46,9 +47,9 @@ services:
         condition: service_healthy
 
   query-service:
-    image: vendekagonlabs/datomic-query-service
+    image: vendekagonlabs/datomic-query-service:latest
     environment:
-      BASE_DATOMIC_URI: datomic:sql://?jdbc:postgresql://postgres:5432/unify?user=unify&password=unify
+      BASE_DATOMIC_URI: datomic:sql://?jdbc:postgresql://postgres:4335/unify?user=unify&password=unify
       BEARER_TOKEN: "dev"
     healthcheck:
       test: ["CMD", "curl", "http://localhost:80/health"]
@@ -68,13 +69,14 @@ services:
         condition: service_healthy
 
   schema-browser:
-    image: vendekagonlabs/unify-schema-browser
+    image: vendekagonlabs/unify-schema-browser:latest
     networks:
       - datomic-network
     ports:
       - 8899:80 
     environment:
-      BASE_DATOMIC_URI: datomic:sql://?jdbc:postgresql://postgres:5432/unify?user=unify&password=unify
+      BASE_DATOMIC_URI: datomic:sql://?jdbc:postgresql://postgres:4335/unify?user=unify&password=unify
+      BEARER_TOKEN: "dev"
       SERVICE_PORT: 80
     healthcheck:
       test: ["CMD", "curl", "http://localhost:8899/health"]
