@@ -6,8 +6,9 @@ services:
       POSTGRES_USER: unify
       POSTGRES_PASSWORD: unify
       POSTGRES_DB: unify
+      PGPORT: 4335
     ports:
-      - 4335:5432
+      - 4335:4335
     volumes:
       - ./files/init.sql:/docker-entrypoint-initdb.d/init.sql
       - datomic-storage-data:/var/lib/postgresql/data
