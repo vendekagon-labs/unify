@@ -1,5 +1,5 @@
 #!/bin/bash
-base_uri="datomic:sql://?jdbc:postgresql://localhost:5432/unify?user=unify&password=unify"
+base_uri="datomic:sql://?jdbc:postgresql://localhost:4335/unify?user=unify&password=unify"
 matrix_backend="file"
 matrix_dir=".unify/matrix-files"
 

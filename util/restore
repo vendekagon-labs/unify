@@ -8,5 +8,5 @@ fi
 
 util/helpers/ensure-datomic
 pushd .datomic/datomic-pro-*
-bin/datomic -Xmx4g -Xms4g restore-db $1 "datomic:sql://$2?jdbc:postgresql://localhost:5432/unify?user=unify&password=unify"
+bin/datomic -Xmx4g -Xms4g restore-db $1 "datomic:sql://$2?jdbc:postgresql://localhost:4335/unify?user=unify&password=unify"
 
