@@ -1,12 +1,16 @@
-- Fix config!
+## Current: Diff
+
+- Fix schema/db global uncoordinated access and atoms.
+- Fix/unify the way that the list of UIDs is generated, as this needs to also
+  include global IDs, and should be the same as the UID indexing used in 
+  retract.
+- Pursue restoring diff functionality via existing code with fixed UID list.
+- If that doesn't work, begin dissecting units of functionality, starting
+  with the diff/changes namespace.
+
+## Backlog from prior work
+
 - Fix reference data fail on sequence ontology thing
-- Include basic Datomic local system topology via Docker/compose
-- Documentation!!! esp README.md
-- Move dataset processing to scripts that can be run end-to-end in a test
-  preprocessing namespace.
-- Move reference/bootstrap data and re-organize to make it schema specific.
-- Create more compact, edn friendly, user friendly way to define bootstrap reference data.
-- CLI arg for request-db to point to bootstrap reference data
 - Why does prepare slow down when pret is run twice at the REPL? Can we identify and fix this?
 - Variant fixes: revert back to original variant_ref files, maybe?
 
