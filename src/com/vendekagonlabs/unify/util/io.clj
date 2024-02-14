@@ -17,7 +17,11 @@
             [clojure.java.shell :refer [sh]]
             [clojure.string :as s]
             [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io])
+  (:import (java.io File)
+           (java.nio.file FileSystems)))
+
+(def sep (File/separator))
 
 (defn delete-recursively [fname]
   (doseq [f (reverse (file-seq (file fname)))]
@@ -67,12 +71,22 @@
             data
             (->pretty-string data))))
 
+(defn rm-edn-files!
+  "Given a directory, `dir`, removes all edn files in that directory."
+  [dir]
+  (let [files (->> dir
+                   (io/file)
+                   (.list)
+                   (filter #(s/ends-with? % ".edn")))]
+    (doseq [f files]
+      (-> (io/file (str dir sep f))
+          (.delete)))))
 
 (defn glob
   "Given a directory and a glob-pattern, returns vector of matched files."
   [glob-dir glob-pattern]
   (let [grammar-matcher
-        (-> (java.nio.file.FileSystems/getDefault)
+        (-> (FileSystems/getDefault)
             (.getPathMatcher (str "glob:" glob-pattern)))]
     (->> glob-dir
          clojure.java.io/file

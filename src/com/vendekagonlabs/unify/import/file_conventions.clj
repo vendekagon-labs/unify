@@ -16,12 +16,13 @@
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.util.io :as pio]
             [clojure.string :as str]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn])
+  (:import (java.io File)))
 
 (def ref-file-prefix "unify-ref-")
 (def import-cfg-job-file-name "import-job.edn")
 (def ignored-filenames #{"import-summary.edn" import-cfg-job-file-name})
-(def sep (java.io.File/separator))
+(def sep (File/separator))
 
 (defn ->full-path [fname]
   (-> fname
@@ -43,16 +44,6 @@
        (.list)
        (filter #(str/ends-with? % ".tsv"))
        (remove ignored-filenames)))
-
-(defn rm-edn-files
-  [dir]
-  (let [files (->> dir
-                   (io/file)
-                   (.list)
-                   (filter #(str/ends-with? % ".edn")))]
-    (doseq [f files]
-      (-> (io/file (str dir sep f))
-          (.delete)))))
 
 (defn tx-data-folder
   "Return the tx data folder path within a target dir."

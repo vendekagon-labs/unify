@@ -111,9 +111,8 @@
     (let [diff-tx-dir (conventions/diff-tx-dir target-dir)
           suffix (uuid/random-partial)
           diff-opts (assoc ctx :diff-suffix suffix)]
-
       ;; Remove any previous diff
-      (conventions/rm-edn-files diff-tx-dir)
+      (util.io/rm-edn-files! diff-tx-dir)
 
       ;; Write out the diff summary which includes the current HEAD
       ;; before transacting.
