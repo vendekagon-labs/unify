@@ -2,7 +2,9 @@
   (:require [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
             [clojure.pprint :as pp]
-            [com.vendekagonlabs.unify.util.io :as util.io]))
+            [com.vendekagonlabs.unify.db.schema :as schema]
+            [com.vendekagonlabs.unify.util.io :as util.io])
+  (:import (java.io File)))
 
 
 (defn unnamespaced-keyword? [kw]
@@ -55,6 +57,10 @@
 (s/def ::entity-kind-name unnamespaced-keyword?)
 (s/def ::unify-schema
   (s/map-of ::entity-kind-name ::entity-kind-def))
+
+(defn- strip-namespace
+  [ns-kw]
+  (keyword (name ns-kw)))
 
 (defn validate! [schema-data]
   (when-not (s/valid? ::unify-schema schema-data)
@@ -197,15 +203,82 @@
           (write-schema out-file edn-data))))
   (let [metamodel-content [(:unify/metamodel-kinds raw-schema)
                            (:unify/metamodel-refs raw-schema)]]
-    (write-schema (io/file schema-dir "metamodel.edn") metamodel-content))
+    (write-schema (io/file schema-dir "metamodel.edn") metamodel-content)))
+
+(defn kind-info->id-map
+  [schema kind-info]
+  (let [{:keys [unify.kind/global-id unify.kind/context-id]} kind-info]
+    (if-not (or global-id context-id)
+      {:attribute :unify.error/no-unique-id}
+      (let [[scope attr-name] (if global-id
+                                [:global (:db/ident global-id)]
+                                [:context (:db/ident context-id :db/ident)])
+            attr-map (first (filter #(= attr-name (:db/ident %)) schema))
+            attr-type (-> attr-map :db/valueType :db/ident name keyword)
+            doc (:db/doc attr-map)]
+        (merge {:attribute (strip-namespace attr-name)
+                :type attr-type
+                :scope scope}
+               (when doc {:doc doc}))))))
+
+(defn kind->attrs
+  [schema kind])
+
+(defn enum?
+  [schema attr])
+
+(defn find-enums
+  [schema attr])
+
+(defn infer-schema
+  "Given a raw/post-compilation schema directory, attempts to infer a Unify schema."
+  [_schema-dir]
+  (let [schema (schema/get-metamodel-and-schema)
+        kinds (get-in schema [0 :index/kinds])]
+    (into {}
+          (for [[kind kind-info] kinds]
+            (let [parent (:unify.kind/parent kind-info)
+                  id-map (kind-info->id-map schema kind-info)
+                  attr-vecs nil]
+              [kind {:id id-map}])))))
 
 
-  (comment
-    :troubleshooting
+(comment
+  :troubleshooting
+  ;; TODO: index/kind-attrs --- empty?
+  ;; -- confirmed: let's remove it, I guess?
+  (def this-schema (schema/get-metamodel-and-schema))
+  (def flat-schema (rest this-schema))
+  (infer-schema nil)
+  (keyword (name (:db/ident (:db/valueType (first (filter #(= :sample/id (:db/ident %)) this-schema))))))
+  (def kinds (:index/kinds (first this-schema)))
+  (def sample-kind-info (:sample kinds))
+  (:unify.kind/context-id)
+  (:index/enum-idents (first this-schema))
+  (get-in this-schema [0 :index/kind-att])
+  (keys kinds)
+  (keys (get-in this-schema [0 :index/kinds]))
 
-    (unnamespaced-keyword? :this/here)
 
-    (def example-schema-dsl
-      (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
-    (s/valid? ::unify-schema example-schema-dsl)
-    (s/explain ::unify-schema example-schema-dsl)))
+  ;; for each kind, gather up attributes and types
+  ;; check that every ref either points to something or has matching enum, otherwise report error
+  ;; for enum targets, pick enums
+  ;; spit out unify-schema
+  ;; spit out non-unify compatible schema in separate edn file.
+  (def inferred (infer-schema "test/resources/systems/candel/template-dataset/schema/"))
+
+  (def example-schema-dsl
+    (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
+  (s/valid? ::unify-schema example-schema-dsl)
+  (s/explain ::unify-schema example-schema-dsl))
+
+(comment
+  ;; this might be useful to retrieve and put elsewhere in read path, TBD.
+  #_(let [schema-file (io/file schema-dir (:datomic/schema file-name-lookup))
+          metamodel-file (io/file schema-dir (:unify/metamodel "metamodel.edn"))
+          enums-file (io/file schema-dir (:unify/enums file-name-lookup))]
+      (when-not (and (.exists ^File schema-file)
+                     (.exists ^File metamodel-file)
+                     (.exists ^File enums-file))
+        (throw (ex-info "Schema directory specified does not contain all required files"
+                        {:unify.schema/required-files (vals file-name-lookup)})))))
