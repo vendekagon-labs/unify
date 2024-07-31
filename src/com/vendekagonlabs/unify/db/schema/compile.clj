@@ -221,14 +221,25 @@
                 :scope scope}
                (when doc {:doc doc}))))))
 
-(defn kind->attrs
-  [schema kind])
-
 (defn enum?
   [schema attr])
 
 (defn find-enums
   [schema attr])
+
+(defn datomic-attr->unify-attr)
+
+(defn kind-info->attrs
+  [schema kind-info]
+  (let [kind (:unify.kind/name kind-info)
+        schema-attrs (rest schema)
+        matched-attrs (filter
+                        (fn [attr-info]
+                          (when-let [attr-name (:db/ident attr-info)]
+                            (= kind (-> attr-name namespace keyword))))
+                        schema-attrs)]
+    ;; TODO: construct a unify attribute from the Datomic schema attr map.
+    (mapv :db/ident matched-attrs)))
 
 (defn infer-schema
   "Given a raw/post-compilation schema directory, attempts to infer a Unify schema."
@@ -239,33 +250,22 @@
           (for [[kind kind-info] kinds]
             (let [parent (:unify.kind/parent kind-info)
                   id-map (kind-info->id-map schema kind-info)
-                  attr-vecs nil]
-              [kind {:id id-map}])))))
+                  attr-vecs (kind-info->attrs schema kind-info)]
+              [kind (merge
+                      {:id id-map}
+                      (when parent
+                        {:parent parent})
+                      (when attr-vecs
+                        {:attributes attr-vecs}))])))))
 
 
 (comment
   :troubleshooting
   ;; TODO: index/kind-attrs --- empty?
   ;; -- confirmed: let's remove it, I guess?
-  (def this-schema (schema/get-metamodel-and-schema))
-  (def flat-schema (rest this-schema))
-  (infer-schema nil)
-  (keyword (name (:db/ident (:db/valueType (first (filter #(= :sample/id (:db/ident %)) this-schema))))))
-  (def kinds (:index/kinds (first this-schema)))
-  (def sample-kind-info (:sample kinds))
-  (:unify.kind/context-id)
-  (:index/enum-idents (first this-schema))
-  (get-in this-schema [0 :index/kind-att])
-  (keys kinds)
-  (keys (get-in this-schema [0 :index/kinds]))
-
-
-  ;; for each kind, gather up attributes and types
-  ;; check that every ref either points to something or has matching enum, otherwise report error
-  ;; for enum targets, pick enums
-  ;; spit out unify-schema
-  ;; spit out non-unify compatible schema in separate edn file.
-  (def inferred (infer-schema "test/resources/systems/candel/template-dataset/schema/"))
+  (require '[clojure.pprint :as pp])
+  (pp/pprint
+    (infer-schema nil))
 
   (def example-schema-dsl
     (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
