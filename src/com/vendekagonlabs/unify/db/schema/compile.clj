@@ -4,6 +4,7 @@
             [clojure.pprint :as pp]
             [clojure.set :refer [map-invert]]
             [com.vendekagonlabs.unify.db.schema :as schema]
+            [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
             [com.vendekagonlabs.unify.util.io :as util.io])
   (:import (java.io File)))
 
@@ -285,20 +286,23 @@
 
 (defn infer-schema
   "Given a raw/post-compilation schema directory, attempts to infer a Unify schema."
-  [_schema-dir]
-  (let [schema (schema/get-metamodel-and-schema)
-        kinds (get-in schema [0 :index/kinds])]
-    (into {}
-          (for [[kind kind-info] kinds]
-            (let [parent (:unify.kind/parent kind-info)
-                  id-map (kind-info->id-map schema kind-info)
-                  attr-vecs (kind-info->attrs schema kind-info)]
-              [kind (merge
-                      {:id id-map}
-                      (when parent
-                        {:parent parent})
-                      (when attr-vecs
-                        {:attributes attr-vecs}))])))))
+  ([]
+   (let [schema (schema/get-metamodel-and-schema)
+         kinds (get-in schema [0 :index/kinds])]
+     (into {}
+           (for [[kind kind-info] kinds]
+             (let [parent (:unify.kind/parent kind-info)
+                   id-map (kind-info->id-map schema kind-info)
+                   attr-vecs (kind-info->attrs schema kind-info)]
+               [kind (merge
+                       {:id id-map}
+                       (when parent
+                         {:parent parent})
+                       (when attr-vecs
+                         {:attributes attr-vecs}))])))))
+  ([schema-dir]
+   (schema.cache/encache schema-dir)
+   (infer-schema)))
 
 
 (comment
@@ -307,7 +311,7 @@
   ;; -- confirmed: let's remove it, I guess?
   (require '[clojure.pprint :as pp])
   (pp/pprint
-    (infer-schema nil))
+    (infer-schema))
 
   (def example-schema-dsl
     (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
