@@ -240,12 +240,23 @@
   [schema attr]
   (:unify.ref/to attr))
 
+(defn- ns-kw->ns-scope
+  "Given a namespaced keyword, returns a new namespace scoped to the terminal name of the
+   keyword, i.e. from :namespace/name to namespace.name
+   e.g. :clinical-observation/rano -> clinical-observation.rano"
+  [ns-kw]
+  (let [kw-ns (namespace ns-kw)
+        kw-name (name ns-kw)]
+    (str kw-ns "." kw-name)))
+
 (defn find-enums
   [schema attr]
-  [:insert-enums-here])
-
-;; namespace match to find enums, report if none found as
-;; :unify.error/non-conforming-enums-or-ref
+  (let [enums (-> schema first :index/enum-idents)
+        enum-ns (-> attr :db/ident ns-kw->ns-scope)
+        matched-enums (filter #(= enum-ns (namespace %)) enums)]
+    (if (seq matched-enums)
+      (mapv (comp keyword name) matched-enums)
+      [:unify.error/non-conforming-enums-or-missing-unify-ref])))
 
 (defn resolve-attr-type
   [schema attr]
@@ -267,11 +278,6 @@
         doc-string (:db/doc attr)]
     [attr-name attr-type cardinality doc-string]))
 
-(comment
-  (def schema (schema/get-metamodel-and-schema))
-  (-> schema first :index/kinds)
-  (datomic-attr->unify-attr schema first-ex))
-
 (defn kind-info->attrs
   [schema kind-info]
   (let [kind (:unify.kind/name kind-info)
@@ -281,7 +287,6 @@
                           (when-let [attr-name (:db/ident attr-info)]
                             (= kind (-> attr-name namespace keyword))))
                         schema-attrs)]
-    (def first-ex (first matched-attrs))
     (mapv (partial datomic-attr->unify-attr schema) matched-attrs)))
 
 (defn infer-schema
@@ -317,14 +322,3 @@
     (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
   (s/valid? ::unify-schema example-schema-dsl)
   (s/explain ::unify-schema example-schema-dsl))
-
-(comment
-  ;; this might be useful to retrieve and put elsewhere in read path, TBD.
-  #_(let [schema-file (io/file schema-dir (:datomic/schema file-name-lookup))
-          metamodel-file (io/file schema-dir (:unify/metamodel "metamodel.edn"))
-          enums-file (io/file schema-dir (:unify/enums file-name-lookup))]
-      (when-not (and (.exists ^File schema-file)
-                     (.exists ^File metamodel-file)
-                     (.exists ^File enums-file))
-        (throw (ex-info "Schema directory specified does not contain all required files"
-                        {:unify.schema/required-files (vals file-name-lookup)})))))
