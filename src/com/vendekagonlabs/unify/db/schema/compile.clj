@@ -260,7 +260,6 @@
 
 (defn resolve-attr-type
   [schema attr]
-  (prn :attr attr)
   (cond
     (enum? schema attr)
     {:enum-of (find-enums schema attr)}
