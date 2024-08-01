@@ -12,22 +12,23 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import
-  (:require [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
-            [com.vendekagonlabs.unify.util.io :as util.io]
+  (:require [clojure.tools.logging :as log]
             [cognitect.anomalies :as anomalies]
-            [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.db.schema :as db.schema]
-            [com.vendekagonlabs.unify.db.schema.compile :as compile]
             [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
+            [com.vendekagonlabs.unify.db.schema.compile :as compile]
+            [com.vendekagonlabs.unify.db.schema.compile.metaschema :as compile.metaschema]
             [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
-            [com.vendekagonlabs.unify.import.tx-data :as tx-data]
             [com.vendekagonlabs.unify.import.engine :as engine]
-            [com.vendekagonlabs.unify.import.retract :as retract]
-            [com.vendekagonlabs.unify.util.uuid :as uuid]
-            [com.vendekagonlabs.unify.import.upsert-coordination :as upsert-coord]
+            [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
+            [com.vendekagonlabs.unify.import.retract :as retract]
+            [com.vendekagonlabs.unify.import.tx-data :as tx-data]
+            [com.vendekagonlabs.unify.import.upsert-coordination :as upsert-coord]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.util.text :refer [->pretty-string folder-of]]
+            [com.vendekagonlabs.unify.util.uuid :as uuid]
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 (defn validate
@@ -142,6 +143,24 @@
     (compile/validate! unify-schema-data)
     (compile/write-schema-dir! schema-directory compiled-schema)
     {:results :success}))
+
+(defn infer-schema
+  "Given a schema directory with full Datomic and Unify schema, as created by compile, attempts
+  to infer a valid Unify schema. Outputs resulting file to :unify-schema specified path."
+  [{:keys [schema-directory unify-schema]}]
+  (schema.cache/encache schema-directory)
+  (let [inferred-schema (compile/infer-schema)]
+    (util.io/write-edn-file unify-schema inferred-schema)))
+
+(defn infer-metaschema
+  "Given a schema directory with full Datomic and Unify schema, as created by compile, attempts
+  to generate a valid Datomic analytics metaschema. Outputs resulting file to :metaschema
+  specified path."
+  [{:keys [schema-directory metaschema]}]
+  (schema.cache/encache schema-directory)
+  (let [inferred-metaschema (compile.metaschema/generate)]
+    (util.io/write-edn-file metaschema inferred-metaschema)))
+
 
 (defn crosscheck-references
   "Checks all reference data in the tx-data dir of target-dir to see if it asserts anything
