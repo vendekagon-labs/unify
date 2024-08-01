@@ -2,6 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
             [clojure.pprint :as pp]
+            [clojure.set :refer [map-invert]]
             [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.util.io :as util.io])
   (:import (java.io File)))
@@ -132,6 +133,9 @@
   {:cardinality-one :db.cardinality/one
    :cardinality-many :db.cardinality/many})
 
+(def rev-cardinality-lookup
+  (map-invert cardinality-lookup))
+
 (defn process-attribute
   [kind-name [attr-kw attr-type attr-card attr-doc]]
   (let [ns-attr-kw (add-namespace kind-name attr-kw)
@@ -222,12 +226,50 @@
                (when doc {:doc doc}))))))
 
 (defn enum?
-  [schema attr])
+  [schema attr]
+  (and (= :db.type/ref (-> attr :db/valueType :db/ident))
+       (not (:unify.ref/to attr))))
+
+(defn unify-ref?
+  [schema attr]
+  (and (= :db.type/ref (-> attr :db/valueType :db/ident))
+       (:unify.ref/to attr)))
+
+(defn resolve-ref
+  [schema attr]
+  (:unify.ref/to attr))
 
 (defn find-enums
-  [schema attr])
+  [schema attr]
+  [:insert-enums-here])
 
-(defn datomic-attr->unify-attr)
+;; namespace match to find enums, report if none found as
+;; :unify.error/non-conforming-enums-or-ref
+
+(defn resolve-attr-type
+  [schema attr]
+  (prn :attr attr)
+  (cond
+    (enum? schema attr)
+    {:enum-of (find-enums schema attr)}
+    (unify-ref? schema attr)
+    {:ref-to (resolve-ref schema attr)}
+    :else
+    (-> attr :db/valueType :db/ident name keyword)))
+
+(defn datomic-attr->unify-attr
+  [schema attr]
+  (let [attr-name (-> attr :db/ident name keyword)
+        attr-type (resolve-attr-type schema attr)
+        cardinality (get rev-cardinality-lookup
+                         (-> attr :db/cardinality :db/ident))
+        doc-string (:db/doc attr)]
+    [attr-name attr-type cardinality doc-string]))
+
+(comment
+  (def schema (schema/get-metamodel-and-schema))
+  (-> schema first :index/kinds)
+  (datomic-attr->unify-attr schema first-ex))
 
 (defn kind-info->attrs
   [schema kind-info]
@@ -238,8 +280,8 @@
                           (when-let [attr-name (:db/ident attr-info)]
                             (= kind (-> attr-name namespace keyword))))
                         schema-attrs)]
-    ;; TODO: construct a unify attribute from the Datomic schema attr map.
-    (mapv :db/ident matched-attrs)))
+    (def first-ex (first matched-attrs))
+    (mapv (partial datomic-attr->unify-attr schema) matched-attrs)))
 
 (defn infer-schema
   "Given a raw/post-compilation schema directory, attempts to infer a Unify schema."
