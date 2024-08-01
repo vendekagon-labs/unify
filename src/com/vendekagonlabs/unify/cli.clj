@@ -72,6 +72,8 @@
         "                    Optionally use --update to transact updated changes instead of prepared transactions."
         "                    If an imports fails due to eg network latency or process termination, you can resume"
         "                    with --resume"
+        "  infer-schema      Given a compiled --schema-directory, infers and generates a --unify-schema"
+        "  infer-metaschema  Given a compiled --schema-directory, outputs a basic Datomic analytics --metaschema."
         ;;"  validate          Runs validation checks against the database."
         ;;"                    Requires --working-directory and --database arguments when working with branch databases."
         ;;"  crosscheck-reference   Checks all reference data files for potential upsert collisions."
@@ -89,6 +91,8 @@
     "Directory containing data that should be added to a new database on creation."]
    [nil "--unify-schema      UNIFY-SCHEMA"
     "An edn file which contains a Unify schema definition."]
+   [nil "--metaschema        METASCHEMA"
+    "An edn file which contains a Datomic analytics metaschema."]
    [nil "--tx-batch-size     TX-BATCH-SIZE" "Datomic transaction batch size"
     :default 50
     :parse-fn #(Integer/parseInt %)
@@ -163,6 +167,29 @@
     (exit 1 (str "ERROR: compile-schema requires --unify-schema argument, which "
                  "must point to an edn file containing a Unify schema specification.")))
   (import/compile-schema arg-map))
+
+(defn infer-schema
+  [{:keys [schema-directory unify-schema] :as arg-map}]
+  (when-not (and schema-directory
+                 (util.io/exists? schema-directory))
+    (exit 1 (str "ERROR: infer-schema requires a --schema-directory that exists.")))
+  (when-not unify-schema
+    (exit 1 (str "ERROR: compile-schema requires --unify-schema argument for the edn file "
+                 "to be generated after inference.")))
+  (println "NOTE: infer-schema is not guaranteed to generate a working Unify schema. Check the "
+           "output file for :unify.error/* keys.")
+  (import/infer-schema arg-map))
+
+(defn infer-metaschema
+  [{:keys [schema-directory metaschema] :as arg-map}]
+  (when-not (and schema-directory
+                 (util.io/exists? schema-directory))
+    (exit 1 (str "ERROR: infer-metaschema requires a --schema-directory that exists.")))
+  (when-not metaschema
+    (exit 1 (str "ERROR: compile-schema requires an output --metaschema edn file argument.")))
+  (println "NOTE: infer-metaschema is not guaranteed to generate a working metaschema. Check the "
+           "output file for :unify.error/* keys.")
+  (import/infer-metaschema arg-map))
 
 (defn prepare
   [{:keys [import-cfg-file target-dir resume overwrite
@@ -283,6 +310,8 @@
    ;;   "crosscheck-reference" crosscheck-reference
    "list-dbs"   list-dbs
    "compile-schema" compile-schema
+   "infer-schema" infer-schema
+   "infer-metaschema" infer-metaschema
    "delete-db"  delete-db})
 
 (def allowed-tasks (set (keys tasks)))

@@ -2,7 +2,11 @@
   (:require [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
             [clojure.pprint :as pp]
-            [com.vendekagonlabs.unify.util.io :as util.io]))
+            [clojure.set :refer [map-invert]]
+            [com.vendekagonlabs.unify.db.schema :as schema]
+            [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
+            [com.vendekagonlabs.unify.util.io :as util.io])
+  (:import (java.io File)))
 
 
 (defn unnamespaced-keyword? [kw]
@@ -55,6 +59,10 @@
 (s/def ::entity-kind-name unnamespaced-keyword?)
 (s/def ::unify-schema
   (s/map-of ::entity-kind-name ::entity-kind-def))
+
+(defn- strip-namespace
+  [ns-kw]
+  (keyword (name ns-kw)))
 
 (defn validate! [schema-data]
   (when-not (s/valid? ::unify-schema schema-data)
@@ -125,6 +133,9 @@
 (def cardinality-lookup
   {:cardinality-one :db.cardinality/one
    :cardinality-many :db.cardinality/many})
+
+(def rev-cardinality-lookup
+  (map-invert cardinality-lookup))
 
 (defn process-attribute
   [kind-name [attr-kw attr-type attr-card attr-doc]]
@@ -197,15 +208,116 @@
           (write-schema out-file edn-data))))
   (let [metamodel-content [(:unify/metamodel-kinds raw-schema)
                            (:unify/metamodel-refs raw-schema)]]
-    (write-schema (io/file schema-dir "metamodel.edn") metamodel-content))
+    (write-schema (io/file schema-dir "metamodel.edn") metamodel-content)))
+
+(defn kind-info->id-map
+  [schema kind-info]
+  (let [{:keys [unify.kind/global-id unify.kind/context-id]} kind-info]
+    (if-not (or global-id context-id)
+      {:attribute :unify.error/no-unique-id}
+      (let [[scope attr-name] (if global-id
+                                [:global (:db/ident global-id)]
+                                [:context (:db/ident context-id :db/ident)])
+            attr-map (first (filter #(= attr-name (:db/ident %)) schema))
+            attr-type (-> attr-map :db/valueType :db/ident name keyword)
+            doc (:db/doc attr-map)]
+        (merge {:attribute (strip-namespace attr-name)
+                :type attr-type
+                :scope scope}
+               (when doc {:doc doc}))))))
+
+(defn enum?
+  [schema attr]
+  (and (= :db.type/ref (-> attr :db/valueType :db/ident))
+       (not (:unify.ref/to attr))))
+
+(defn unify-ref?
+  [schema attr]
+  (and (= :db.type/ref (-> attr :db/valueType :db/ident))
+       (:unify.ref/to attr)))
+
+(defn resolve-ref
+  [schema attr]
+  (:unify.ref/to attr))
+
+(defn- ns-kw->ns-scope
+  "Given a namespaced keyword, returns a new namespace scoped to the terminal name of the
+   keyword, i.e. from :namespace/name to namespace.name
+   e.g. :clinical-observation/rano -> clinical-observation.rano"
+  [ns-kw]
+  (let [kw-ns (namespace ns-kw)
+        kw-name (name ns-kw)]
+    (str kw-ns "." kw-name)))
+
+(defn find-enums
+  [schema attr]
+  (let [enums (-> schema first :index/enum-idents)
+        enum-ns (-> attr :db/ident ns-kw->ns-scope)
+        matched-enums (filter #(= enum-ns (namespace %)) enums)]
+    (if (seq matched-enums)
+      (mapv (comp keyword name) matched-enums)
+      [:unify.error/non-conforming-enums-or-missing-unify-ref])))
+
+(defn resolve-attr-type
+  [schema attr]
+  (cond
+    (enum? schema attr)
+    {:enum-of (find-enums schema attr)}
+    (unify-ref? schema attr)
+    {:ref-to (resolve-ref schema attr)}
+    :else
+    (-> attr :db/valueType :db/ident name keyword)))
+
+(defn datomic-attr->unify-attr
+  [schema attr]
+  (let [attr-name (-> attr :db/ident name keyword)
+        attr-type (resolve-attr-type schema attr)
+        cardinality (get rev-cardinality-lookup
+                         (-> attr :db/cardinality :db/ident))
+        doc-string (:db/doc attr)]
+    [attr-name attr-type cardinality doc-string]))
+
+(defn kind-info->attrs
+  [schema kind-info]
+  (let [kind (:unify.kind/name kind-info)
+        schema-attrs (rest schema)
+        matched-attrs (filter
+                        (fn [attr-info]
+                          (when-let [attr-name (:db/ident attr-info)]
+                            (= kind (-> attr-name namespace keyword))))
+                        schema-attrs)]
+    (mapv (partial datomic-attr->unify-attr schema) matched-attrs)))
+
+(defn infer-schema
+  "Given a raw/post-compilation schema directory, attempts to infer a Unify schema."
+  ([]
+   (let [schema (schema/get-metamodel-and-schema)
+         kinds (get-in schema [0 :index/kinds])]
+     (into {}
+           (for [[kind kind-info] kinds]
+             (let [parent (:unify.kind/parent kind-info)
+                   id-map (kind-info->id-map schema kind-info)
+                   attr-vecs (kind-info->attrs schema kind-info)]
+               [kind (merge
+                       {:id id-map}
+                       (when parent
+                         {:parent parent})
+                       (when attr-vecs
+                         {:attributes attr-vecs}))])))))
+  ([schema-dir]
+   (schema.cache/encache schema-dir)
+   (infer-schema)))
 
 
-  (comment
-    :troubleshooting
+(comment
+  :troubleshooting
+  ;; TODO: index/kind-attrs --- empty?
+  ;; -- confirmed: let's remove it, I guess?
+  (require '[clojure.pprint :as pp])
+  (pp/pprint
+    (infer-schema))
 
-    (unnamespaced-keyword? :this/here)
-
-    (def example-schema-dsl
-      (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
-    (s/valid? ::unify-schema example-schema-dsl)
-    (s/explain ::unify-schema example-schema-dsl)))
+  (def example-schema-dsl
+    (util.io/read-edn-file "test/resources/systems/patient-dashboard/schema/unify.edn"))
+  (s/valid? ::unify-schema example-schema-dsl)
+  (s/explain ::unify-schema example-schema-dsl))
