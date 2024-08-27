@@ -4,6 +4,7 @@
             [clojure.pprint :as pp]
             [clojure.set :refer [map-invert]]
             [com.vendekagonlabs.unify.db.schema :as schema]
+            [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
             [com.vendekagonlabs.unify.util.io :as util.io])
   (:import (java.io File)))
@@ -278,13 +279,19 @@
     [attr-name attr-type cardinality doc-string]))
 
 (defn kind-info->attrs
-  [schema kind-info]
+  [schema kind-info {:keys [attribute] :as _id-map}]
   (let [kind (:unify.kind/name kind-info)
         schema-attrs (rest schema)
         matched-attrs (filter
                         (fn [attr-info]
                           (when-let [attr-name (:db/ident attr-info)]
-                            (= kind (-> attr-name namespace keyword))))
+                            (and (= kind (-> attr-name namespace keyword))
+                                 ;; not a synthetic composite id
+                                 (not= attr-name (metamodel/synthetic-attr? schema kind))
+                                 ;; not a need-uid
+                                 (not= attr-name (metamodel/need-uid? schema kind))
+                                 ;; not the user specified unique id
+                                 (not= attribute (strip-namespace attr-name)))))
                         schema-attrs)]
     (mapv (partial datomic-attr->unify-attr schema) matched-attrs)))
 
@@ -297,7 +304,7 @@
            (for [[kind kind-info] kinds]
              (let [parent (:unify.kind/parent kind-info)
                    id-map (kind-info->id-map schema kind-info)
-                   attr-vecs (kind-info->attrs schema kind-info)]
+                   attr-vecs (kind-info->attrs schema kind-info id-map)]
                [kind (merge
                        {:id id-map}
                        (when parent
