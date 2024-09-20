@@ -19,6 +19,11 @@
             [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
             [clojure.java.io :as io]))
 
+(defn file-extension [file-path-str]
+  (-> (re-find #"(\.[a-zA-Z0-9]+)$" file-path-str)
+      (second)
+      (String/.toLowerCase)))
+
 (defn delete-recursively [fname]
   (doseq [f (reverse (file-seq (file fname)))]
     (delete-file f)))
