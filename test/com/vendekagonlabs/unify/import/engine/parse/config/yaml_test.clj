@@ -1,4 +1,4 @@
-(ns com.vendekagonlabs.unify.import.engine.parse.config.yaml
+(ns com.vendekagonlabs.unify.import.engine.parse.config.yaml-test
   (:require [clojure.test :refer :all]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.data :as data]
