@@ -59,7 +59,7 @@
         v))
     parsed-yaml))
 
-(defn read-yaml-file
+(defn read-config-file
   [yaml-file-path]
   (-> yaml-file-path
       (slurp)
@@ -67,6 +67,26 @@
       (massage-colls)
       (fix-unify-variables)
       (parse-keywords)))
+
+(defn fix-mapping-vars
+  [parsed-mapping-yaml]
+  (walk/postwalk
+    (fn [v]
+      (if-let [vars-map (:unify/variables v)]
+        (assoc v :unify/variables
+          (into {}
+            (for [[key val] vars-map]
+              [key (keyword val)])))
+        v))
+    parsed-mapping-yaml))
+
+(defn read-mappings-file
+  [yaml-file-path]
+  (-> yaml-file-path
+      (slurp)
+      (yaml/parse-string)
+      (massage-colls)
+      (fix-mapping-vars)))
 
 (comment
   (in-ns 'com.vendekagonlabs.unify.import.engine.parse.schema.yaml)
@@ -79,10 +99,27 @@
   (def ref-file "test/resources/systems/candel/template-dataset/config.edn")
   (def ref-edn (util.io/read-edn-file ref-file))
 
-  (def parsed-yaml (read-yaml-file config-file))
+  (def parsed-yaml (read-config-file config-file))
   (def diff-output (diff ref-edn parsed-yaml))
   (pp/pprint (first diff-output))
   (pp/pprint (second diff-output))
+
+  (= ref-edn parsed-yaml)
+
+  (def mapping-file "test/resources/systems/candel/parse-config-examples/template-mappings.yaml")
+  (def ref-mapping-file "test/resources/systems/candel/template-dataset/mappings.edn")
+  (def parsed-mapping (read-mappings-file mapping-file))
+  (def ref-edn (util.io/read-edn-file ref-mapping-file))
+
+  (pp/pprint parsed-mapping)
+
+  (keys parsed-mapping)
+  (keys ref-edn)
+  (pp/pprint
+    (first (diff ref-edn parsed-mapping)))
+  (pp/pprint
+    (second (diff ref-edn parsed-mapping)))
+  (= parsed-mapping ref-edn)
 
   (keys (first diff-output))
   (pp/pprint
