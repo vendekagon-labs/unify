@@ -26,7 +26,7 @@
       (is (nil? (second diff))))))
 
 (deftest equivalent-mapping-test
-  (let [parsed-yaml-mapping (sut/read-config-file mapping-yaml-file)
+  (let [parsed-yaml-mapping (sut/read-mappings-file mapping-yaml-file)
         parsed-edn-mapping (util.io/read-edn-file ref-mapping-edn-file)
         diff (data/diff parsed-edn-mapping parsed-yaml-mapping)]
     (testing "YAML and edn equivalent configs parse to equivalent edn data structures."

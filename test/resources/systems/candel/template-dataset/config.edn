@@ -205,8 +205,8 @@
                                                   {:unify/input-tsv-file "processed/ldh_meas_and_samples.txt"
                                                    :id               "sample.id"
                                                    :subject          "Patient ID"
-                                                   :unify/constants  {:type      ":sample.type/normal"
-                                                                      :specimen  ":sample.specimen/whole-blood"
+                                                   :unify/constants  {:type      "sample.type/normal"
+                                                                      :specimen  "sample.specimen/whole-blood"
                                                                       :timepoint "baseline"}}
 
 
@@ -219,7 +219,7 @@
                                                    :metastasis       "sample/metastatic"
                                                    :recurrence       "sample/recurring"
                                                    :timepoint        "timepoint"
-                                                   :unify/constants  {:specimen ":sample.specimen/fresh-frozen"}}]
+                                                   :unify/constants  {:specimen "sample.specimen/fresh-frozen"}}]
 
 
                       ; The subjects map contains information about each subject. Each patient in the dataset should be represented as one subject entity.

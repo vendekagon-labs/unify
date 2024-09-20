@@ -1,8 +1,7 @@
 (ns com.vendekagonlabs.unify.import.engine.parse.config.yaml
   (:require [clj-yaml.core :as yaml]
             [clojure.string :as str]
-            [clojure.walk :as walk]
-            [com.vendekagonlabs.unify.util.io :as util.io])
+            [clojure.walk :as walk])
   (:import (clojure.lang LazySeq)))
 
 (defn- massage-colls

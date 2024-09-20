@@ -107,8 +107,8 @@ dataset:
       id: "sample.id"
       subject: "Patient ID"
       unify/constants:
-        type: ":sample.type/normal"
-        specimen: ":sample.specimen/whole-blood"
+        type: "sample.type/normal"
+        specimen: "sample.specimen/whole-blood"
         timepoint: "baseline"
     - type: "sample/type"
       id: "barcode"
@@ -116,7 +116,7 @@ dataset:
       recurrence: "sample/recurring"
       timepoint: "timepoint"
       unify/constants:
-        specimen: ":sample.specimen/fresh-frozen"
+        specimen: "sample.specimen/fresh-frozen"
       subject: "subject.id"
       unify/na: ""
       metastasis: "sample/metastatic"
