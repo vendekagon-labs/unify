@@ -1,0 +1,122 @@
+unify/mappings:
+  enum/sample.specimen:
+    sample.specimen/whole-blood:
+      - blood-Frozen
+      - "sample.specimen/whole-blood"
+    sample.specimen/fresh-frozen:
+      - tumor-Frozen
+      - "sample.specimen/fresh-frozen"
+    sample.specimen/ffpe:
+      - tumor-FFPE
+  enum/sample.type:
+    sample.type/normal:
+      - "sample.type/normal"
+      - N
+    sample.type/tumor:
+      - sample.type/tumor
+      - ""
+      - T
+  enum/metastasis:
+    true:
+    - "Met"
+    - "T"
+    - "TRUE"
+    false: ["Primary", "N/A", "NA", "F", "FALSE", ""]
+  enum/tf:
+    true:
+      - T
+      - "TRUE"
+    false:
+      - F
+      - ""
+      - NA
+      - "N/A"
+      - "FALSE"
+  enum/subject.smoker:
+    subject.smoker/current:
+      - Current
+    subject.smoker/former:
+      - Former
+    subject.smoker/never:
+      - Never
+  enum/subject.sex:
+    subject.sex/female:
+      - F
+    subject.sex/male:
+      - M
+  enum/dcb:
+    true:
+      - DCB
+    false:
+      - NDB
+      - NR
+  enum/clinical.observation.recist:
+    clinical-observation.recist/SD:
+      - SD
+    clinical-observation.recist/PD:
+      - POD
+    clinical-observation.recist/PR:
+      - PR
+  enum/genomic-coordinate.assembly:
+    genomic-coordinate.assembly/GRCh38:
+      - GrCh38
+      - GRCh38
+      - "assembly/GRCh38"
+      - "genomic-coordinate.assembly/GRCh38"
+  enum/variant.type:
+    variant.type/snp: "SNP"
+    variant.type/consolidated: "Consolidated"
+    variant.type/dnp: "DNP"
+    variant.type/tnp: "TNP"
+    variant.type/onp: "ONP"
+    variant.type/del: "DEL"
+    variant.type/ins: "INS"
+  enum/variant.impact:
+    variant.impact/high: "HIGH"
+    variant.impact/low: "LOW"
+    variant.impact/moderate: "MODERATE"
+    variant.impact/modifier: "MODIFIER"
+  enum/variant.classification:
+    variant.classification/intron: "Intron"
+    variant.classification/UTR3: "3'UTR"
+    variant.classification/frame-shift-del: "Frame_Shift_Del"
+    variant.classification/silent: "Silent"
+    variant.classification/missense: "Missense_Mutation"
+    variant.classification/UTR5: "5'UTR"
+    variant.classification/nonsense: "Nonsense_Mutation"
+    variant.classification/splice-site: "Splice_Site"
+    variant.classification/RNA: "RNA"
+    variant.classification/frame-shift-ins: "Frame_Shift_Ins"
+    variant.classification/splice-region: "Splice_Region"
+    variant.classification/flank5: "5'Flank"
+    variant.classification/flank3: "3'Flank"
+    variant.classification/in-frame-ins: "In_Frame_Ins"
+    variant.classification/in-frame-del: "In_Frame_Del"
+    variant.classification/nonstop: "Nonstop_Mutation"
+    variant.classification/transl-start-site: "Translation_Start_Site"
+    variant.classification/IGR: "IGR"
+  enum/variant.feature:
+    variant.feature/motif:
+      - Motif
+      - MotifFeature
+      - ""
+    variant.feature/regulatory:
+      - Regulatory
+      - RegulatoryFeature
+    variant.feature/transcript:
+      - Transcript
+      - TranscriptFeature
+unify/variables:
+  sample/specimen: enum/sample.specimen
+  sample/type: enum/sample.type
+  sample/metastasis: enum/metastasis
+  sample/recurrence: enum/tf
+  subject/smoker: enum/subject.smoker
+  subject/sex: enum/subject.sex
+  clinical-observation/dcb: enum/dcb
+  clinical-observation/recist: enum/clinical.observation.recist
+  genomic-coordinate/assembly: enum/genomic-coordinate.assembly
+  variant/type: enum/variant.type
+  variant/classification: enum/variant.classification
+  variant/impact: enum/variant.impact
+  variant/feature-type: enum/variant.feature

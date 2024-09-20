@@ -5,10 +5,10 @@
 {:unify/mappings  {; The name of the mapping can be anything you want as long as it is a keyword - begins with a colon
                    ; You use it in the unify/variables section below, and that's it.
                    :enum/sample.specimen             {; In the mapping, the lefthand side in the CANDEL value, and the righthand side is the values in your file.
-                                                      :sample.specimen/whole-blood  ["blood-Frozen" :sample.specimen/whole-blood]
-                                                      :sample.specimen/fresh-frozen ["tumor-Frozen" :sample.specimen/fresh-frozen]
+                                                      :sample.specimen/whole-blood  ["blood-Frozen" "sample.specimen/whole-blood"]
+                                                      :sample.specimen/fresh-frozen ["tumor-Frozen" "sample.specimen/fresh-frozen"]
                                                       :sample.specimen/ffpe         ["tumor-FFPE"]}
-                   :enum/sample.type                 {:sample.type/normal ["sample.type/normal" "N" :sample.type/normal]
+                   :enum/sample.type                 {:sample.type/normal ["sample.type/normal" "N"]
                                                       :sample.type/tumor  ["sample.type/tumor" "" "T"]}
                    :enum/metastasis                  {true  ["Met" "T" "TRUE"]
                                                       false ["Primary" "N/A" "NA" "F" "FALSE" ""]}
@@ -26,8 +26,8 @@
                                                       :clinical-observation.recist/PR ["PR"]}
                    :enum/genomic-coordinate.assembly {:genomic-coordinate.assembly/GRCh38 ["GrCh38"
                                                                                            "GRCh38"
-                                                                                           ":assembly/GRCh38"
-                                                                                           ":genomic-coordinate.assembly/GRCh38"]}
+                                                                                           "assembly/GRCh38"
+                                                                                           "genomic-coordinate.assembly/GRCh38"]}
                    :enum/variant.type                {:variant.type/snp          "SNP"
                                                       :variant.type/consolidated "Consolidated"
                                                       :variant.type/dnp          "DNP"

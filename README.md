@@ -15,16 +15,17 @@ Unify is under heavy development and should be considered early alpha.
 
 Unify uses schema annotation in a Datomic database, called the "metamodel", to
 infer the details necessary for automating a batch import process. The combined
-schema and metamodel can defined in a Unify specified DSL, or it can be
-transacted more verbosely as raw, transactable Datomic edn.
+schema and metamodel can be defined in a Unify specified DSL, or it can be
+transacted more verbosely as raw Datomic edn.
 
 Once the schema annotations are in place, an import can be defined declaratively
-in a config.edn file that specifies how to map data from files into the schema.
-Datomic handles reference resolution by resolving IDs. These can be defined a
-number of ways: as unique globally, as only unique in the context of a tree
-of data relationships, or as composite IDs composed of other fields.
+in a config.edn file that specifies how to map data from external files into the schema.
+Datomic handles reference resolution by resolving unique identifying fields into values.
+In Unify, these can be defined a number of ways: as globally unique identifiers, as only
+unique in the context of a tree of data relationships, or as composite IDs composed of other fields
+that is only unique in composite form.
 
-End-to-end examples and tutorials are coming which will provide a more detailed
+End-to-end examples and tutorials are planned which will provide a more detailed
 walkthrough of how to use Unify. Example data is available in this repo in the
 `test/resources/systems/` subdirectory.
 
@@ -67,12 +68,12 @@ CANDEL schema, you can run the following commands with these values set:
 
 ```
 $DATABASE_NAME  # a string, the name of the database
-$SCHEMA_DIR  # a directory containing a unify Schema
+$SCHEMA_DIR  # a directory containing a unify schema
 $WORKING_DIR  # user defined output path, ./unify prepare will create this
 $IMPORT_CONFIG_PATH  # path to a config edn file describing an import
 ```
 
-For this example, which you can run with this repo, they are set to:
+Here is an example, which you can run with this repo:
 
 ```
 $DATABASE_NAME=unify-example
