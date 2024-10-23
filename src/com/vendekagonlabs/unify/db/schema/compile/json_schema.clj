@@ -43,7 +43,9 @@
     :required ["user"]}})
 
 (defn attributes->properties
-  "Given a set of attributes, returns"
+  "Given a set of attributes, returns JSON schema properties that allow for
+  both the correct scalar name and type of the attribute as well as Unify syntax
+  that can be used to specify it being set from a file."
   [attributes])
   ; an attribute can be set as a literal, or as a field, or as a unify directive of several types,
   ; some of which are only valid if the attribute is of type ref.
@@ -57,10 +59,35 @@
   for said kind name using schema inference."
   [schema kind])
 
-(defn ->kind-objects
+(defn ->kind-children-lookup
+  "Given the kind info as structured in the in-memory kind index, constructs a forward
+  link from parents to children."
+  [schema]
+  (let [kind-info (:index/kinds (first schema))]
+    (->> kind-info
+         (keep (fn [[kind attrs]]
+                 (when-let [parent-kind (:unify.kind/parent attrs)]
+                   {parent-kind [kind]})))
+         (apply merge-with concat))))
+
+(defn ->kind-tree
   "Given a Unify schema, recursively constructs a tree of kind properties via anonymous
   JSON Schema object type nesting."
-  [schema])
+  [schema]
+  (let [kind-info (-> schema first :index/kinds)
+        ref-kinds (->> kind-info
+                       (vals)
+                       (filter :unify.kind/ref-data)
+                       (mapv :unify.kind/name))
+        root-kinds (->> kind-info
+                        (vals)
+                        (remove :unify.kind/parent)
+                        (remove :unify.kind/ref-data)
+                        (mapv :unify.kind/name))
+        child-lookup (->kind-children-lookup schema)]
+    {:ref-kinds ref-kinds
+     :root-kinds root-kinds
+     :child-lookup child-lookup}))
   ; at root
 
 
@@ -68,7 +95,7 @@
   ([schema]
    (let [root-schema (->root-schema-definition schema)
          import-schema (import-properties)
-         kind-schemas (->kind-objects schema)]
+         kind-schemas (->kind-tree schema)]
      (merge root-schema
             {:required ["unify/import" "dataset"]
              :properties
@@ -84,8 +111,15 @@
   (def ex-schema (schema/get-metamodel-and-schema))
   (metamodel/all-kind-names ex-schema)
   (->root-schema-definition ex-schema)
-  (keys (first ex-schema))
-  (:index/kinds (first ex-schema))
+  (def kind-info (:index/kinds (first ex-schema)))
+  (keys kind-info)
+  (->kind-children-lookup ex-schema)
+  (mapv :unify.kind/parent (vals (:index/kinds (first ex-schema))))
+  (:unify.kind/parent (:sample (:index/kinds (first ex-schema))))
+  (-> ex-schema first :index/kinds seq)
+
+  (: (->kind-tree ex-schema))
+
   (:index/unify-schema-metadata (first ex-schema))
   (println
     (write-json-str
