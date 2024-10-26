@@ -5,6 +5,18 @@
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [com.vendekagonlabs.unify.db.schema :as schema]))
 
+(def db-type-lookup
+  {:db.type/bigdec "number"
+   :db.type/float "number"
+   :db.type/double "number"
+   :db.type/bigint "integer"
+   :db.type/long "integer"
+   :db.type/keyword "string"
+   :db.type/string "string"
+   :db.type/ref "string"
+   :db.type/symbol "string"
+   :db.type/uri "string"
+   :db.type/instant "string"})
 
 (defn ->root-schema-definition [schema]
   (let [{:keys [unify.schema/version
@@ -34,9 +46,11 @@
   "Given a set of attributes, returns JSON schema properties that allow for
   both the correct scalar name and type of the attribute as well as Unify syntax
   that can be used to specify it being set from a file."
-  [schema value-attrs])
-  ; an attribute can be set as a literal, or as a field, or as a unify directive of several types,
-  ; some of which are only valid if the attribute is of type ref.
+  [value-attrs]
+  (->> value-attrs
+       (mapv (fn [{:keys [:db/ident :db/valueType :db/doc]}]
+               {(name ident) {:type (get db-type-lookup valueType)
+                              :description doc}}))))
 
 (declare ->properties)
 
@@ -54,11 +68,21 @@
 
 (defn other-ref-properties
   "Returns the JSON Schema properties for ref attributes."
-  [schema ref-attrs])
+  [ref-attrs]
+  (->> ref-attrs
+       (mapv (fn [{:keys [:db/ident :db/doc]}]
+               {(name ident) {:type "string"
+                              :description doc}}))
+       (apply merge)))
 
 (defn enum-properties
   "Returns the JSON Schema properties for enum attributes"
-  [schema enum-attrs])
+  [enum-attrs]
+  (->> enum-attrs
+       (mapv (fn [{:keys [:db/ident :db/doc]}]
+               {(name ident) {:type "string"
+                              :description doc}}))
+       (apply merge)))
 
 (defn group-attributes
   "Groups attributes for a particular kind into different categories
@@ -100,9 +124,9 @@
         grouped-attrs (group-attributes schema children attributes)
         {:keys [::value ::enum ::child ::ref]} grouped-attrs
         child-properties (apply merge (map (partial nest-child schema attributes kind-children-lookup) child))
-        enum-properties (enum-properties schema enum)
-        non-child-ref-properties (other-ref-properties schema ref)
-        attr-properties (value-attr-properties schema value)]
+        enum-properties (enum-properties enum)
+        non-child-ref-properties (other-ref-properties ref)
+        attr-properties (value-attr-properties value)]
     (merge child-properties enum-properties attr-properties non-child-ref-properties)))
 
 (defn gather-attributes
