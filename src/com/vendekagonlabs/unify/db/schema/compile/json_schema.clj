@@ -176,7 +176,6 @@
   "Given a Unify schema and a kind name, produces a map of JSON schema properties
   for said kind name using schema inference."
   [schema kind]
-  (prn :->properties-kind kind)
   (let [attributes (gather-attributes schema kind)
         children (get-children schema kind)
         {:keys [::value ::enum ::child ::ref]} (group-attributes schema children attributes)
@@ -188,10 +187,6 @@
                                    (other-ref-properties ref))
         attr-properties (when value
                           (value-attr-properties value))
-        _ (prn :child-keys (keys child-properties)
-               :enum-keys (keys enum-properties)
-               :non-child-keys (keys non-child-ref-properties)
-               :attr-keys (keys attr-properties))
         all-properties (merge unify-special-forms
                               child-properties
                               enum-properties
@@ -215,8 +210,9 @@
                         (remove :unify.kind/parent)
                         (remove :unify.kind/ref-data)
                         (map :unify.kind/name))]
-    (apply merge (map (partial ->properties schema) ref-kinds)
-                 (map (partial ->properties schema) root-kinds))))
+    ;; concat atypical for apply, but ambiguity w/merge and seq-able maps
+    (apply merge (concat (map (partial ->properties schema) ref-kinds)
+                         (map (partial ->properties schema) root-kinds)))))
 
 
 (defn generate
@@ -233,12 +229,6 @@
      (generate schema))))
 
 (comment
-  (generate)
-  (def ex-schema (schema/get-metamodel-and-schema))
-  (def attrs (gather-attributes ex-schema :dataset))
-  (def children (get-children ex-schema :dataset))
-  ()
-  (spit (write-json-str ()))
-  (println (write-json-str (->kind-tree ex-schema)))
-  (get-children ex-schema :dataset))
-
+  (let [as-generated (generate)
+        to-json (write-json-str as-generated)]
+    (spit "first-generated-schema.json" to-json)))
