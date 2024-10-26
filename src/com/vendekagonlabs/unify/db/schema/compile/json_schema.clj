@@ -103,7 +103,6 @@
   schema, e.g. nested child refs, strings or ref resolving forms
   for other reference types, enums, data literals, etc."
   [schema child-kinds attributes]
-  (prn "AM I EVEN FUCKING IN THIS FUNCTION ANYWHERE???")
   (let [child-kinds-set (set child-kinds)]
     (->> (vals attributes)
          (keep (fn [attr-map]
@@ -169,9 +168,11 @@
   "Given a Unify schema and a kind name, produces a map of JSON schema properties
   for said kind name using schema inference."
   [schema kind]
-  (for [attributes (gather-attributes schema kind)
+  (let [attributes (gather-attributes schema kind)
         children (get-children schema kind)
-        _ (prn ::children children)
+        _ (prn ::children children
+               ::attrs (keys attributes)
+               ::kind kind)
         {:keys [::value ::enum ::child ::ref]} (group-attributes schema children attributes)
         child-properties (when child
                            (apply merge (map (partial nest-child schema) child)))
