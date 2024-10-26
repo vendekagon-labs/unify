@@ -52,7 +52,8 @@
                                      (if (= base-type "string")
                                        {:type "string"}
                                        {:oneOf [{:type "string"}
-                                                {:type base-type}]}))})))))
+                                                {:type base-type}]}))})))
+       (apply merge)))
 
 (defn gather-attributes
   "Given a Unify schema and a kind name as keyword, returns the attributes in the
@@ -72,11 +73,17 @@
   "Returns a nested JSON Schema object as an attribute on its parent
   and recursively resolves properties for the child and all
   its children."
-  [schema child-kind]
-  {(name child-kind) {:type "object"
+  [schema {:keys [db/ident db/cardinality child-kind] :as _child-attr}]
+  (let [cardinality' (-> cardinality :db/ident)
+        property-name (name ident)]
+    (if (= :db.cardinality/one cardinality')
+      {property-name {:type "object"
                       :properties (->properties
                                     schema
-                                    child-kind)}})
+                                    child-kind)}}
+      {property-name {:type "array"
+                      :items {:type "object"
+                              :properties (->properties schema child-kind)}}})))
 
 (defn other-ref-properties
   "Returns the JSON Schema properties for ref attributes."
@@ -97,8 +104,8 @@
        (apply merge)))
 
 (defn group-attributes
-  "Groups attributes for a particular kind into different categories
-  that will drive different generative patterns for different JSON
+  "Groups and annotates attribute maps for a particular kind into different
+  categories that will drive different generative patterns for different JSON
   schema property types and allow the use of different Unify
   schema, e.g. nested child refs, strings or ref resolving forms
   for other reference types, enums, data literals, etc."
@@ -108,23 +115,24 @@
          (keep (fn [attr-map]
                  ;; if not a reference, it's a flat value type attribute
                  (if-not (= :db.type/ref (-> attr-map :db/valueType :db/ident))
-                   [::value attr-map]
+                   (assoc attr-map ::attr-type ::value)
                    ;; if it is a reference, we have three cases to disambiguate
                    (let [ref-targets (metamodel/kind-ref? schema (:db/ident attr-map))]
                      (cond
                        ;; if we don't point to another kind, it's an enum
                        (not ref-targets)
-                       [::enum attr-map]
+                       (assoc attr-map ::attr-type ::enum)
                        ;; if we point to another kind and it's in the set of children
                        ;; for this kind, it's a child ref (nested object in schema)
                        (and ref-targets
                             (child-kinds-set (:unify.ref/to ref-targets)))
-                       [::child attr-map]
+                       (assoc attr-map ::attr-type ::child
+                                       :child-kind (:unify.ref/to ref-targets))
                        ;; if we don't point to a child, it's a sibling or undifferentiated ref
                        ;; to another kind somewhere else in the hierarchy
                        :else
-                       [::ref attr-map])))))
-         (group-by first))))
+                       (assoc attr-map ::attr-type ::ref))))))
+         (group-by ::attr-type))))
 
 (def unify-special-forms
   {"unify/variable" {:type "string"}
@@ -168,11 +176,9 @@
   "Given a Unify schema and a kind name, produces a map of JSON schema properties
   for said kind name using schema inference."
   [schema kind]
+  (prn :->properties-kind kind)
   (let [attributes (gather-attributes schema kind)
         children (get-children schema kind)
-        _ (prn ::children children
-               ::attrs (keys attributes)
-               ::kind kind)
         {:keys [::value ::enum ::child ::ref]} (group-attributes schema children attributes)
         child-properties (when child
                            (apply merge (map (partial nest-child schema) child)))
@@ -182,11 +188,15 @@
                                    (other-ref-properties ref))
         attr-properties (when value
                           (value-attr-properties value))
-        all-properties (merge child-properties
+        _ (prn :child-keys (keys child-properties)
+               :enum-keys (keys enum-properties)
+               :non-child-keys (keys non-child-ref-properties)
+               :attr-keys (keys attr-properties))
+        all-properties (merge unify-special-forms
+                              child-properties
                               enum-properties
                               attr-properties
-                              non-child-ref-properties
-                              unify-special-forms)]
+                              non-child-ref-properties)]
     {kind {:type "object"
            :properties all-properties}}))
 
@@ -225,10 +235,10 @@
 (comment
   (generate)
   (def ex-schema (schema/get-metamodel-and-schema))
-  (gather-attributes ex-schema :dataset)
-  (gather-attributes ex-schema :study-day)
-  (gather-attributes ex-schema :tcr)
-  (->kind-children-lookup ex-schema)
-  (->kind-tree ex-schema)
+  (def attrs (gather-attributes ex-schema :dataset))
+  (def children (get-children ex-schema :dataset))
+  ()
+  (spit (write-json-str ()))
+  (println (write-json-str (->kind-tree ex-schema)))
   (get-children ex-schema :dataset))
 
