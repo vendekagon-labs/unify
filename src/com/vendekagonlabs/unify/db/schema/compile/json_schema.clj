@@ -49,8 +49,12 @@
   [value-attrs]
   (->> value-attrs
        (mapv (fn [{:keys [:db/ident :db/valueType :db/doc]}]
-               {(name ident) {:type (get db-type-lookup valueType)
-                              :description doc}}))))
+               (let [base-type (get db-type-lookup valueType)]
+                 {(name ident) (merge {:description doc}
+                                      (if (= base-type "string")
+                                        {:type "string"}
+                                        {:oneOf [{:type "string"}
+                                                 {:type base-type}]}))})))))
 
 (declare ->properties)
 
