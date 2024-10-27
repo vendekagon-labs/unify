@@ -115,17 +115,30 @@
   "Returns a nested JSON Schema object as an attribute on its parent
   and recursively resolves properties for the child and all
   its children."
-  [schema {:keys [db/ident db/cardinality child-kind] :as _child-attr}]
+  [schema {:keys [db/ident db/cardinality child-kind db/doc] :as _child-attr}]
   (let [cardinality' (-> cardinality :db/ident)
         property-name (name ident)]
     (if (= :db.cardinality/one cardinality')
+      ;; NOTE: the (-> properties vals first :properties) pattern is sufficient
+      ;; to kill the double nesting bug for now, but probably in the long run
+      ;; this should be refactored so that (->properties ...) only returns
+      ;; properties and it's up to the calling function to supply type,
+      ;; description, etc. info
       {property-name {:type "object"
-                      :properties (->properties
-                                    schema
-                                    child-kind)}}
+                      :description doc
+                      :properties (-> (->properties
+                                        schema
+                                        child-kind)
+                                      (vals)
+                                      (first)
+                                      (:properties))}}
       {property-name {:type "array"
+                      :description doc
                       :items {:type "object"
-                              :properties (->properties schema child-kind)}}})))
+                              :properties (-> (->properties schema child-kind)
+                                              (vals)
+                                              (first)
+                                              (:properties))}}})))
 
 (defn other-ref-properties
   "Returns the JSON Schema properties for ref attributes."
@@ -293,5 +306,7 @@
      (generate schema))))
 
 (comment
+  ;; TODO: fix double nesting issue somehow, I am seeing
+  ;; assays : items of type object with property assay (but should be assay properties instead) : }
   (let [json-schema (generate)]
     (spit "first-generated-schema.json" json-schema)))
