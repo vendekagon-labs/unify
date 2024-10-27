@@ -227,9 +227,6 @@
                               enum-properties
                               attr-properties
                               non-child-ref-properties)]
-    ;; TODO:
-    ;; for reference types, this can also be an array of objects with item type
-    ;; all-properties, need to figure out how to set this optimally
     {kind {:type "object"
            :properties all-properties}}))
 
@@ -247,26 +244,41 @@
                         (vals)
                         (remove :unify.kind/parent)
                         (remove :unify.kind/ref-data)
-                        (map :unify.kind/name))]
+                        (map :unify.kind/name))
+        ref-kind-properties (->> ref-kinds
+                                 (map (partial ->properties schema))
+                                 ;; for reference types, we can provide a list of
+                                 ;; data literals or multiple files without needing a
+                                 ;; new group (e.g. like an assay or measurement set in
+                                 ;; the candel schema), so we have to accommodate either
+                                 ;; object or list-of objects.
+                                 ;;
+                                 ;; note: we merge into one map first because nth based destructuring
+                                 ;; works on a seq'd map, but not a seq of maps
+                                 (apply merge)
+                                 (map (fn [[kind type-schema]]
+                                        {kind {:oneOf [type-schema
+                                                       {:type "array"
+                                                        :items type-schema}]}})))]
     ;; concat atypical for apply, but ambiguity w/merge and seq-able maps
-    (apply merge (concat (map (partial ->properties schema) ref-kinds)
+    ;; requires we flatten this stuff out into one coll
+    (apply merge (concat ref-kind-properties
                          (map (partial ->properties schema) root-kinds)))))
 
-
 (defn generate
+  "Generates a JSON schema"
   ([schema]
    (let [root-schema (->root-schema-definition schema)
-         kind-schemas (->kind-tree schema)]
-     (merge root-schema
-            {:required ["unify/import" "dataset"]
-             :properties
-             (merge import-properties kind-schemas)})))
-
+         kind-schemas (->kind-tree schema)
+         edn-schema (merge root-schema
+                           {:required ["unify/import" "dataset"]
+                            :properties
+                            (merge import-properties kind-schemas)})]
+     (write-json-str edn-schema)))
   ([]
    (let [schema (schema/get-metamodel-and-schema)]
      (generate schema))))
 
 (comment
-  (let [as-generated (generate)
-        to-json (write-json-str as-generated)]
-    (spit "first-generated-schema.json" to-json)))
+  (let [json-schema (generate)]
+    (spit "first-generated-schema.json" json-schema)))
