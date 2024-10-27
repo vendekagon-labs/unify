@@ -55,7 +55,9 @@
   [value-attrs]
   (->> value-attrs
        (map (fn [{:keys [db/ident db/valueType db/doc db/cardinality]}]
-              (let [base-type (get db-type-lookup valueType "string")]
+              (let [base-type (get db-type-lookup valueType "string")
+                    valueType (:db/ident valueType)
+                    cardinality (:db/ident cardinality)]
                 {(name ident) (merge {:description doc}
                                      (cond
                                        ;; if it's a cardinality one string, then
@@ -79,10 +81,20 @@
                                                 {:type base-type}]}
                                        ;; final case is base type literal, string col name,
                                        ;; and unify many (for card many, non-string base type)
-                                       :else
+                                       (and (not= base-type "string")
+                                            (= cardinality :db.cardinality/many))
                                        {:oneOf [{:type "string"}
                                                 {:type base-type}
-                                                unify-many-object]}))})))
+                                                unify-many-object]}
+                                       :else
+                                       (throw
+                                         (ex-info
+                                           (str "Unable to resolve JSON schema type for attribute: " ident)
+                                           {:json-schema-generation/attribute {:ident ident
+                                                                               :valueType valueType
+                                                                               :json-base-type base-type
+                                                                               :doc doc
+                                                                               :cardinality cardinality}}))))})))
        (apply merge)))
 
 (defn gather-attributes
