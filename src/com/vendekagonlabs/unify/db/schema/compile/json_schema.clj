@@ -22,7 +22,7 @@
   (let [schema-metadata (-> schema first :index/unify-schema-metadata)
         schema-version (:unify.schema/version schema-metadata)
         schema-name (:unify.schema/name schema-metadata)
-        schema-info-str (str schema-name "-" schema-version "-import-config")]
+        schema-info-str (str (namespace schema-name) "-" (name schema-name) "-" schema-version "-import-config")]
     {:$schema "https://json-schema.org/draft/2020-12/schema"
      :$id (format "https://www.unifybio.org/%s/%s/%s/schemas/import-config"
                   (namespace schema-name) (name schema-name) schema-version)
