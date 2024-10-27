@@ -21,6 +21,7 @@
             [com.vendekagonlabs.unify.db.schema.compile.metaschema :as compile.metaschema]
             [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
             [com.vendekagonlabs.unify.import.engine :as engine]
+            [com.vendekagonlabs.unify.import.engine.parse.config.yaml :as parse.yaml]
             [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.import.retract :as retract]
@@ -38,6 +39,16 @@
         db-info (db/fetch-info database)]
     (post-import/run-all-validations db-info dataset-name)))
 
+(defn- read-config-file
+  [file-path]
+  (let [extension (util.io/file-extension file-path)]
+    (case extension
+      ".yaml" (parse.yaml/read-config-file file-path)
+      ".yml" (parse.yaml/read-config-file file-path)
+      ".edn" (util.io/read-edn-file file-path)
+      (throw (ex-info (str "Config file " file-path " is not edn (.edn) or yaml (.yaml, .yml).")
+                      {:cli/invalid-config-file {:unify/config-file ::invalid-file-type}})))))
+
 
 (defn prepare-import
   "Create the txn data files from an import-config-file, datomic-config, and target-dir."
@@ -48,7 +59,7 @@
            resume
            continue-on-error]}]
   (schema.cache/encache schema-directory)
-  (let [import-config (util.io/read-edn-file import-cfg-file)
+  (let [import-config (read-config-file import-cfg-file)
         config-root-dir (str (folder-of import-cfg-file) "/")
         schema (db.schema/get-metamodel-and-schema)
         import-result (engine/create-entity-data schema

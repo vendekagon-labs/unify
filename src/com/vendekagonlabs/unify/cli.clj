@@ -82,7 +82,7 @@
        (str/join \newline)))
 
 (def cli-options
-  [[nil "--import-config     IMPORT-CONFIG" "Import config edn file"]
+  [[nil "--import-config     IMPORT-CONFIG" "Import config edn or yaml file"]
    [nil "--working-directory WORKING-DIRECTORY"
     "Directory where prepared data goes, transact uses the data prepare puts here."]
    [nil "--schema-directory  SCHEMA-DIRECTORY"

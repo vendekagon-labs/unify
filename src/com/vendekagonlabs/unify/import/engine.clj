@@ -14,7 +14,6 @@
 
 (ns com.vendekagonlabs.unify.import.engine
   (:require [charred.api :as csv]
-            [clojure.edn :as edn]
             [clojure.java.io :as jio]
             [clojure.set :as set]
             [clojure.core.async :as a]
@@ -23,11 +22,13 @@
             [clojure.tools.logging :as log]
             [cognitect.anomalies :as anom]
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]
+            [com.vendekagonlabs.unify.import.engine.parse.config.yaml :as parse.yaml]
             [com.vendekagonlabs.unify.matrix :as matrix]
             [com.vendekagonlabs.unify.import.engine.parse.config :as parse.config]
             [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]
             [com.vendekagonlabs.unify.import.engine.parse.matrix :as parse.matrix]
             [com.vendekagonlabs.unify.import.engine.parse.data :as parse.data]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.util.io :as io]
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
@@ -308,6 +309,15 @@
     ;; TODO: fix up job results to match result reporting from other file processing fns
     job-results))
 
+(defn read-mapping-file
+  [file-path]
+  (let [extension (util.io/file-extension file-path)]
+    (case extension
+      ".yaml" (parse.yaml/read-mappings-file file-path)
+      ".yml" (parse.yaml/read-mappings-file file-path)
+      ".edn" (util.io/read-edn-file file-path)
+      (throw (ex-info (str "Mappings file " file-path " is not edn (.edn) or yaml (.yaml, .yml).")
+                      {:config/invalid-config {:unify/import-config-mappings ::invalid-file-type}})))))
 
 (defn create-entity-data
   "Given a schema and a config map, generate entity map files and write to target-dir."
@@ -320,8 +330,8 @@
                               {:config/invalid-mapping {:unify/import-config-mappings ::no-mappings-entry}})))
           mapping-file-path (str (when (text/filename-relative? raw-mapping-file-path) cfg-root-dir)
                                  raw-mapping-file-path)
-
-          mapping-lookup (parse.mapping/mappings-edn->lookup (edn/read-string (slurp mapping-file-path)))
+          mapping-edn (read-mapping-file mapping-file-path)
+          mapping-lookup (parse.mapping/mappings-edn->lookup mapping-edn)
           parsed-cfg (parse.config/parse-config-map schema cfg-map)
           import-entity (parse.config/cfg-map->import-entity cfg-map)
           dataset-entity (parse.config/cfg-map->dataset-entity schema mapping-lookup parsed-cfg import-entity)

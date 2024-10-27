@@ -3,6 +3,7 @@
 {; The top-level :unify/import section gives information about your data import
  ; Generally all keys that begin with :unify/ are specific commands for telling unify what to do with your data or config
  :unify/import       {:user     "your-user-name"
+                      :name     "template-import"
                       :mappings "mappings.edn"}
 
  ; The top-level :dataset section contains all the data included in your dataset (excluding reference data such as variants)
@@ -204,8 +205,8 @@
                                                   {:unify/input-tsv-file "processed/ldh_meas_and_samples.txt"
                                                    :id               "sample.id"
                                                    :subject          "Patient ID"
-                                                   :unify/constants  {:type      :sample.type/normal
-                                                                      :specimen  :sample.specimen/whole-blood
+                                                   :unify/constants  {:type      "sample.type/normal"
+                                                                      :specimen  "sample.specimen/whole-blood"
                                                                       :timepoint "baseline"}}
 
 
@@ -218,7 +219,7 @@
                                                    :metastasis       "sample/metastatic"
                                                    :recurrence       "sample/recurring"
                                                    :timepoint        "timepoint"
-                                                   :unify/constants  {:specimen :sample.specimen/fresh-frozen}}]
+                                                   :unify/constants  {:specimen "sample.specimen/fresh-frozen"}}]
 
 
                       ; The subjects map contains information about each subject. Each patient in the dataset should be represented as one subject entity.

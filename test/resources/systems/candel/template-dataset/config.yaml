@@ -1,0 +1,224 @@
+unify/import:
+  name: "template-import"
+  user: "your-user-name"
+  mappings: "mappings.yaml"
+dataset:
+  description: "Description of your dataset, ie title of paper, title of clinical trial, or description of conglomerate dataset"
+  name: "template-dataset-10"
+  doi: "10.1126/science.aaa1348"
+  url: "http://science.sciencemag.org/content/suppl/2015/03/11/science.aaa1348.DC1"
+  assays:
+    - name: "WES"
+      technology: :assay.technology/WES
+      description: "whole exome sequencing"
+      measurement-sets:
+        - name: "variant-set-1"
+          measurements:
+            - unify/input-tsv-file: "processed/variant_measurements.txt"
+              sample: "sample.id"
+              variant: "var.id"
+              unify/variable: "variable"
+              unify/value: "value"
+              unify/variables:
+                t.depth: measurement/t-depth
+                n.depth: measurement/n-depth
+                vaf: measurement/vaf
+    - name: "LDH"
+      technology: :assay.technology/ELISA
+      description: "LDH measurement at baseline"
+      measurement-sets:
+        - name: "clinical LDH measurements"
+          measurements:
+            unify/input-tsv-file: "processed/ldh_meas_and_samples.txt"
+            unify/na: "NA"
+            unify/omit-if-na:
+              - ":measurement/ng-mL"
+            sample: "sample.id"
+            measurement/ng-mL: "LDH @ Baseline"
+            unify/constants:
+              measurement/epitope: "LDHA"
+    - name: "nanostring"
+      technology: :assay.technology/nanostring
+      description: "gene expr via nanostring"
+      measurement-sets:
+        - name: "baseline"
+          measurements:
+            - unify/input-tsv-file: "processed/nanostring.txt"
+              gene-product: "variable"
+              sample: "sample"
+              nanostring-count: "value"
+    - name: "TCRseq"
+      technology: :assay.technology/TCR-seq
+      description: "TCR sequencing"
+      measurement-sets:
+        - name: "Baseline TCR clonality measurements"
+          measurements:
+            - unify/input-tsv-file: "processed/tcr_clonality.txt"
+              sample: "sample"
+              tcr-clonality: "Clonality"
+  clinical-observation-sets:
+    - name: "recist-and-dcb-all-timepoints"
+      clinical-observations:
+        - unify/input-tsv-file: "processed/rizvi-clinical_observations.txt"
+          subject: "subject.id"
+          timepoint: "timepoint"
+          unify/variable: "variable"
+          unify/value: "value"
+          unify/variables:
+            recist: clinical-observation/recist
+            dcb: clinical-observation/dcb
+  subjects:
+    - HLA-A-type:
+        unify/many-variable: "hlaA"
+        unify/many-delimiter: ","
+      therapies:
+        unify/input-csv-file: "processed/rizvi-therapies.txt"
+        treatment-regimen: "regimen"
+        line: "line"
+        unify/constants:
+          order: 1
+        unify/reverse:
+          unify/rev-variable: "subject.id"
+          unify/rev-attr: ":subject/therapies"
+      age: "age"
+      sex: "gender"
+      HLA-C-type:
+        unify/many-variable: "hlaC"
+        unify/many-delimiter: ","
+      smoker: "smoker"
+      HLA-B-type:
+        unify/many-variable: "hlaB"
+        unify/many-delimiter: ","
+      id: "subject.id"
+      unify/input-tsv-file: "processed/rizvi-subjects.txt"
+    - unify/input-tsv-file: "processed/tcga-subjects.tsv"
+      unify/na: ""
+      id: "subject.id"
+  samples:
+    - unify/input-tsv-file: "processed/rizvi-samples.txt"
+      id: "sample.id"
+      subject: "subject.id"
+      timepoint: "timepoint"
+      specimen: "specimen"
+      type: "type"
+      metastasis: "primary"
+      gdc-anatomic-site: "site"
+    - unify/input-tsv-file: "processed/ldh_meas_and_samples.txt"
+      id: "sample.id"
+      subject: "Patient ID"
+      unify/constants:
+        type: "sample.type/normal"
+        specimen: "sample.specimen/whole-blood"
+        timepoint: "baseline"
+    - type: "sample/type"
+      id: "barcode"
+      unify/input-tsv-file: "processed/tcga-samples.tsv"
+      recurrence: "sample/recurring"
+      timepoint: "timepoint"
+      unify/constants:
+        specimen: "sample.specimen/fresh-frozen"
+      subject: "subject.id"
+      unify/na: ""
+      metastasis: "sample/metastatic"
+  timepoints:
+    - type: ":timepoint.type/baseline"
+      treatment-regimen: "Pembrolizumab-3wk"
+      relative-order: 1
+      id: "Pembrolizumab-3wk/baseline"
+    - type: ":timepoint.type/eos"
+      treatment-regimen: "Pembrolizumab-3wk"
+      relative-order: 2
+      id: "Pembrolizumab-3wk/eos"
+    - type: ":timepoint.type/baseline"
+      treatment-regimen: "Pembrolizumab-2wk"
+      relative-order: 1
+      id: "Pembrolizumab-2wk/baseline"
+    - type: ":timepoint.type/eos"
+      treatment-regimen: "Pembrolizumab-2wk"
+      relative-order: 2
+      id: "Pembrolizumab-2wk/eos"
+    - type: ":timepoint.type/baseline"
+      id: "baseline"
+  treatment-regimens:
+    - name: "Pembrolizumab-3wk"
+      clinical-trial:
+        nct-number: "NCT01295827"
+      drug-regimens:
+        drug: "PEMBROLIZUMAB"
+        cycle-length: 21
+    - name: "Pembrolizumab-2wk"
+      clinical-trial:
+        nct-number: "NCT01295827"
+      drug-regimens:
+        drug: "PEMBROLIZUMAB"
+        cycle-length: 14
+genomic-coordinate:
+  - unify/input-tsv-file: "processed/genomic_coords.txt"
+    contig: "chrom"
+    start: "start"
+    end: "end"
+    strand: "strand"
+    assembly: "assembly"
+    id: "gc.id"
+  - unify/input-tsv-file:
+      unify.glob/directory: "processed/"
+      unify.glob/pattern: "gc_ref_*.tsv"
+    unify/na: ""
+    contig: "Chromosome"
+    start: "Start_Position"
+    end: "End_Position"
+    strand: "Strand"
+    assembly: "NCBI_Build"
+    id: "gc.id"
+variant:
+  - unify/input-tsv-file: "processed/variants.txt"
+    id: "var.id"
+    genomic-coordinates: "gc.id"
+    gene: "hugo"
+    ref-allele: "ref"
+    alt-allele: "alt"
+  - unify/input-tsv-file:
+      unify.glob/directory: "processed/"
+      unify.glob/pattern: "variant_ref_*fixed.tsv"
+    unify/na: ""
+    id: "var.id"
+    genomic-coordinates: "gc.id"
+    unify/variable: "variable"
+    unify/value: "value"
+    unify/variables:
+      Feature_type: variant/feature-type
+      ExAC_AF_NFE: variant/exac-nfe
+      HGVSc: variant/HGVSc
+      ExAC_AF_SAS: variant/exac-sas
+      PUBMED: variant/publication
+      ExAC_AF_FIN: variant/exac-fin
+      IMPACT: variant/impact
+      Hugo_Symbol: variant/gene
+      HGVSp_Short: variant/HGVSp
+      ExAC_AF_AFR: variant/exac-afr
+      Variant_Type: variant/type
+      ExAC_AF_EAS: variant/exac-eas
+      ExAC_AF: variant/exac-af
+      Variant_Classification: variant/classification
+      COSMIC: variant/cosmic
+      dbSNP_RS: variant/dbSNP
+      ExAC_AF_OTH: variant/exac-oth
+      CONTEXT: variant/context
+      ExAC_AF_AMR: variant/exac-amr
+      Tumor_Seq_Allele2: variant/alt-allele
+      ExAC_AF_Adj: variant/exac-af-adj
+      Reference_Allele: variant/ref-allele
+cnv:
+  unify/input-tsv-file:
+    unify.glob/directory: "processed/"
+    unify.glob/pattern: "cnv_ref_fixed_again*.tsv"
+  unify/na: ""
+  genomic-coordinates: "gc.id"
+  id: "gc.id"
+  genes:
+    unify/many-delimiter: ";"
+    unify/many-variable: "Genes"
+clinical-trial:
+  nct-number: "NCT01295827"
+  other-ids: "KEYNOTE-001"
+  name-long: "Study of Pembrolizumab (MK-3475) in Participants With Progressive Locally Advanced or Metastatic Carcinoma, Melanoma, or Non-small Cell Lung Carcinoma"
