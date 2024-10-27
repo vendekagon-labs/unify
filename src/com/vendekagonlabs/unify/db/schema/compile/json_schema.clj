@@ -251,6 +251,7 @@
         ref-kinds (->> kind-info
                        (vals)
                        (filter :unify.kind/ref-data)
+                       (filter :unify.kind/allow-create-on-import)
                        (map :unify.kind/name))
         root-kinds (->> kind-info
                         (vals)
