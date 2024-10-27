@@ -1,7 +1,8 @@
+# $schema: ./import-config-schema.json
 unify/import:
   name: "template-import"
-  user: "your-user-name"
-  mappings: "mappings.edn"
+  user: "your-user-name@your-organization.org"
+  mappings: "mappings.yaml"
 dataset:
   description: "Description of your dataset, ie title of paper, title of clinical trial, or description of conglomerate dataset"
   name: "template-dataset-10"
@@ -29,14 +30,14 @@ dataset:
       measurement-sets:
         - name: "clinical LDH measurements"
           measurements:
-            unify/input-tsv-file: "processed/ldh_meas_and_samples.txt"
-            unify/na: "NA"
-            unify/omit-if-na:
-              - ":measurement/ng-mL"
-            sample: "sample.id"
-            measurement/ng-mL: "LDH @ Baseline"
-            unify/constants:
-              measurement/epitope: "LDHA"
+            - unify/input-tsv-file: "processed/ldh_meas_and_samples.txt"
+              unify/na: "NA"
+              unify/omit-if-na:
+                - ":measurement/ng-mL"
+              sample: "sample.id"
+              measurement/ng-mL: "LDH @ Baseline"
+              unify/constants:
+                measurement/epitope: "LDHA"
     - name: "nanostring"
       technology: :assay.technology/nanostring
       description: "gene expr via nanostring"
@@ -72,14 +73,14 @@ dataset:
         unify/many-variable: "hlaA"
         unify/many-delimiter: ","
       therapies:
-        unify/input-csv-file: "processed/rizvi-therapies.txt"
-        treatment-regimen: "regimen"
-        line: "line"
-        unify/constants:
-          order: 1
-        unify/reverse:
-          unify/rev-variable: "subject.id"
-          unify/rev-attr: ":subject/therapies"
+        - unify/input-csv-file: "processed/rizvi-therapies.txt"
+          treatment-regimen: "regimen"
+          line: "line"
+          unify/constants:
+            order: 1
+          unify/reverse:
+            unify/rev-variable: "subject.id"
+            unify/rev-attr: ":subject/therapies"
       age: "age"
       sex: "gender"
       HLA-C-type:
@@ -144,14 +145,14 @@ dataset:
       clinical-trial:
         nct-number: "NCT01295827"
       drug-regimens:
-        drug: "PEMBROLIZUMAB"
-        cycle-length: 21
+        - drug: "PEMBROLIZUMAB"
+          cycle-length: 21
     - name: "Pembrolizumab-2wk"
       clinical-trial:
         nct-number: "NCT01295827"
       drug-regimens:
-        drug: "PEMBROLIZUMAB"
-        cycle-length: 14
+        - drug: "PEMBROLIZUMAB"
+          cycle-length: 14
 genomic-coordinate:
   - unify/input-tsv-file: "processed/genomic_coords.txt"
     contig: "chrom"
