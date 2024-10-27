@@ -55,8 +55,8 @@
   [value-attrs]
   (->> value-attrs
        (map (fn [{:keys [db/ident db/valueType db/doc db/cardinality]}]
-              (let [base-type (get db-type-lookup valueType "string")
-                    valueType (:db/ident valueType)
+              (let [valueType (:db/ident valueType)
+                    base-type (get db-type-lookup valueType "string")
                     cardinality (:db/ident cardinality)]
                 {(name ident) (merge {:description doc}
                                      (cond
