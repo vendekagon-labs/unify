@@ -1,6 +1,0 @@
-#!/bin/bash
-set -e
-REVISION=`git --no-replace-objects describe --tags --match v1.3.1`
-REVISION=${REVISION:7} # drop the first 5 characters
-REVISION=${REVISION:0:${#REVISION}-9} # drop the last 9 characters
-echo $REVISION
