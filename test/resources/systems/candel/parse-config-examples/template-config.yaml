@@ -1,6 +1,7 @@
+# $schema: ./import-config-schema.json
 unify/import:
   name: "template-import"
-  user: "your-user-name"
+  user: "your-user-name@your-organization.org"
   mappings: "mappings.edn"
 dataset:
   description: "Description of your dataset, ie title of paper, title of clinical trial, or description of conglomerate dataset"
@@ -29,14 +30,14 @@ dataset:
       measurement-sets:
         - name: "clinical LDH measurements"
           measurements:
-            unify/input-tsv-file: "processed/ldh_meas_and_samples.txt"
-            unify/na: "NA"
-            unify/omit-if-na:
-              - ":measurement/ng-mL"
-            sample: "sample.id"
-            measurement/ng-mL: "LDH @ Baseline"
-            unify/constants:
-              measurement/epitope: "LDHA"
+            - unify/input-tsv-file: "processed/ldh_meas_and_samples.txt"
+              unify/na: "NA"
+              unify/omit-if-na:
+                - ":measurement/ng-mL"
+              sample: "sample.id"
+              measurement/ng-mL: "LDH @ Baseline"
+              unify/constants:
+                measurement/epitope: "LDHA"
     - name: "nanostring"
       technology: :assay.technology/nanostring
       description: "gene expr via nanostring"
@@ -71,6 +72,10 @@ dataset:
     - HLA-A-type:
         unify/many-variable: "hlaA"
         unify/many-delimiter: ","
+      # TODO: Unify should treat an object or an array here equivalently, so we should probably
+      # modify JSON spec at some point. But on the flip side, there appears to be a bug in
+      # config parsing when this is an array with one object instead of an isolated object, so
+      # we should wait to address that. Removed out of PR #53 and into a new issue.
       therapies:
         unify/input-csv-file: "processed/rizvi-therapies.txt"
         treatment-regimen: "regimen"
@@ -144,14 +149,14 @@ dataset:
       clinical-trial:
         nct-number: "NCT01295827"
       drug-regimens:
-        drug: "PEMBROLIZUMAB"
-        cycle-length: 21
+        - drug: "PEMBROLIZUMAB"
+          cycle-length: 21
     - name: "Pembrolizumab-2wk"
       clinical-trial:
         nct-number: "NCT01295827"
       drug-regimens:
-        drug: "PEMBROLIZUMAB"
-        cycle-length: 14
+        - drug: "PEMBROLIZUMAB"
+          cycle-length: 14
 genomic-coordinate:
   - unify/input-tsv-file: "processed/genomic_coords.txt"
     contig: "chrom"
