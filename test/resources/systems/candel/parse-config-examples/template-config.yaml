@@ -72,15 +72,19 @@ dataset:
     - HLA-A-type:
         unify/many-variable: "hlaA"
         unify/many-delimiter: ","
+      # TODO: Unify should treat an object or an array here equivalently, so we should probably
+      # modify JSON spec at some point. But on the flip side, there appears to be a bug in
+      # config parsing when this is an array with one object instead of an isolated object, so
+      # we should wait to address that. Removed out of PR #53 and into a new issue.
       therapies:
-        - unify/input-csv-file: "processed/rizvi-therapies.txt"
-          treatment-regimen: "regimen"
-          line: "line"
-          unify/constants:
-            order: 1
-          unify/reverse:
-            unify/rev-variable: "subject.id"
-            unify/rev-attr: ":subject/therapies"
+        unify/input-csv-file: "processed/rizvi-therapies.txt"
+        treatment-regimen: "regimen"
+        line: "line"
+        unify/constants:
+          order: 1
+        unify/reverse:
+          unify/rev-variable: "subject.id"
+          unify/rev-attr: ":subject/therapies"
       age: "age"
       sex: "gender"
       HLA-C-type:
