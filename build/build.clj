@@ -2,9 +2,14 @@
   (:require [clojure.tools.build.api :as b]))
 
 (def lib 'com.vendekagonlabs.unify.cli)
+
 (def version (format "0.2.%s" (b/git-count-revs nil)))
+
+
 (def class-dir "target/classes")
-(def uber-file (format "target/%s-%s-alpha.jar" (name lib) version))
+
+(def uber-file
+  (format "target/%s-%s-alpha.jar" (name lib) version))
 
 (def basis
   (delay (b/create-basis {:project "deps.edn"})))
@@ -23,6 +28,9 @@
            :uber-file uber-file
            :basis @basis
            :main 'unify-central.service}))
+
+(defn print-version [_]
+  (print version))
 
 (comment
   (uber nil))
