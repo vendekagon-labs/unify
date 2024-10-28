@@ -74,6 +74,8 @@
         "                    with --resume"
         "  infer-schema      Given a compiled --schema-directory, infers and generates a --unify-schema"
         "  infer-metaschema  Given a compiled --schema-directory, outputs a basic Datomic analytics --metaschema."
+        "  infer-json-schema Given a compiled --schema-directory, outputs a JSON schema for the import config"
+        "                    to the file specified by --json-schema"
         ;;"  validate          Runs validation checks against the database."
         ;;"                    Requires --working-directory and --database arguments when working with branch databases."
         ;;"  crosscheck-reference   Checks all reference data files for potential upsert collisions."
@@ -91,6 +93,8 @@
     "Directory containing data that should be added to a new database on creation."]
    [nil "--unify-schema      UNIFY-SCHEMA"
     "An edn file which contains a Unify schema definition."]
+   [ nil "--json-schema      JSON-SCHEMA"
+    "A json file which will contain a Unify import config JSON schema that applies to import config as YAML "]
    [nil "--metaschema        METASCHEMA"
     "An edn file which contains a Datomic analytics metaschema."]
    [nil "--tx-batch-size     TX-BATCH-SIZE" "Datomic transaction batch size"
@@ -190,6 +194,17 @@
   (println "NOTE: infer-metaschema is not guaranteed to generate a working metaschema. Check the "
            "output file for :unify.error/* keys.")
   (import/infer-metaschema arg-map))
+
+(defn infer-json-schema
+  [{:keys [schema-directory json-schema] :as arg-map}]
+  (when-not (and schema-directory
+                 (util.io/exists? schema-directory))
+    (exit 1 (str "ERROR: infer-metaschema requires a --schema-directory that exists.")))
+  (when-not json-schema
+    (exit 1 (str "ERROR: compile-schema requires an output --json-schema output JSON file argument.")))
+  (println "NOTE: JSON schema compilation is in early alpha and generates most, but not all, "
+            "types and constraints, but _should_ properly generate the import structure.")
+  (import/infer-json-schema arg-map))
 
 (defn prepare
   [{:keys [import-cfg-file target-dir resume overwrite
@@ -311,6 +326,7 @@
    "list-dbs"   list-dbs
    "compile-schema" compile-schema
    "infer-schema" infer-schema
+   "infer-json-schema" infer-json-schema
    "infer-metaschema" infer-metaschema
    "delete-db"  delete-db})
 

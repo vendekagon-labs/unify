@@ -24,6 +24,7 @@
             [com.vendekagonlabs.unify.import.engine.parse.config.yaml :as parse.yaml]
             [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
+            [com.vendekagonlabs.unify.db.schema.compile.json-schema :as compile.json-schema]
             [com.vendekagonlabs.unify.import.retract :as retract]
             [com.vendekagonlabs.unify.import.tx-data :as tx-data]
             [com.vendekagonlabs.unify.import.upsert-coordination :as upsert-coord]
@@ -155,13 +156,23 @@
     (compile/write-schema-dir! schema-directory compiled-schema)
     {:results :success}))
 
+(defn infer-json-schema
+  "Given a schema directory, infers the contents of a JSON Schema and generates
+  the corresponding JSON file."
+  [{:keys [schema-directory json-schema]}]
+  (schema.cache/encache schema-directory)
+  (let [inferred-json-schema (compile.json-schema/generate)]
+    (spit json-schema inferred-json-schema)
+    {:results :success}))
+
 (defn infer-schema
   "Given a schema directory with full Datomic and Unify schema, as created by compile, attempts
   to infer a valid Unify schema. Outputs resulting file to :unify-schema specified path."
   [{:keys [schema-directory unify-schema]}]
   (schema.cache/encache schema-directory)
   (let [inferred-schema (compile/infer-schema)]
-    (util.io/write-edn-file unify-schema inferred-schema)))
+    (util.io/write-edn-file unify-schema inferred-schema)
+    {:results :success}))
 
 (defn infer-metaschema
   "Given a schema directory with full Datomic and Unify schema, as created by compile, attempts
@@ -170,7 +181,8 @@
   [{:keys [schema-directory metaschema]}]
   (schema.cache/encache schema-directory)
   (let [inferred-metaschema (compile.metaschema/generate)]
-    (util.io/write-edn-file metaschema inferred-metaschema)))
+    (util.io/write-edn-file metaschema inferred-metaschema)
+    {:results :success}))
 
 
 (defn crosscheck-references
