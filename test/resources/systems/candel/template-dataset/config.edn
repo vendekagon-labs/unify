@@ -2,7 +2,7 @@
 
 {; The top-level :unify/import section gives information about your data import
  ; Generally all keys that begin with :unify/ are specific commands for telling unify what to do with your data or config
- :unify/import       {:user     "your-user-name"
+ :unify/import       {:user     "your-user-name@your-organization.org"
                       :name     "template-import"
                       :mappings "mappings.edn"}
 
@@ -91,14 +91,14 @@
                                                    :technology       :assay.technology/ELISA
                                                    :description      "LDH measurement at baseline"
                                                    :measurement-sets [{:name         "clinical LDH measurements"
-                                                                       :measurements {:unify/input-tsv-file  "processed/ldh_meas_and_samples.txt"
-                                                                                      :unify/na          "NA"
-                                                                                      :unify/omit-if-na  [:measurement/ng-mL]
-                                                                                      :sample            "sample.id"
-                                                                                      :measurement/ng-mL "LDH @ Baseline"
-                                                                                      ; The :unify/constants key allows you to specify an attribute that is constant across all entities in the input file
-                                                                                      ; Here that means that every measurement in the LDH input file is targeting the LDHA protein
-                                                                                      :unify/constants   {:measurement/epitope "LDHA"}}}]}
+                                                                       :measurements [{:unify/input-tsv-file  "processed/ldh_meas_and_samples.txt"
+                                                                                       :unify/na          "NA"
+                                                                                       :unify/omit-if-na  [:measurement/ng-mL]
+                                                                                       :sample            "sample.id"
+                                                                                       :measurement/ng-mL "LDH @ Baseline"
+                                                                                       ; The :unify/constants key allows you to specify an attribute that is constant across all entities in the input file
+                                                                                       ; Here that means that every measurement in the LDH input file is targeting the LDHA protein
+                                                                                       :unify/constants   {:measurement/epitope "LDHA"}}]}]}
 
 
 
@@ -242,16 +242,16 @@
                                                    ; The following map specifies the links between subjects and their therapy or therapies. Each subject can have 0, 1, or many therapies.
                                                    ; The therapy entity links subjects to treatment-regimens (see below) which are things like arms of clinical trials, which many subjects are on.
                                                    ; The wick package contains helper functions to generate all this data for the simple case in which each subject has only a single therapy
-                                                   :therapies        {; This input file will have one line per subject-therapy combination
-                                                                      :unify/input-csv-file  "processed/rizvi-therapies.txt"
-                                                                      ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
-                                                                      ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
-                                                                      :treatment-regimen "regimen"
-                                                                      :line              "line"
-                                                                      ; We use :unify/constants here to indicate the :therapy/order attribute, which is 1 for all therapies in this particular dataset (because here each subject has only one therapy)
-                                                                      :unify/constants   {:order 1}
-                                                                      :unify/reverse     {:unify/rev-variable "subject.id"
-                                                                                          :unify/rev-attr     :subject/therapies}}}
+                                                   :therapies        [{; This input file will have one line per subject-therapy combination
+                                                                       :unify/input-csv-file  "processed/rizvi-therapies.txt"
+                                                                       ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
+                                                                       ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
+                                                                       :treatment-regimen "regimen"
+                                                                       :line              "line"
+                                                                       ; We use :unify/constants here to indicate the :therapy/order attribute, which is 1 for all therapies in this particular dataset (because here each subject has only one therapy)
+                                                                       :unify/constants   {:order 1}
+                                                                       :unify/reverse     {:unify/rev-variable "subject.id"
+                                                                                           :unify/rev-attr     :subject/therapies}}]}
 
                                                   {:unify/input-tsv-file "processed/tcga-subjects.tsv"
                                                    :unify/na         ""
@@ -277,12 +277,12 @@
                       ; Subjects are linked to treatment-regimen(s) through the therapy entity (see above)
                       :treatment-regimens        [{:name           "Pembrolizumab-3wk"
                                                    :clinical-trial {:nct-number "NCT01295827"}
-                                                   :drug-regimens  {:drug         "PEMBROLIZUMAB"
-                                                                    :cycle-length 21}}
+                                                   :drug-regimens  [{:drug         "PEMBROLIZUMAB"
+                                                                     :cycle-length 21}]}
                                                   {:name           "Pembrolizumab-2wk"
                                                    :clinical-trial {:nct-number "NCT01295827"} ; Note that this will point to the same trial I created above
-                                                   :drug-regimens  {:drug         "PEMBROLIZUMAB"
-                                                                    :cycle-length 14}}]
+                                                   :drug-regimens  [{:drug         "PEMBROLIZUMAB"
+                                                                     :cycle-length 14}]}]
 
                       ; Timepoints are very important entities. Each timepoint is one element on a timeline that your whole dataset follows.
                       ; Laying out the timepoints in your dataset may be one of the first things you do.

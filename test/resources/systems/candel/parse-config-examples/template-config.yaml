@@ -2,7 +2,7 @@
 unify/import:
   name: "template-import"
   user: "your-user-name@your-organization.org"
-  mappings: "mappings.yaml"
+  mappings: "mappings.edn"
 dataset:
   description: "Description of your dataset, ie title of paper, title of clinical trial, or description of conglomerate dataset"
   name: "template-dataset-10"
