@@ -1,0 +1,18 @@
+#!/bin/bash
+base_uri="datomic:sql://?jdbc:postgresql://localhost:4335/unify?user=unify&password=unify"
+matrix_backend="file"
+matrix_dir=".unify/matrix-files"
+# NOTE: when adapting this file, you will almost certainly need to change the
+# release jar path.
+release_jar_name="target/com.vendekagonlabs.unify.cli-0.2.190-alpha.jar"
+
+if [[ -e $release_jar_name ]]; then
+    echo "Wrapping CLI call to $release_jar_name"
+else
+    echo "No release jar $release_jar_name found! Compile with 'clj -X:build'"
+    exit 1
+fi
+
+UNIFY_BASE_URI=$base_uri UNIFY_MATRIX_BACKEND=$matrix_backend UNIFY_MATRIX_DIR=$matrix_dir \
+	java -cp $release_jar_name clojure.main -m com.vendekagonlabs.unify.cli 
+
