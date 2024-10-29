@@ -64,8 +64,6 @@
         "  delete-db         Deletes the database specified by --database"
         "  prepare           Uses an import config file to generate all data needed to run an import."
         "                    Requires --import-config, --working-directory and --schema-directory args."
-        ;;        "  diff              Generates all changes required to update an existing dataset to match the target."
-        ;;"                    Requires --working-directory and --database arguments."
         "  retract           Retracts dataset indicated by --dataset from --database"
         "  transact          Transacts all data (as created by prepare) for an import job --working-directory"
         "                    into database specified by --database."
@@ -106,8 +104,6 @@
    ;; --overwrite option disabled for now as it exhibits inconsistent behavior on different OSes, directory structures.
    ; [nil "--overwrite" "When set on prepare, will delete and rewrite working directory if it already exists."]
    [nil "--resume" "When set, will resume a previously started transact command."
-    :default false]
-   [nil "--update" "When set, will transact the changes generated from diff instead of prepare"
     :default false]
    [nil "--skip-annotations" "When set, will not transact annotations into database."
     :default false]
@@ -259,32 +255,6 @@
       (println "Completed " (get-in result [:results :completed])
                "retractions to remove dataset:" dataset))))
 
-
-#_(defn diff
-    [{:keys [target-dir resume datomic-uri skip-annotations database] :as ctx}]
-    (when-not (and datomic-uri database)
-      (exit 1 "ERROR: Diff needs a database to transact to."))
-    (print-db-version datomic-uri)
-    (when resume
-      (println (str "WARN: Resuming transaction job. This will skip transacting the import job entity. "
-                    "Transactions may take awhile to restart as previously successful IDs are found.")))
-    (when-not (and target-dir (util.io/exists? target-dir))
-      (exit 1 (str "ERROR: Working Directory arg must be passed, directory must exist, and "
-                   "it must already contain transaction and entity data as created by prepare.")))
-
-    (let [returned (import/perform-diff ctx)]
-      (if-let [errors (:errors returned)]
-        (do (println "Diff did not complete successfully, see logs. Anomalies: " errors)
-            returned)
-        (println "\nCompleted. Diff data in: "
-                 (conventions/diff-tx-dir target-dir)))))
-
-#_(defn validate
-    [{:keys [working-directory database] :as ctx}]
-    (import/validate {:database          database
-                      :working-directory working-directory}))
-
-
 #_(defn format-crosscheck-conflict
     "Formatter to make crosscheck conflict results easier to read."
     [{:keys [transaction-entity database-entity difference]}]
@@ -319,7 +289,6 @@
   {"request-db" request-db
    "prepare"    prepare
    "retract"    retract
-   ;;   "diff" diff
    "transact"   transact
    ;;   "validate" validate
    ;;   "crosscheck-reference" crosscheck-reference

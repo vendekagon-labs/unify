@@ -29,7 +29,7 @@
     (delete-file f)))
 
 (defn mkdirs!
-  "Make all directories that don't exist in aboslute path (mkdir -p)"
+  "Make all directories that don't exist in absolute path (mkdir -p)"
   [dir]
   (-> dir
       (io/file)

@@ -24,8 +24,7 @@
             [com.vendekagonlabs.unify.util.io :as pio]
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
             [com.vendekagonlabs.unify.db.transact :refer [run-txns!
-                                                          sync+retry
-                                                          diff-renames]]
+                                                          sync+retry]]
             [clojure.edn :as edn]
             [cognitect.anomalies :as anom]
             [clojure.core.async :as a]
@@ -201,14 +200,10 @@
 
 (defn- transact-one-file-sync!
   "Synchronously transact a single file of transaction data."
-  [conn f-path {:keys [import-name diff-suffix] :as opts}]
+  [conn f-path {:keys [import-name] :as _opts}]
   (with-open [in (PushbackReader. (io/reader f-path))]
-    (let [base-tx-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
-                           (take-while #(not= % ::eof)))
-          tx-seq (if-not diff-suffix
-                   base-tx-seq
-                   (map (partial diff-renames {:diff-suffix diff-suffix})
-                        base-tx-seq))
+    (let [tx-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
+                      (take-while #(not= % ::eof)))
           uuid-set (ic/successful-uuid-set (d/db conn) import-name {:invalidate false})]
       (reduce (fn [results tx]
                 (if-not (uuid-set (:unify.import.tx/id (first tx)))
@@ -219,7 +214,7 @@
 
 (defn run-import-job-file!
   "Transact the import-cfg literal file."
-  [conn import-job-file-path {:keys [import-name dataset-name diff-suffix] :as opts}]
+  [conn import-job-file-path {:keys [import-name dataset-name] :as opts}]
   (log/info "run-import-job-file!> Transacting literal data from import config file: " import-job-file-path)
   (let [tx-result (transact-one-file-sync! conn import-job-file-path opts)]
     (log/info "run-import-job-file!> Completed transacting import-cfg-file: " import-job-file-path)
@@ -234,7 +229,7 @@
   the function waits until each file is complete before starting the next one.
   Files are transacted in order according to the lexical ordering (sort) of their
   filename (not full path)."
-  [conn file-paths conc {:keys [import-name dataset-name diff-suffix skip-annotations] :as opts}]
+  [conn file-paths conc {:keys [import-name dataset-name skip-annotations] :as opts}]
   (if (> (count file-paths) 0)
     (let [sorted-file-paths (sort-by text/filename file-paths)]
       (loop [all-results []
@@ -267,25 +262,13 @@
   before the update transactions."
   [target-dir datomic-uri conc {:keys [resume
                                        skip-annotations
-                                       diff-suffix
-                                       disable-remote-calls
-                                       update] :as opts}]
-
-  (when (and (some? diff-suffix) update)
-    (log/error "update and diff-suffix both supplied.")
-    (throw (ex-info (str "update and diff-suffix both supplied by opts")
-                    {:invalid/args opts})))
-
-  (let [transact-dir (if update
-                       (conventions/diff-dir target-dir)
-                       target-dir)
+                                       disable-remote-calls] :as _opts}]
+  (let [transact-dir target-dir
         import-job-name (conventions/import-name target-dir)
         conn (d/connect datomic-uri)
         db (d/db conn)
         all-dataset-fnames (conventions/dataset-tx-data-filenames transact-dir)
-        all-ref-fnames (if update
-                         (conventions/ref-tx-data-filenames transact-dir)
-                         (conventions/ref-tx-data-filenames target-dir))
+        all-ref-fnames (conventions/ref-tx-data-filenames target-dir)
         import-job-file-path (conventions/tx-import-cfg-job-path transact-dir)]
     (log/info "Running transactions for import: " import-job-name
               ::target-dir target-dir ", " ::update update)
@@ -295,14 +278,8 @@
       (throw (ex-info (str "Import name:" import-job-name " does not exist.")
                       {:import-name/does-not-exist import-job-name})))
 
-    (let [read-opts (if (some? diff-suffix)
-                      (let [dataset-name (conventions/dataset-name target-dir)]
-                        {:import-name      import-job-name
-                         :dataset-name     dataset-name
-                         :diff-suffix      diff-suffix
-                         :skip-annotations skip-annotations})
-                      {:import-name      import-job-name
-                       :skip-annotations skip-annotations})
+    (let [read-opts {:import-name      import-job-name
+                     :skip-annotations skip-annotations}
 
           matrix-upload (if-not disable-remote-calls
                           (matrix/upload-matrix-files! target-dir)
