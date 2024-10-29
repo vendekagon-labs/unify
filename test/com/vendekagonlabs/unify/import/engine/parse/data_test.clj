@@ -14,6 +14,7 @@
 (ns com.vendekagonlabs.unify.import.engine.parse.data-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
             [clojure.string :as str]
+            [com.vendekagonlabs.unify.test-util :as tu]
             [com.vendekagonlabs.unify.test-util :as test-util]
             [com.vendekagonlabs.unify.import.engine.parse.data :as sut]
             [com.vendekagonlabs.unify.db.schema :as db.schema]
@@ -26,7 +27,7 @@
 (def mapping-file (str import-root-dir "mappings.edn"))
 (def mappings (util.io/read-edn-file mapping-file))
 (def config (util.io/read-edn-file ref-config-file))
-(def schema (db.schema/get-metamodel-and-schema))
+(def schema (tu/get-candel-schema))
 
 (defn parsed-config []
   (parse.config/parse-config-map schema config))

@@ -15,8 +15,23 @@
   (:require [clojure.edn :as edn]
             [clojure.data.csv :as data.csv]
             [clojure.java.io :as io]
+            [com.vendekagonlabs.unify.db.schema :as schema]
+            [com.vendekagonlabs.unify.db.schema.cache :as cache]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import :as import]))
+
+(def cached-schema-file
+  ".unify/cached-schema.edn")
+
+(def candel-schema-dir
+  "test/resources/systems/candel/template-dataset/schema")
+
+(defn get-candel-schema []
+  (if (util.io/exists? cached-schema-file)
+    (schema/get-metamodel-and-schema)
+    (do
+      (cache/encache candel-schema-dir)
+      (schema/get-metamodel-and-schema))))
 
 (defmacro thrown->ex-data
   [body]

@@ -25,7 +25,7 @@
 (def good-config (util.io/read-edn-file "test/resources/systems/candel/small-reference-import/config.edn"))
 (def wrong-attr-config (util.io/read-edn-file "test/resources/systems/candel/parse-config-examples/attribute-typos.edn"))
 (def wrong-config-keys (util.io/read-edn-file "test/resources/systems/candel/parse-config-examples/wrong-config-keys.edn"))
-(def schema (db.schema/get-metamodel-and-schema))
+(def schema (tu/get-candel-schema))
 
 
 (def import-root-dir "test/resources/systems/candel/small-reference-import/")
