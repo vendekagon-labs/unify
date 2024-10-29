@@ -71,6 +71,7 @@
 (defn cache
   "Write schema to resources (wrapped in vec for eagerness, readability)"
   [schema]
+  (util.io/mkdirs! ".unify/")
   (binding [*print-length* nil]
     (spit cached (vec schema))))
 
@@ -131,8 +132,7 @@
 
 (defn version
   ([]
-   (-> "cached-schema.edn"
-       (io/resource)
+   (-> ".unify/cached-schema.edn"
        (util.io/read-edn-file)
        (first)
        (:index/unify-schema-metadata)
