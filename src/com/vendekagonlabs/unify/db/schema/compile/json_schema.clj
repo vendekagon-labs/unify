@@ -201,7 +201,9 @@
    "unify/reverse" {:type "object"
                     :properties {"unify/rev-variable" {:type "string"}
                                  "unify/rev-attr" {:type "string"}}}
-   "unify/na" {:type "string"}
+   "unify/na" {:oneOf [{:type "string"}
+                       {:type "array"
+                        :items {:type "string"}}]}
    "unify/omit-if-na" {:type "array"
                        :items {:type "string"}}
    "unify/input-tsv-file" {:oneOf [{:type "string"}
@@ -306,7 +308,5 @@
      (generate schema))))
 
 (comment
-  ;; TODO: fix double nesting issue somehow, I am seeing
-  ;; assays : items of type object with property assay (but should be assay properties instead) : }
   (let [json-schema (generate)]
     (spit "first-generated-schema.json" json-schema)))
