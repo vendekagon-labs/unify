@@ -17,7 +17,6 @@
             [com.vendekagonlabs.unify.test-util :as tu]
             [com.vendekagonlabs.unify.test-util :as test-util]
             [com.vendekagonlabs.unify.import.engine.parse.data :as sut]
-            [com.vendekagonlabs.unify.db.schema :as db.schema]
             [com.vendekagonlabs.unify.import.engine.parse.config :as parse.config]
             [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]
             [com.vendekagonlabs.unify.util.io :as util.io]))

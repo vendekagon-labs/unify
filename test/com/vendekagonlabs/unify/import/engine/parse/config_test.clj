@@ -15,7 +15,6 @@
   (:require [clojure.test :refer :all]
             [com.vendekagonlabs.unify.test-util :as tu]
             [contextual.core :as c]
-            [com.vendekagonlabs.unify.db.schema :as db.schema]
             [com.vendekagonlabs.unify.util.collection :as coll]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]
