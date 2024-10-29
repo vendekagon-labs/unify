@@ -33,6 +33,7 @@ tuple-tmp-output/
 .auth/
 datomic-socks-proxy
 PRET_ERROR_DUMP
+UNIFY_ERROR_DUMP
 resources/info.edn
 datomic-config.edn
 .lsp

@@ -367,7 +367,7 @@
     (catch Exception e
       (let [data (ex-data e)
             pretty-data (text/->pretty-string data)
-            err-fname "PRET_ERROR_DUMP"]
+            err-fname "UNIFY_ERROR_DUMP"]
         (log/error "Engine encountered exception while generating entity data, error state in file: "
                    err-fname)
         (io/write-edn-file err-fname

@@ -14,5 +14,5 @@ else
 fi
 
 UNIFY_BASE_URI=$base_uri UNIFY_MATRIX_BACKEND=$matrix_backend UNIFY_MATRIX_DIR=$matrix_dir \
-	java -cp $release_jar_name clojure.main -m com.vendekagonlabs.unify.cli 
+	java -cp $release_jar_name clojure.main -m com.vendekagonlabs.unify.cli $*
 
