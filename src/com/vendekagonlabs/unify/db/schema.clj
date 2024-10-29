@@ -35,7 +35,7 @@
       (util.io/read-edn-file)))
 
 ;; for metamodel inference backing, etc.
-(def cached (clojure.java.io/resource "cached-schema.edn"))
+(def cached ".unify/cached-schema.edn")
 
 (def new-ident-q
   '[:find (count ?i)

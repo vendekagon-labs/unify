@@ -19,7 +19,6 @@
             [com.vendekagonlabs.unify.db.schema.cache :as schema.cache]
             [com.vendekagonlabs.unify.db.schema.compile :as compile]
             [com.vendekagonlabs.unify.db.schema.compile.metaschema :as compile.metaschema]
-            [com.vendekagonlabs.unify.import.diff.tx-data :as diff]
             [com.vendekagonlabs.unify.import.engine :as engine]
             [com.vendekagonlabs.unify.import.engine.parse.config.yaml :as parse.yaml]
             [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]
@@ -30,7 +29,6 @@
             [com.vendekagonlabs.unify.import.upsert-coordination :as upsert-coord]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.util.text :refer [->pretty-string folder-of]]
-            [com.vendekagonlabs.unify.util.uuid :as uuid]
             [com.vendekagonlabs.unify.validation.post-import :as post-import]))
 
 (defn validate
@@ -86,9 +84,7 @@
            datomic-uri
            resume
            skip-annotations
-           disable-remote-calls
-           update
-           diff-suffix]}]
+           disable-remote-calls]}]
   (println "Transacting prepared tx-data from directory:\n" target-dir "\ninto datomic db at:\n" datomic-uri)
   (let [ensured-datomic-config (db/ensure-db target-dir datomic-uri)
         tx-result-map (tx-data/transact-import-data! target-dir
@@ -102,9 +98,7 @@
                                                               availableProcessors))
                                                      {:resume               resume
                                                       :skip-annotations     skip-annotations
-                                                      :disable-remote-calls disable-remote-calls
-                                                      :update               update
-                                                      :diff-suffix          diff-suffix})
+                                                      :disable-remote-calls disable-remote-calls})
         {:keys [ref-results data-results]} tx-result-map]
     (if-let [anomalies (seq (concat (filter ::anomalies/category ref-results)
                                     (filter ::anomalies/category data-results)))]
@@ -112,38 +106,6 @@
                      (->pretty-string anomalies))
           {:errors anomalies})
       {:results (apply merge-with + (concat ref-results data-results))})))
-
-
-(defn perform-diff
-  "Performs the update operation:
-   1. prepared data is transacted to branch with temp dataset uids
-   2. Diff transactions are generated"
-  [{:keys [target-dir
-           database] :as ctx}]
-  (try
-    (let [diff-tx-dir (conventions/diff-tx-dir target-dir)
-          suffix (uuid/random-partial)
-          diff-opts (assoc ctx :diff-suffix suffix)]
-
-      ;; Remove any previous diff
-      (conventions/rm-edn-files diff-tx-dir)
-
-      ;; Write out the diff summary which includes the current HEAD
-      ;; before transacting.
-      (log/info "Writing-summary " diff-opts)
-      (diff/write-summary! diff-opts)
-
-      (log/info "Perform Diff started with: " database " " target-dir
-                " - transacting.")
-      (transact-import diff-opts)
-
-      (log/info "Diff transaction complete - generating change data")
-      (diff/make-transaction-data! diff-opts))
-
-    (catch Exception e
-      {:errors [{::anomalies/category ::anomalies/fault
-                 ::anomalies/message  (.getMessage e)
-                 ::anomalies/ex-data  (ex-data e)}]})))
 
 (defn compile-schema
   "Given an edn file that conforms to the Unify schema definition specification, will

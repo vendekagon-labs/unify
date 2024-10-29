@@ -13,7 +13,6 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.db.transact
   (:require [datomic.api :as d]
-            [clojure.pprint :refer [pprint]]
             [com.vendekagonlabs.unify.db.query :as db.query]
             [clojure.edn :as edn]
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
@@ -163,8 +162,6 @@
         done-ch (a/chan)
         transact-data (fn [data]
                         (let [result (async-transact-w-retry conn data opts)]
-                          ;;                          (println "transct result: ")
-                          ;;                          (clojure.pprint/pprint result)
                           (if (::anom/category result)
                             (do
                               (log/error "Anomaly encountered running transactions -- stopping."
@@ -173,13 +170,12 @@
                               (a/close! to-ch)
                               (a/>!! done-ch result))
                             result)))]
-
     ; go block prints a '.' after every 10 transactions, puts completed
     ; report on done channel when no value left to be taken.
     (a/go-loop [total 0]
       (when (zero? (mod total 10))
         (print ".") (flush))
-      (if-let [c (a/<! to-ch)]
+      (if-let [_c (a/<! to-ch)]
         (recur (inc total))
         (a/>! done-ch {:completed total})))
 
@@ -196,68 +192,6 @@
     {:result done-ch
      :stop   (fn [] (a/close! to-ch))}))
 
-
-(defn diff-renames
-  "Used as a transducer over tx-batches, renames all incoming data to match diff dataset name.
-  Has to resolve import/name and dataset/name both in bare form, and when referred to by other
-  entities."
-  [{:keys [diff-suffix]} tx-batch]
-  (let [append-diff-suffix (fn [import]
-                             (str import "-" diff-suffix))
-        tx-tx (first tx-batch)
-        flat-txes (rest tx-batch)]
-    (cons (-> tx-tx
-              (update-in [:unify.import.tx/id] append-diff-suffix)
-              (#(if (get-in % [:unify.import.tx/import :unify.import/name])
-                  (update-in % [:unify.import.tx/import :unify.import/name] append-diff-suffix)
-                  (update-in % [:unify.import.tx/import 1] append-diff-suffix))))
-          (map
-            (fn renames [tx-map]
-              (->> (for [[a v] tx-map]
-                     (let [attr-name (name a)]
-                       (cond
-                         (or (= :unify.import/name a)
-                             (= :dataset/name a))
-                         [a (append-diff-suffix v)]
-
-                         (= attr-name "uid")
-                         [a (let [[dataset path] v]
-                              [(append-diff-suffix dataset) path])]
-
-                         (= :unify.import/most-recent a)
-                         [a [:unify.import/name (append-diff-suffix (second v))]]
-
-                         (and (coll? v))
-                         [a (cond
-                              (map? v)
-                              (renames v)
-
-                              (every? map? v)
-                              (mapv renames v)
-
-                              (and (sequential? v)
-                                   (= 2 (count v))
-                                   (-> v first keyword?))
-                              (cond
-                                (= "uid" (-> v first name))
-                                (let [[lookup-attr [dataset path]] v]
-                                  [lookup-attr [(append-diff-suffix dataset) path]])
-
-                                (= :dataset/name (first v))
-                                [(first v) (append-diff-suffix (second v))]
-
-                                :else
-                                v)
-
-                              :else
-                              v)]
-
-                         :else
-                         [a v])))
-                   (into {})))
-            flat-txes))))
-
-
 (defn run-txns!
   "Use tx-pipeline to transact into Datomic with concurrency 'conc'
   Loop through edn files in f-list, which must be transaction-data files,
@@ -265,7 +199,7 @@
   is supplied, filters out transactions that were previously successful by
   their import supplied uuid."
   ([conn f-list conc opts]
-   (let [{:keys [import-name dataset-name diff-suffix skip-annotations]} opts
+   (let [{:keys [import-name skip-annotations]} opts
          input-chan (a/chan (* 4 1024))
          tx-xform (if-not import-name
                     (map identity)
@@ -274,16 +208,12 @@
                           ;; at that point, possibly good time for cleanup of nested
                           ;; coll logic (since partitions are put on channel, tx-map
                           ;; affecting transducers but be sub-collection fns)
-                          txn-uuid-set (ic/successful-uuid-set db import-name {:invalidate false})
-                          base-xform (remove (fn [tx-batch]
-                                               (when-let [batch-tx-id (-> tx-batch first :unify.import.tx/id)]
-                                                 (when (txn-uuid-set batch-tx-id)
-                                                   (log/debug "Skipping transaction: " batch-tx-id)
-                                                   true))))
-                          xform (if (and dataset-name diff-suffix)
-                                  (comp base-xform (map (partial diff-renames opts)))
-                                  base-xform)]
-                      xform))
+                          txn-uuid-set (ic/successful-uuid-set db import-name {:invalidate false})]
+                      (remove (fn [tx-batch]
+                                (when-let [batch-tx-id (-> tx-batch first :unify.import.tx/id)]
+                                  (when (txn-uuid-set batch-tx-id)
+                                    (log/debug "Skipping transaction: " batch-tx-id)
+                                    true))))))
          ;; don't just pass `opts` through here to make it clear import-name is not intended for pipeline
          result-map (pipeline conn conc input-chan {:skip-annotations skip-annotations
                                                     :transducer       tx-xform})]
@@ -317,7 +247,7 @@
          (and (retryable? tx-result)
               (<= retry max-retries))
          (do (log/info "Encountered backpressure, retrying transaction, retry: " retry)
-             (Thread/sleep tempo-msec)
+             (Thread/sleep ^Long tempo-msec)
              (recur (inc retry)))
 
          ;; unless we exceed max retries, then log error and throw.
