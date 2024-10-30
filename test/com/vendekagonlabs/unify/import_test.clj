@@ -43,14 +43,7 @@
   (log/info "Initializing in-memory integration test db.")
   (db/init datomic-uri
            :schema-directory schema-directory
-           :seed-data-directory seed-data-directory)
-  ;; TODO: Temp fix for drug ordering issue with template dataset.
-  (let [conn (d/connect datomic-uri)]
-    @(d/transact conn [{:drug/preferred-name "PEMBROLIZUMAB"}])
-    @(d/transact conn [{:db/id "LDHA-protein"
-                        :protein/uniprot-name "LDHA"}
-                       {:epitope/id "LDHA"
-                        :epitope/protein "LDHA-protein"}])))
+           :seed-data-directory seed-data-directory))
 
 (defn teardown []
   (log/info "Ending integration test and deleting db.")

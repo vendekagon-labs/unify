@@ -1,0 +1,5 @@
+[{:db/id "LDHA-db-id"
+  :protein/preferred-name "LDHA"
+  :protein/gene [:gene/hgnc-symbol "LDHA"]}
+ {:epitope/id "LDHA"
+  :epitope/protein "LDHA-db-id"}]

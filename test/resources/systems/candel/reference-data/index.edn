@@ -4,11 +4,6 @@
   :files ["all-coordinates-tx-data.edn"
           "all-genes-tx-data.edn"
           "all-gene-products-tx-data.edn"]}
- {:name :drugs
-  :entity-id :drug/preferred-name
-  :count 53715
-  :proprietary true
-  :files ["all-drug-tx-data.edn"]}
  {:name :diseases
   :entity-id :meddra-disease/preferred-name
   :count 23389
@@ -16,9 +11,8 @@
   :files ["all-disease-tx-data.edn"]}
  {:name :proteins-epitopes
   :entity-id :protein/uniprot-name
-  :proprietary true  ; not really, but data not in test system, so exclude
-  :count 77807
-  :files ["all-protein-epitope-tx-data.edn"]}
+  :count 2
+  :files ["temp-proteins.edn"]}
  {:name :cell-types
   :entity-id :cell-type/co-name
   :count 2319
@@ -32,6 +26,10 @@
   :count 2482
   :proprietary true  ; not really, but data not in test system, so exclude
   :files ["all-so-sequence-features-tx-data.edn"]}
+ {:name :drugs
+  :entity-id :drug/preferred-name
+  :count 1
+  :files ["temp-drugs.edn"]}
  {:name :nanostring-signatures
   :entity-id :nanostring-signature/name
   :count 42
