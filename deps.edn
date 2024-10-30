@@ -7,6 +7,7 @@
                           :exclusions [org.slf4j/jul-to-slf4j org.slf4j/slf4j-nop]}
         com.cognitect.aws/api       {:mvn/version "0.8.505"}
         com.cognitect.aws/s3        {:mvn/version "811.2.858.0"}
+        org.postgresql/postgresql {:mvn/version "42.7.1"}
         com.cnuernber/charred {:mvn/version "1.033"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
         clj-http/clj-http {:mvn/version "3.10.0"}
@@ -33,7 +34,6 @@
  :paths ["src" "resources"]
  :aliases {:dev {:extra-paths ["dev" "test"]
                  :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}
-                              org.postgresql/postgresql {:mvn/version "42.7.1"}
                               io.github.clojure/tools.build {:mvn/version "0.10.5"}}}
            :repl-server {:exec-fn clojure.core.server/start-server
                          :extra-paths ["dev" "test"]
@@ -51,7 +51,6 @@
            ;; some kind of task dispatch
            :version {:extra-paths ["build/"]
                      :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
-                     :ns-default build
                      :exec-fn print-version}
            :test {:extra-paths ["test" "dev"]
                   :extra-deps {io.github.cognitect-labs/test-runner
