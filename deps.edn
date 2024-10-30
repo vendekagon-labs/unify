@@ -43,15 +43,16 @@
                                      :port 5555
                                      :accept clojure.core.server/repl}}
            :build {:extra-paths ["build/"]
-                   :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
+                   :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}
+                          org.postgresql/postgresql {:mvn/version "42.7.1"}}
                    :ns-default build
                    :exec-fn uber}
            ;; some redundancy with build alias, but keeping clean clj -X:build for
            ;; now, if we add more tools.build aware commands, can turn this into
            ;; some kind of task dispatch
            :version {:extra-paths ["build/"]
-                     :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
-                     :ns-default build
+                     :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}
+                            org.postgresql/postgresql {:mvn/version "42.7.1"}}
                      :exec-fn print-version}
            :test {:extra-paths ["test" "dev"]
                   :extra-deps {io.github.cognitect-labs/test-runner
