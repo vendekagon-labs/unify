@@ -124,63 +124,54 @@
                                                                                        :tcr-clonality    "Clonality"}]}]}
 
                                                   ; Below is an example of how we represent cytometry data, including defining cell populations both from gating and clustering
-                                                  #_{:name             "CyTOF"
-                                                     :technology       :assay.technology/mass-cytometry
-                                                     :description      "CyTOF analysis performed at Primity Bio"
-                                                     :measurement-sets [{:name             "Spitzer gated"
-                                                                         :cell-populations [{:unify/input-tsv-file "processed/cell_populations_Spitzer.txt"
-                                                                                             :unify/na         "NA"
-                                                                                             :cell-type        "cell.type"
-                                                                                             :unify/constants  {:from-clustering false}
-                                                                                             :positive-markers {:unify/many-delimiter ","
-                                                                                                                :unify/many-variable  "positive.epitopes"}
-                                                                                             :name             "name"}]
-                                                                         :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_eventCount_Spitzer.txt"
-                                                                                             :unify/na         "NA"
-                                                                                             :unify/omit-if-na [:measurement/cell-count
-                                                                                                                :measurement/leukocyte-count
-                                                                                                                :measurement/percent-of-leukocytes]
-                                                                                             :sample           "sample"
-                                                                                             :cell-population  "uniquePopulationName"
-                                                                                             :unify/variable   "variable"
-                                                                                             :unify/value      "value"
-                                                                                             :unify/variables  {"eventCount"                :measurement/cell-count
-                                                                                                                "normalization.measurement" :measurement/leukocyte-count
-                                                                                                                "normalized.measurement"    :measurement/percent-of-leukocytes}}
-                                                                                            {:unify/input-tsv-file     "processed/cytof_measurements_median_Spitzer.txt"
-                                                                                             :unify/na             "NA"
-                                                                                             :unify/omit-if-na     [:measurement/median-channel-value]
-                                                                                             :sample               "sample"
-                                                                                             :cell-population      "uniquePopulationName"
-                                                                                             :epitope              "epitope"
-                                                                                             :median-channel-value "median"}]}
+                                                  {:name             "CyTOF"
+                                                   :technology       :assay.technology/mass-cytometry
+                                                   :description      "CyTOF analysis performed at Primity Bio"
+                                                   :measurement-sets [{:name             "Spitzer gated"
+                                                                       :cell-populations [{:unify/input-tsv-file "processed/cell_populations_Spitzer.txt"
+                                                                                           :unify/na         "NA"
+                                                                                           :cell-type        "cell.type"
+                                                                                           :unify/constants  {:from-clustering false}
+                                                                                           :positive-markers {:unify/many-delimiter ","
+                                                                                                              :unify/many-variable  "positive.epitopes"}
+                                                                                           :name             "name"}]
+                                                                       :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_eventCount_Spitzer.txt"
+                                                                                           :unify/na         "NA"
+                                                                                           :unify/omit-if-na [:measurement/cell-count
+                                                                                                              :measurement/leukocyte-count
+                                                                                                              :measurement/percent-of-leukocytes]
+                                                                                           :sample           "sample"
+                                                                                           :cell-population  "uniquePopulationName"
+                                                                                           :unify/variable   "variable"
+                                                                                           :unify/value      "value"
+                                                                                           :unify/variables  {"eventCount"                :measurement/cell-count
+                                                                                                              "normalization.measurement" :measurement/leukocyte-count
+                                                                                                              "normalized.measurement"    :measurement/percent-of-leukocytes}}
+                                                                                          {:unify/input-tsv-file     "processed/cytof_measurements_median_Spitzer.txt"
+                                                                                           :unify/na             "NA"
+                                                                                           :unify/omit-if-na     [:measurement/median-channel-value]
+                                                                                           :sample               "sample"
+                                                                                           :cell-population      "uniquePopulationName"
+                                                                                           :epitope              "epitope"
+                                                                                           :median-channel-value "median"}]}
 
 
-                                                                        {:name             "Spitzer clustered"
-                                                                         :description      "All data pooled together and clustered with grappolo"
-                                                                         :cell-populations [{:unify/input-tsv-file "processed/cell_populations_cluster_Spitzer.txt"
-                                                                                             :name             "cluster.id"
-                                                                                             :unify/constants  {:from-clustering true}}]
-                                                                         :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_clusters_Spitzer.txt"
-                                                                                             :unify/na         "NA"
-                                                                                             :unify/omit-if-na [:measurement/median-channel-value
-                                                                                                                :measurement/percent-of-leukocytes]
-                                                                                             :sample           "sample"
-                                                                                             :cell-population  "cluster.id"
-                                                                                             :epitope          "epitope"
-                                                                                             :unify/variable   "variable"
-                                                                                             :unify/value      "value"
-                                                                                             :unify/variables  {"median-channel-value" :measurement/median-channel-value
-                                                                                                                "popsize"              :measurement/percent-of-leukocytes}}]}]}]
-
-
-
-
-
-
-
-
-
+                                                                      {:name             "Spitzer clustered"
+                                                                       :description      "All data pooled together and clustered with grappolo"
+                                                                       :cell-populations [{:unify/input-tsv-file "processed/cell_populations_cluster_Spitzer.txt"
+                                                                                           :name             "cluster.id"
+                                                                                           :unify/constants  {:from-clustering true}}]
+                                                                       :measurements     [{:unify/input-tsv-file "processed/cytof_measurements_clusters_Spitzer.txt"
+                                                                                           :unify/na         "NA"
+                                                                                           :unify/omit-if-na [:measurement/median-channel-value
+                                                                                                              :measurement/percent-of-leukocytes]
+                                                                                           :sample           "sample"
+                                                                                           :cell-population  "cluster.id"
+                                                                                           :epitope          "epitope"
+                                                                                           :unify/variable   "variable"
+                                                                                           :unify/value      "value"
+                                                                                           :unify/variables  {"median-channel-value" :measurement/median-channel-value
+                                                                                                              "popsize"              :measurement/percent-of-leukocytes}}]}]}]
 
 
                       ; We are now out of the :dataset/assays section of the map and back to the top level of the dataset map
@@ -393,11 +384,6 @@
                       ; values all in one column, with values separated by a delimeter like a semicolon, and use the following syntax to specify that
                       :genes               {:unify/many-delimiter ";"
                                             :unify/many-variable  "Genes"}}
- ;; TODO: uncomment out when ref ordering bug fixed
- ;; If you haven't installed a proprietary WHO Drug reference dataset, you can
- ;; define all drug names referred to in treatment data here.
- #_:drug            #_[{:unify/input-tsv-file "processed/drugs.tsv"
-                        :preferred-name   "name"}]
  :clinical-trial     {:nct-number "NCT01295827"
                       :other-ids  "KEYNOTE-001"
                       :name-long  "Study of Pembrolizumab (MK-3475) in Participants With Progressive Locally Advanced or Metastatic Carcinoma, Melanoma, or Non-small Cell Lung Carcinoma"}}
