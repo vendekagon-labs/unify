@@ -25,7 +25,9 @@
                    (:unify.kind/ref-data ent)))
        (map (fn [[_ ent]]
               (or (get-in ent [:unify.kind/need-uid :db/ident])
-                  (get-in ent [:unify.kind/global-id :db/ident]))))
+                  (get-in ent [:unify.kind/global-id :db/ident])
+                  ;; TODO: temp for REPL dev, make sure to remove this!
+                  ent)))
        (remove :dataset/name)))
 
 (defn dataset->imports

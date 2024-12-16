@@ -21,6 +21,7 @@
             [com.vendekagonlabs.unify.db.schema :as db.schema]
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
+            [com.vendekagonlabs.unify.import.retract :as retract]
             [com.vendekagonlabs.unify.import.tx-data :as tx-data]
             [com.vendekagonlabs.unify.import.diff.changes :as cmp]
             [com.vendekagonlabs.unify.util.timestamps :as timestamps]
@@ -57,7 +58,7 @@
 
 (defn kind-depth
   "Computes the maximum number of dependency steps a given kind would
-   require to reach a an entity that doesn't have dependencies.
+   require to reach an entity that doesn't have dependencies.
 
    Uses the map of references "
   [refs kind-name]
@@ -114,6 +115,20 @@
           {:uid-attr attr
            :filename (str index "-" (namespace attr) ".edn")}))
       sorted-attrs)))
+
+(comment
+  (require '[com.vendekagonlabs.unify.import.retract :as retract])
+  (def my-schema (db.schema/get-metamodel-and-schema))
+  (def diff-uids (map :uid-attr (sorted-uid-attrs)))
+  (def all-kind-ids (retract/schema->kind-ids my-schema))
+  (filter map? all-kind-ids)
+  (def fixed-kind-ids (remove nil? all-kind-ids))
+  (require '[clojure.set :as set])
+  (set/difference (set all-kind-ids) (set diff-uids))
+  (count fixed-kind-ids)
+  (sort-by-parentage my-schema fixed-kind-ids)
+
+  (keys (db.indexes/by-uid (db.schema/get-metamodel-and-schema))))
 
 
 
