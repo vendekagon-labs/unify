@@ -52,7 +52,7 @@ Treg > Ki67+CD38+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	KI67
 Treg > Ki67+HLADR+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	KI67,DRA
 Treg > Ki67+Tbet+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	KI67,DRA
 Treg > Tbet+	CD4-positive, CD25-positive, alpha-beta regulatory T cell	TBX21
-CD8  T Cells	CD8-positive, alpha-beta T cell	NA
+CD8  T Cells	CD8-positive, alpha-beta T cell	CD8
 CD8  T Cells > CD25+	CD8-positive, alpha-beta T cell	IL2RA
 CD8  T Cells > CD38+	CD8-positive, alpha-beta T cell	CD38
 CD8  T Cells > Ki-67+	CD8-positive, alpha-beta T cell	KI67
@@ -63,7 +63,7 @@ CD8  T Cells > Ki67+CD38+	CD8-positive, alpha-beta T cell	KI67,CD38
 CD8  T Cells > Ki67+HLADR+	CD8-positive, alpha-beta T cell	KI67,DRA
 CD8  T Cells > Ki67+Tbet+	CD8-positive, alpha-beta T cell	KI67,DRA
 CD8  T Cells > Tbet+	CD8-positive, alpha-beta T cell	TBX21
-CM CD8	central memory CD8-positive, alpha-beta T cell	NA
+CM CD8	central memory CD8-positive, alpha-beta T cell	CD8
 CM CD8 > CD25+	central memory CD8-positive, alpha-beta T cell	IL2RA
 CM CD8 > CD38+	central memory CD8-positive, alpha-beta T cell	CD38
 CM CD8 > Ki-67+	central memory CD8-positive, alpha-beta T cell	KI67
