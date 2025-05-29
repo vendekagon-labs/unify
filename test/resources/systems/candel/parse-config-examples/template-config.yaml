@@ -282,6 +282,12 @@ cnv:
   genes:
     unify/many-delimiter: ";"
     unify/many-variable: "Genes"
+epitope:
+  unify/input-tsv-file: "processed/epitopes.tsv"
+  id: "id"
+  protein:
+    unify/many-variable: "proteins"
+    unify/many-delimiter: ";"
 clinical-trial:
   nct-number: "NCT01295827"
   other-ids: "KEYNOTE-001"

@@ -65,7 +65,7 @@
       ;        aren't part of the contract, but e.g. 50 samples should be imported by this import
       ;        would be a fair stipulation of the contract implied by a unify import.
       (testing "Right number of txes completed. This implicitly also tests for data import failures."
-        (is (=  2600 (get-in import-result [:results :completed]))))
+        (is (=  2601 (get-in import-result [:results :completed]))))
       (testing "No reference data import errors."
         (is (not (seq (:errors import-result)))))
       (println "NOTE: currently skipping validation tests.")

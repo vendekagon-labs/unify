@@ -384,6 +384,10 @@
                       ; values all in one column, with values separated by a delimeter like a semicolon, and use the following syntax to specify that
                       :genes               {:unify/many-delimiter ";"
                                             :unify/many-variable  "Genes"}}
+ :epitope            {:unify/input-tsv-file "processed/epitopes.tsv"
+                      :id "id"
+                      :protein {:unify/many-delimiter ";"
+                                :unify/many-variable "proteins"}}
  :clinical-trial     {:nct-number "NCT01295827"
                       :other-ids  "KEYNOTE-001"
                       :name-long  "Study of Pembrolizumab (MK-3475) in Participants With Progressive Locally Advanced or Metastatic Carcinoma, Melanoma, or Non-small Cell Lung Carcinoma"}}
