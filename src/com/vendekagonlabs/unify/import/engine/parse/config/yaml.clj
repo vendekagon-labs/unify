@@ -39,6 +39,30 @@
         v))
     parsed-yaml))
 
+(defn- parse-raw-attr-name
+  "From a string representation of a keyword attr, parses the same
+  with or without a leading :"
+  [s-attr-name]
+  (if (str/starts-with? s-attr-name ":")
+    (keyword (subs s-attr-name 1))
+    (keyword s-attr-name)))
+
+(defn- fix-unify-matrix-indexing
+  "The :unify.matrix/indexed-by syntax inverts keyword expectation
+  re: keys/vals position, as with unify/variables, so we fix this
+  form manually."
+  [parsed-yaml]
+  (walk/postwalk
+    (fn [v]
+      (if (and (map? v)
+               (:unify.matrix/indexed-by v))
+        (assoc v :unify.matrix/indexed-by
+                 (into {}
+                       (for [[key attr-name] (:unify.matrix/indexed-by v)]
+                           [(name key) (parse-raw-attr-name attr-name)])))
+        v))
+    parsed-yaml))
+
 (defn parse-keywords
   [parsed-yaml]
   (walk/postwalk
@@ -56,6 +80,7 @@
       (yaml/parse-string)
       (massage-colls)
       (fix-unify-variables)
+      (fix-unify-matrix-indexing)
       (parse-keywords)))
 
 (defn fix-mapping-vars
@@ -66,7 +91,7 @@
         (assoc v :unify/variables
                  (into {}
                    (for [[key val] vars-map]
-                     [key (keyword val)])))
+                     [key (parse-raw-attr-name val)])))
         v))
     parsed-mapping-yaml))
 

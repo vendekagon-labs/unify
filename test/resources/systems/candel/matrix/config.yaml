@@ -1,0 +1,53 @@
+unify/import:
+  user: "test-user"
+  mappings: "mappings.edn"
+  name: "matrix-import"
+
+dataset:
+  name: "matrix-test"
+  assays:
+    - name: "rna-seq"
+      technology: ":assay.technology/RNA-seq"
+      measurement-sets:
+        - name: "rna seq data"
+          single-cells:
+            - unify/input-tsv-file: "cell-barcodes.tsv"
+              id: "barcode"
+          measurement-matrices:
+            - name: "screening-rna-seq"
+              measurement-type: ":measurement/read-count"
+              unify.matrix/input-file: "dense-rnaseq-fixed.tsv"
+              unify.matrix/format: ":unify.matrix.format/dense"
+              unify.matrix/column-attribute: ":measurement-matrix/gene-products"
+              unify.matrix/indexed-by:
+                sample.id: ":measurement-matrix/samples"
+            - name: "single cell counts"
+              measurement-type: ":measurement/read-count"
+              unify.matrix/constants:
+                measurement-matrix/samples: "SYNTH-SC-DATA-01"
+              unify.matrix/input-file: "short-processed-counts-fixed.tsv"
+              unify.matrix/format: ":unify.matrix.format/sparse"
+              unify.matrix/indexed-by:
+                barcode: ":measurement-matrix/single-cells"
+                hugo: ":measurement-matrix/gene-products"
+
+  subjects:
+    - unify/input-tsv-file: "samples.tsv"
+      id: "subj.ids"
+      sex: "sex"
+      race: "race"
+      ethnicity: "ethnic"
+
+  samples:
+    - unify/input-tsv-file: "samples.tsv"
+      id: "samples"
+      subject: "subj.ids"
+      unify/constants:
+        timepoint: "screening"
+    - id: "SYNTH-SC-DATA-01"
+      subject: "SUBJ8"
+      timepoint: "screening"
+
+  timepoints:
+    - id: "screening"
+      type: ":timepoint.type/baseline"

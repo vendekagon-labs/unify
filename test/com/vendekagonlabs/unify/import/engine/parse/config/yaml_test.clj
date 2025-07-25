@@ -14,6 +14,11 @@
 (def ref-mapping-edn-file
   "test/resources/systems/candel/template-dataset/mappings.edn")
 
+(def matrix-config-yaml
+  "test/resources/systems/candel/matrix/config.yaml")
+(def matrix-ref-config-edn
+  "test/resources/systems/candel/matrix/config.edn")
+
 (deftest equivalent-config-test
   (let [parsed-yaml-config (sut/read-config-file config-yaml-file)
         parsed-edn-config (util.io/read-edn-file ref-config-edn-file)
@@ -28,6 +33,17 @@
 (deftest equivalent-mapping-test
   (let [parsed-yaml-mapping (sut/read-mappings-file mapping-yaml-file)
         parsed-edn-mapping (util.io/read-edn-file ref-mapping-edn-file)
+        diff (data/diff parsed-edn-mapping parsed-yaml-mapping)]
+    (testing "YAML and edn equivalent configs parse to equivalent edn data structures."
+      (is (= parsed-edn-mapping parsed-yaml-mapping))
+      ;; one of these will always fail when equality fails, this will cause failure
+      ;; report to show the diff data structure for what's not equivalent
+      (is (nil? (first diff)))
+      (is (nil? (second diff))))))
+
+(deftest equivalent-matrix-config-test
+  (let [parsed-yaml-mapping (sut/read-config-file matrix-config-yaml)
+        parsed-edn-mapping (util.io/read-edn-file matrix-ref-config-edn)
         diff (data/diff parsed-edn-mapping parsed-yaml-mapping)]
     (testing "YAML and edn equivalent configs parse to equivalent edn data structures."
       (is (= parsed-edn-mapping parsed-yaml-mapping))

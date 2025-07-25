@@ -499,8 +499,18 @@
   [cfg-dir m]
   (let [all-maps-list (concat (coll/all-nested-maps m :unify/input-tsv-file)
                               (coll/all-nested-maps m :unify/input-csv-file))
-        nested-directive? (fn [[_ v]] (and (map? v) (or (:unify/input-tsv-file v)
-                                                        (:unify/input-csv-file v))))]
+        nested-directive? (fn [[k v]]
+                            (when-not (and
+                                        (namespace k)
+                                        (str/starts-with? (namespace k) "unify"))
+                              (let [check-map (if (map? v)
+                                                v
+                                                (when (sequential? v)
+                                                  (when (map? (first v))
+                                                    (first v))))]
+                                (when check-map
+                                  (or (:unify/input-csv-file check-map)
+                                      (:unify/input-tsv-file check-map))))))]
     (->> all-maps-list
          (map #(into {} (remove nested-directive? %)))
          ;; if we have multiple files from parsed glob pattern, then we

@@ -233,16 +233,16 @@
                                                    ; The following map specifies the links between subjects and their therapy or therapies. Each subject can have 0, 1, or many therapies.
                                                    ; The therapy entity links subjects to treatment-regimens (see below) which are things like arms of clinical trials, which many subjects are on.
                                                    ; The wick package contains helper functions to generate all this data for the simple case in which each subject has only a single therapy
-                                                   :therapies        {; This input file will have one line per subject-therapy combination
-                                                                      :unify/input-csv-file  "processed/rizvi-therapies.txt"
-                                                                      ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
-                                                                      ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
-                                                                      :treatment-regimen "regimen"
-                                                                      :line              "line"
-                                                                      ; We use :unify/constants here to indicate the :therapy/order attribute, which is 1 for all therapies in this particular dataset (because here each subject has only one therapy)
-                                                                      :unify/constants   {:order 1}
-                                                                      :unify/reverse     {:unify/rev-variable "subject.id"
-                                                                                          :unify/rev-attr     :subject/therapies}}}
+                                                   :therapies        [{; This input file will have one line per subject-therapy combination
+                                                                       :unify/input-csv-file  "processed/rizvi-therapies.txt"
+                                                                       ; The treatment-regimen attribute points to treatment regimens, which have been separately specified in the dataset (see below)
+                                                                       ; This attribute needs to contain values that correspond to the :treatment-regimen/name fields
+                                                                       :treatment-regimen "regimen"
+                                                                       :line              "line"
+                                                                       ; We use :unify/constants here to indicate the :therapy/order attribute, which is 1 for all therapies in this particular dataset (because here each subject has only one therapy)
+                                                                       :unify/constants   {:order 1}
+                                                                       :unify/reverse     {:unify/rev-variable "subject.id"
+                                                                                           :unify/rev-attr     :subject/therapies}}]}
 
                                                   {:unify/input-tsv-file "processed/tcga-subjects.tsv"
                                                    :unify/na         ""
