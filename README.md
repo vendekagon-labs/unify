@@ -80,12 +80,15 @@ $DATABASE_NAME=unify-example
 $SCHEMA_DIR=test/resources/systems/candel/template-dataset/schema
 $WORKING_DIR=~/scratch/candel-import-prepared
 $IMPORT_CONFIG_PATH=test/resources/systems/candel/template-dataset/config.edn
+$SEED_DATA_DIR=test/resources/systerm/candel/reference-data
 ```
 
 The steps are (1) request a db.
 
 ```
-./unify-local request-db --database unify-example --schema-directory test/resources/systems/candel/template-dataset/schema
+./unify-local request-db --database unify-example \
+                         --schema-directory $SCHEMA_DIR \
+                         --seed-data-directory $SEED_DATA_DIR
 ```
 
 Then (2) prepare the import. This reads the files linked in the config.edn file
