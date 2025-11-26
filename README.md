@@ -29,6 +29,12 @@ End-to-end examples and tutorials are planned which will provide a more detailed
 walkthrough of how to use Unify. Example data is available in this repo in the
 `test/resources/systems/` subdirectory.
 
+There is more thorough documentation for a specific system configuration,
+UnifyBio (as used by the Rare Cancer Research Foundation and Vendekagon Labs),
+available [here](https://unifybio.github.io/). The
+[detailed docs on import config](https://unifybio.github.io/import-config/)
+are especially helpful for new users of any Unify system.
+
 ## Local Setup
 
 For running the Unify CLI, install the latest version of
@@ -37,7 +43,7 @@ For running the Unify CLI, install the latest version of
 Unify provides a simple local system setup for test use that only requires
 `docker-compose`. You can inspect the local system and change the configuration,
 or use it as a template. It can be found in the repo at `ops/local/`. To
-get going with minimal fuss, with `docker-compose`
+get going with minimal fuss, with `docker compose`
 [installed](https://docs.docker.com/desktop/install/), run the following from
 the project root:
 
@@ -64,26 +70,27 @@ with no arguments for command line help.
 ### Using the example CANDEL template dataset
 
 To stand up an example db with the
-CANDEL schema, you can run the following commands with these values set:
+CANDEL schema, run the following commands with these values set:
 
 ```
 $DATABASE_NAME  # a string, the name of the database
 $SCHEMA_DIR  # a directory containing a unify schema
 $WORKING_DIR  # user defined output path, ./unify prepare will create this
 $IMPORT_CONFIG_PATH  # path to a config edn file describing an import
+$SEED_DATA_DIR  # a path to initial reference/seed data, e.g. HGNC names for genes
 ```
 
-Here is an example, which you can run with this repo:
+The example CANDEL parameters can be run from this repo with no additions:
 
 ```
 $DATABASE_NAME=unify-example
 $SCHEMA_DIR=test/resources/systems/candel/template-dataset/schema
 $WORKING_DIR=~/scratch/candel-import-prepared
 $IMPORT_CONFIG_PATH=test/resources/systems/candel/template-dataset/config.edn
-$SEED_DATA_DIR=test/resources/systerm/candel/reference-data
+$SEED_DATA_DIR=test/resources/systems/candel/reference-data
 ```
 
-The steps are (1) request a db.
+The steps are (1) request a db (this will create & transact schema + seed data).
 
 ```
 ./unify-local request-db --database unify-example \
@@ -101,7 +108,7 @@ said file.
                       --import-config $IMPORT_CONFIG_PATH
 ```
 
-Once the data has been prepared, then for step (3) it can be transacted:
+Once the data has been prepared, then for step (3) transact it into the database:
 
 ```
 ./unify-local transact --working-directory $WORKING_DIR \
@@ -116,9 +123,9 @@ You can use a graphic browser to explore the schema in your example database at:
 http://localhost:8899/schema/1.3.1/index.html
 ```
 
-You can also query it by connecting with it from a normal Datomic peer process,
-or from any other language using the JSON query service that the local ops stand
-up with root URL of:
+You can also query it by connecting to it from a normal Datomic peer process,
+or from any other language using the JSON query service that the local ops
+stands up with root URL of:
 
 ```
 http://localhost:8889/query/$DB_NAME
@@ -145,5 +152,8 @@ Apache 2.0, Copyright Vendekagon Labs, LLC.
 ### Supporters
 
 Development on Unify is currently being supported by the
-[Rare Cancer Research Foundation](https://rarecancer.org)
-and [Clojurists Together](https://www.clojuriststogether.org).
+[Rare Cancer Research Foundation](https://rarecancer.org). Past development has
+been supported by [Clojurists Together](https://www.clojuriststogether.org).
+
+Unify was developed from CANDEL, which was open sourced by the
+[Parker Institute for Cancer Immunotherapy](https://www.parkerici.org/).
