@@ -25,7 +25,7 @@
         (ex-info (str "info.edn file does not exist, you should only encounter this error as a dev in unify repo."
                        "\nRegenerate with echo command below or see Makefile for reference:"
                       "\n----------------------\n"
-                      "> echo \"{:unify/version \\\"$(util/version)\\\"}\" > resources/info.edn"
+                      "> echo \"{:unify/version \\\"$(clj -X:version)\\\"}\" > resources/info.edn"
                       "\n----------------------\n"
                       "If you see this error as an end user, report to Unify dev team.")
                  {:cli/missing-file "resources/info.edn"})))

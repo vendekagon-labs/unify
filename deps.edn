@@ -38,9 +38,9 @@
            :repl-server {:exec-fn clojure.core.server/start-server
                          :extra-paths ["dev" "test"]
                          :extra-deps {techascent/tech.ml.dataset {:mvn/version "7.007"}}
-                         :server-daemon false
                          :exec-args {:name "repl-server"
                                      :port 5555
+                                     :server-daemon false
                                      :accept clojure.core.server/repl}}
            :build {:extra-paths ["build/"]
                    :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
@@ -51,6 +51,7 @@
            ;; some kind of task dispatch
            :version {:extra-paths ["build/"]
                      :deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
+                     :ns-default build
                      :exec-fn print-version}
            :test {:extra-paths ["test" "dev"]
                   :extra-deps {io.github.cognitect-labs/test-runner
