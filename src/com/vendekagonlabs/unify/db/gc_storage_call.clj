@@ -21,7 +21,7 @@
 
 (defn -main [& _args]
   (doseq [db db-list]
-    (let [uri (str root-db-uri db)
+    (let [uri (str (config/base-uri) db)
           conn (d/connect uri)]
       (d/gc-storage conn (java.util.Date.)))))
 

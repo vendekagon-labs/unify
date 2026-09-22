@@ -11,7 +11,7 @@
 ;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
-(ns com.vendekagonlabs.pret.bootstrap.data.so-sequence-features
+(ns com.vendekagonlabs.unify.bootstrap.data.so-sequence-features
   "This namespace contains utilites for extracting reference data from the
   OBO Foundry Sequence Ontology. The data referred to herein is licensed
   under CC v4.0 which allows commercial use. See:

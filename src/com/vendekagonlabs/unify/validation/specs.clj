@@ -122,7 +122,7 @@
 (s/def :clinical-observation/absolute-monocyte-count ::non-negative)
 
 (s/def :sample/purity ::zero-to-one)
-(s/def :timepoint/relative-order pos?)
+(s/def :timepoint/relative-order int?)
 (s/def :timepoint/offset int?)
 
 (s/def :therapy/line pos?)

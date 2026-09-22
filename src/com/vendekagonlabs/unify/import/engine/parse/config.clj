@@ -13,7 +13,6 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import.engine.parse.config
   (:require [clojure.data :as data]
-            [contextual.core :as c]
             [clojure.walk :as walk]
             [clojure.set :as set]
             [com.vendekagonlabs.unify.util.collection :as coll]
@@ -41,22 +40,6 @@
                            :unify.matrix/value-type :unify.matrix/constants})
 
 (def req-top-keys #{:dataset :unify/import})
-
-(defn strip-contextual
-  "Strip out contextual by manually munging back into a normal config map. This is a gnarly
-  way to do this, but the decontextualize function doesn't hit all cases."
-  [nested-coll]
-  (walk/postwalk (fn [node]
-                   (cond
-                     (vector? node)
-                     (into [] node)
-
-                     (map? node)
-                     (into {} node)
-
-                     :else
-                     node))
-                 nested-coll))
 
 (defn kw-in-ns? [kw ns]
   (and (keyword? kw)
@@ -133,28 +116,61 @@
   [x]
   (and (keyword? x) (not (namespace x))))
 
+(defn add-node-contexts
+  "Recursively walks a nested structure of maps and vectors (as parsed from an
+  import config file), decorating every map node with the path of keys/indices
+  used to reach it from the root (or from `init-path`, when given), stored
+  under `unify-key`. Vector nodes are walked, so their elements' indices
+  contribute to descendants' paths, but are not themselves annotated.
+
+  This is the explicit replacement for the path-tracking the `contextual`
+  library used to provide implicitly via proxy map/vector types: instead of
+  wrapping the tree in delegates that track access path as it's read, this
+  walks the tree once, top-down, threading the path and baking it directly
+  into each node."
+  ([m] (add-node-contexts m :unify/node-ctx []))
+  ([m unify-key] (add-node-contexts m unify-key []))
+  ([m unify-key init-path]
+   (letfn [(annotate [node path]
+             (cond
+               (map? node)
+               (-> (into {} (map (fn [[k v]] [k (annotate v (conj path k))])) node)
+                   (assoc unify-key path))
+
+               (vector? node)
+               (into [] (map-indexed (fn [i v] (annotate v (conj path i))) node))
+
+               :else node))]
+     (annotate m init-path))))
+
 (defn- ctx->ns
-  "Transform keys in contextual map into namespaced keys according to namespace
-  path rules defined in schema"
+  "Transform keys of a node already annotated with its raw path (see
+  `add-node-contexts`, under ::raw-ctx) into namespaced keys according to
+  namespace path rules defined in schema."
   [schema node]
-  (if (or (not (map? node))
-          (all-unify? node))
+  (if-not (map? node)
     node
-    (let [ctx (c/context node)
-          kw-ctx (filter entity-keyword? ctx)
-          kind (metamodel/node-context->kind schema kw-ctx)]
-      (into {:unify/node-kind kind}
-            (for [[k v] node]
-              [(ns-if-not-ns k (name kind)) v])))))
+    (let [ctx (::raw-ctx node)
+          node (dissoc node ::raw-ctx)]
+      (if (all-unify? node)
+        node
+        (let [kw-ctx (filter entity-keyword? ctx)
+              kind (metamodel/node-context->kind schema kw-ctx)]
+          (into {:unify/node-kind kind}
+                (for [[k v] node]
+                  [(ns-if-not-ns k (name kind)) v])))))))
 
 
 
 (defn namespace-config
-  "Given a schema and contextual import config root, adds namespaces to all
-  non-namespaced keys that reflect the kind of the entity map. Throws if config
-  map fails validations."
-  [schema ctx-cfg-root]
-  (walk/postwalk (partial ctx->ns schema) ctx-cfg-root))
+  "Given a schema and a raw (not yet namespaced) import config subtree, adds
+  namespaces to all non-namespaced keys that reflect the kind of the entity
+  map, as determined from each node's path from the root (or from
+  `init-path`, when given). Throws if config map fails validations."
+  ([schema cfg-root] (namespace-config schema cfg-root []))
+  ([schema cfg-root init-path]
+   (->> (add-node-contexts cfg-root ::raw-ctx init-path)
+        (walk/postwalk (partial ctx->ns schema)))))
 
 
 (defn ensure-raw [schema cfg-map]
@@ -410,19 +426,6 @@
   (clojure.walk/postwalk (partial add-parent-ref schema parsed-cfg) parsed-cfg+uids))
 
 
-(defn add-node-contexts
-  "Given a directive map, add node contexts (as per contextual) to each :unify/input-tsv-file node
-  in either the :unify/node-ctx key or another passed key."
-  ([m unify-key]
-   (let [add-ctx-fn (fn [node]
-                      (if (map? node)
-                        (assoc node unify-key (c/context node))
-                        node))]
-     (clojure.walk/postwalk add-ctx-fn m)))
-  ([m]
-   (add-node-contexts m :unify/node-ctx)))
-
-
 (def max-ref-data-cycles 100)
 
 (defn order-ref-data-dependencies
@@ -541,12 +544,11 @@
   "Returns all directives for running reference data in order based on dependencies between
   reference data."
   [schema ref-only-cfg-map import-root-dir]
-  (let [ctx-root (c/contextualize ref-only-cfg-map)
-        ns-ref-data-maps (add-node-contexts
-                           (c/contextualize
-                             (zipmap (keys ctx-root)
-                                     (map (partial namespace-config schema)
-                                          (vals ctx-root)))))
+  (let [ns-ref-data-maps (add-node-contexts
+                           (into {}
+                                 (map (fn [[ref-kind subtree]]
+                                        [ref-kind (namespace-config schema subtree [ref-kind])]))
+                                 ref-only-cfg-map))
         ref-jobs (get-directive-maps import-root-dir ns-ref-data-maps)
         ordered-ref-jobs (ref-jobs->deps-order schema ref-jobs)]
     ordered-ref-jobs))
@@ -597,17 +599,12 @@
   [schema cfg-map]
   (->> cfg-map
        (ensure-raw schema)
-       (c/contextualize)
        (:dataset)
-       (namespace-config schema)
+       (#(namespace-config schema % [:dataset]))
        (ensure-ns schema)
        (ensure-attr+entity)
        (hash-map :dataset)
-       ;; this re-wraps in contextualize to get namespaced paths out
-       (c/contextualize)
        (#(add-node-contexts % :unify/ns-node-ctx))
-       (c/decontextualize)
-       (strip-contextual)
        (ensure-idents schema)))
 
 
@@ -650,14 +647,10 @@
         parsed-cfg+uids (enrich-cfg-literal-data schema mapping cleaned-cfg-map)]
     (->> parsed-cfg-map
          (only-directives)
-         ;; yes, this strip seems redundant but it removes the precomputed contextual
-         ;; layer from the add-reverse-refs call and the last one doesn't, ¯\_(ツ)_/¯
-         (strip-contextual)
          (add-reverse-refs schema parsed-cfg+uids)
          (get-directive-maps import-root-dir)
          (map (partial cache-uid-prefix schema parsed-cfg+uids))
-         (verify-directives)
-         (strip-contextual))))
+         (verify-directives))))
 
 (defn cfg-map->import-entity
   "From the config map, returns the data in the shape expected by database for inserting the
@@ -690,9 +683,7 @@
   (when-let [mtx-directives (coll/all-nested-maps parsed-cfg-map :unify.matrix/input-file)]
     (let [parsed-cfg+uids (enrich-cfg-literal-data schema mapping parsed-cfg-map)]
       (->> mtx-directives
-           (strip-contextual)
            (add-reverse-refs schema parsed-cfg+uids)
            (map (fn [mtx-job]
                   (update-in mtx-job [:unify.matrix/input-file]
-                             (partial maybe->absolute-path import-root-dir))))
-           (strip-contextual)))))
+                             (partial maybe->absolute-path import-root-dir))))))))

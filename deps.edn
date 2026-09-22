@@ -3,7 +3,7 @@
         com.cognitect/anomalies {:mvn/version "0.1.12"}
         com.cognitect.aws/endpoints {:mvn/version "1.1.11.969"}
         com.cognitect.aws/sns       {:mvn/version "697.2.391.0"}
-        com.datomic/peer {:mvn/version "1.0.6735"
+        com.datomic/peer {:mvn/version "1.0.7705"
                           :exclusions [org.slf4j/jul-to-slf4j org.slf4j/slf4j-nop]}
         com.cognitect.aws/api       {:mvn/version "0.8.505"}
         com.cognitect.aws/s3        {:mvn/version "811.2.858.0"}
@@ -13,11 +13,8 @@
         clj-http/clj-http {:mvn/version "3.10.0"}
         org.clojure/core.async {:mvn/version "1.6.681"}
         org.clojure/tools.logging {:mvn/version "0.4.1"}
-        ch.qos.logback/logback-classic {:mvn/version "1.2.3"}
+        ch.qos.logback/logback-classic {:mvn/version "1.5.38"}
         org.clojure/tools.cli {:mvn/version "1.0.206"}
-        benkamphaus/contextual {:git/url "https://github.com/benkamphaus/contextual.git"
-                                :sha "b36cd30c167106e9bd2c6dbac3c75e4f58bb181a"
-                                :exclusions [org.clojure/clojurescript]}
         ;; match clojure AWS api lib
         org.clojure/data.xml {:mvn/version "0.2.0-alpha6"}
         org.clojure/data.zip {:mvn/version "1.0.0"}

@@ -25,11 +25,11 @@
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
             [com.vendekagonlabs.unify.db.transact :refer [run-txns!
                                                           sync+retry]]
-            [clojure.edn :as edn]
             [cognitect.anomalies :as anom]
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
+            [com.vendekagonlabs.unify.util.progress :as progress]
             [com.vendekagonlabs.unify.db.schema :as db.schema])
   (:import (java.io PushbackReader)
            (java.util UUID)))
@@ -100,23 +100,31 @@
   Each batch will also include a :unify.import.tx/id UUID and :unify.import.tx/import reference to the import entity
 
   'ctx' is a map containing at least the :unify.import/name for the current import job
-  'batch' is the number of entities per transaction"
-  [import-job-name filename-in filename-out batch]
+  'batch' is the number of entities per transaction
+  'all-uids' is the set of all UID attributes in the schema (see metamodel/all-uids),
+  passed in rather than recomputed here since it's the same for every file in a run and
+  computing it means reading and parsing the whole cached schema file from disk.
+  'label' identifies this file in the progress display (see
+  com.vendekagonlabs.unify.util.progress), ticked once per batch."
+  [import-job-name filename-in filename-out batch all-uids label]
   (with-open [in (PushbackReader. (io/reader filename-in))
               out (io/writer filename-out)]
-    (let [all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
-          input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
+    (let [input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
                          (take-while #(not= % ::eof)))]
+      ;; pmap here since hash-uids (a full tree-walk to find and md5-hash UID tuples)
+      ;; is pure/CPU-only per batch: for a file with many batches, this lets the
+      ;; batches for that one file use multiple cores instead of running on a single
+      ;; thread while other (smaller, already-finished) files' cores sit idle.
       (doseq [data (->> input-seq
                         (partition-all batch)
-                        (map (fn [tx-batch]
-                               (conj (hash-uids tx-batch all-uids)
-                                     (create-txn-metadata
-                                       import-job-name)))))]
+                        (pmap (fn [tx-batch]
+                               (let [result (conj (hash-uids tx-batch all-uids)
+                                                   (create-txn-metadata
+                                                     import-job-name))]
+                                 (progress/tick! label (count tx-batch))
+                                 result))))]
         (binding [*out* out]
           (prn data)))))
-  ;; print one dot per file.
-  (do (print ".") (flush))
   (log/info "Generated tx-data for: " filename-out)
   [:completed filename-out])
 
@@ -131,16 +139,26 @@
   'tx-data-path' is output path for transaction data files
   'ctx' is a map containing at least :unify.import/name for the current import job
   'batch' is the size (# of entities) batches to create"
-  [import-job-name ent-file-path batch]
+  [import-job-name ent-file-path batch all-uids]
   (log/info "Generating transaction data from entity data.")
   (let [workers 40
         all-fnames (conventions/all-entity-filenames ent-file-path)
         tx-data-gen (fn [abs-filepath]
-                      (process-one-file!
-                        import-job-name
-                        abs-filepath
-                        (conventions/in-tx-data-dir ent-file-path (text/filename abs-filepath))
-                        batch))
+                      (let [label (text/filename abs-filepath)]
+                        (progress/register! label (progress/fast-line-count abs-filepath))
+                        (try
+                          (let [result (process-one-file!
+                                         import-job-name
+                                         abs-filepath
+                                         (conventions/in-tx-data-dir ent-file-path label)
+                                         batch
+                                         all-uids
+                                         label)]
+                            (progress/complete! label)
+                            result)
+                          (catch Exception e
+                            (progress/fail! label)
+                            (throw e)))))
         input-ch (a/to-chan!! all-fnames)
         result-ch (a/chan workers)]
     (a/pipeline-blocking workers result-ch (map tx-data-gen) input-ch)
@@ -152,7 +170,7 @@
   import entity first as a single transaction, followed by a transaction for the annotated
   literal data map
   Return the :unify.import/name of the job"
-  [working-dir]
+  [working-dir all-uids]
   (let [in-file-path (conventions/import-cfg-job-path working-dir)
         out-file-path (conventions/tx-import-cfg-job-path working-dir)
         cfg-file-data (edn/read-string (str "[" (slurp in-file-path) "]"))
@@ -161,7 +179,6 @@
         processed-import-ent {:db/id         "datomic.tx"
                               :unify.import.tx/import (assoc import-ent :db/id "temp-import-ent")
                               :unify.import.tx/id (str (UUID/randomUUID))}
-        all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
         literal-data (conj (hash-uids (list (second cfg-file-data)) all-uids)
                            (create-txn-metadata import-job-name))]
     (do
@@ -178,10 +195,10 @@
   [target-dir batch]
   (println "Generating transaction data.")
   (let [start (System/currentTimeMillis)
-        import-job-name (process-import-cfg-file! target-dir)
-        process-result (make-transaction-data*! import-job-name target-dir batch)]
-    ;; end .... tx-data progress reporting with newline
-    (println)
+        all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
+        import-job-name (process-import-cfg-file! target-dir all-uids)
+        process-result (progress/with-stage "Generating transaction data"
+                          (make-transaction-data*! import-job-name target-dir batch all-uids))]
     (log/info (str "Transaction data generated from entity data in: "
                    (/ (- (System/currentTimeMillis) start)
                       1000.0) " seconds."))
@@ -289,31 +306,34 @@
                                    (run-import-job-file! conn import-job-file-path read-opts)
                                    [{::skip true}])
 
-          ref-results (cond
-                        ;; if literal import did not succeed, log error (and implicit nil)
-                        (or (not import-literal-results)
-                            (seq (filter ::anom/category import-literal-results)))
-                        (log/error "Skipping reference data because import data literal tx failed.")
+          [ref-results data-results]
+          (progress/with-stage "Transacting data"
+            (let [ref-results (cond
+                                 ;; if literal import did not succeed, log error (and implicit nil)
+                                 (or (not import-literal-results)
+                                     (seq (filter ::anom/category import-literal-results)))
+                                 (log/error "Skipping reference data because import data literal tx failed.")
 
-                        ;; if no reference files, don't need to transact
-                        (empty? all-ref-fnames)
-                        (do
-                          (println "Skipping ref data")
-                          (log/info "No reference data to transact (skipping reference data step).")
-                          [{:completed 0}])
+                                 ;; if no reference files, don't need to transact
+                                 (empty? all-ref-fnames)
+                                 (do
+                                   (println "Skipping ref data")
+                                   (log/info "No reference data to transact (skipping reference data step).")
+                                   [{:completed 0}])
 
-                        ;; if no ref anomalies, proceed to transact import literal
-                        :else
-                        (do
-                          (log/info "Transacting reference data.")
-                          (run-ordered-file-imports! conn all-ref-fnames conc read-opts)))
+                                 ;; if no ref anomalies, proceed to transact import literal
+                                 :else
+                                 (do
+                                   (log/info "Transacting reference data.")
+                                   (run-ordered-file-imports! conn all-ref-fnames conc read-opts)))
 
-          data-results (if (and ref-results
-                                (not (seq (filter ::anom/category ref-results))))
-                         (do
-                           (log/info "Transacting normal data.")
-                           (run-ordered-file-imports! conn all-dataset-fnames conc read-opts))
-                         (log/error "Skipping normal data because all reference data did not transact."))]
+                  data-results (if (and ref-results
+                                        (not (seq (filter ::anom/category ref-results))))
+                                 (do
+                                   (log/info "Transacting normal data.")
+                                   (run-ordered-file-imports! conn all-dataset-fnames conc read-opts))
+                                 (log/error "Skipping normal data because all reference data did not transact."))]
+              [ref-results data-results]))]
       {:import-literal-result import-literal-results
        :ref-results           ref-results
        :matrix-results        [matrix-upload]

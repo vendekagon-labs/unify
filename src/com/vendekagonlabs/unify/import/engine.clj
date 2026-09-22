@@ -32,6 +32,8 @@
             [com.vendekagonlabs.unify.util.io :as io]
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
+            [com.vendekagonlabs.unify.util.memo :as memo]
+            [com.vendekagonlabs.unify.util.progress :as progress]
             [com.vendekagonlabs.unify.validation.record :as record]
             [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.util.collection :as coll]))
@@ -48,6 +50,14 @@
   (or (Long/getLong "com.vendekagonlabs.unify.prepare.threads")
       (+ 2 (available-processors))))
 
+(defn file-concurrency
+  "How many files run-jobs! processes concurrently. Kept modest (rather than, say,
+  available-processors) since each concurrently-running file also internally fans out
+  across threads-per-file workers of its own for row processing."
+  []
+  (or (Long/getLong "com.vendekagonlabs.unify.prepare.file-concurrency")
+      2))
+
 (defmacro csv-throw->anomaly
   [body]
   `(try
@@ -63,14 +73,19 @@
   [rdr sep]
   (let [ch (a/chan 10000 (map (fn trim-whitespace [[row line-no]]
                                 [(mapv str/trim row) line-no])))]
-    (a/go-loop [tsv-lines (csv/read-csv rdr :separator sep)
-                line-no 1]
-      (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
-        (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
-          (if (a/>! ch [this-line line-no])
-            (recur rest-lines (inc line-no))
-            (a/close! ch)))
-        (a/close! ch)))
+    ;; Uses a/thread (backed by core.async's blocking-op thread pool), not a/go-loop
+    ;; (backed by the small, fixed go-block dispatch pool): this loop does blocking
+    ;; file I/O (csv/read-csv realizing lines from rdr) on every iteration, which is
+    ;; exactly the pattern that starves the go-block dispatch pool if run inside go.
+    (a/thread
+      (loop [tsv-lines (csv/read-csv rdr :separator sep)
+             line-no 1]
+        (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
+          (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
+            (if (a/>!! ch [this-line line-no])
+              (recur rest-lines (inc line-no))
+              (a/close! ch)))
+          (a/close! ch))))
     {:header  (first (a/<!! ch))
      :channel ch}))
 
@@ -126,8 +141,10 @@
                        (apply f args)))))))
 
 (defn process-file-async
-  "Runs process-fn on all records in file with concurrency of conc."
-  [full-import-ctx job in-f out-f conc]
+  "Runs process-fn on all records in file with concurrency of conc. `label`
+  identifies this file in the progress display (see
+  com.vendekagonlabs.unify.util.progress), ticked once per record."
+  [full-import-ctx job in-f out-f conc label]
   (with-open [rdr (jio/reader in-f)
               writer (clojure.java.io/writer out-f)]
     (let [out-ch (a/chan 10000)
@@ -148,6 +165,7 @@
                        job
                        na-val-set)
           job+ (update-in job [:unify/precomputed] merge const-data)
+          in-f-str (text/file->str in-f)
           xf (comp->anomalies
                (map (fn parse-data-transducer-fn [[record line-n]]
                       (parse.data/record->entity
@@ -158,27 +176,30 @@
                         na-val-set
                         {:line-number line-n
                          :line        record
-                         :filename    (text/file->str in-f)})))
+                         :filename    in-f-str})))
                (remove #(= % :unify/omit))
                (map record/validate))]
       (ensure-job+header! job header channel)
-      (a/go-loop [total 0]
-        (when (zero? (mod total 1000))
-          (print ".") (flush))
-        (if-let [result (a/<! out-ch)]
-          (if (::anom/category result)
-            (a/<! (exit+cleanup result))
-            (do (try
-                  (binding [*out* writer]
-                    (prn result))
-                  (catch Exception e
-                    (a/<!
-                      (exit+cleanup (merge (ex-data e)
-                                           {::anom/category            ::anom/fault
-                                            :engine/output-file-closed {:out-file out-f
-                                                                        :message  (.getMessage e)}})))))
-                (recur (inc total))))
-          (a/>! done-ch {:line-count total})))
+      ;; Same reasoning as record-stream->chan above: (prn result) writes to the output
+      ;; file on every record, which is blocking I/O and starves the go dispatch pool
+      ;; if run inside go-loop, so this runs on the blocking-op thread pool via a/thread.
+      (a/thread
+        (loop [total 0]
+          (if-let [result (a/<!! out-ch)]
+            (if (::anom/category result)
+              (a/<!! (exit+cleanup result))
+              (do (try
+                    (binding [*out* writer]
+                      (prn result))
+                    (progress/tick! label)
+                    (catch Exception e
+                      (a/<!!
+                        (exit+cleanup (merge (ex-data e)
+                                             {::anom/category            ::anom/fault
+                                              :engine/output-file-closed {:out-file out-f
+                                                                          :message  (.getMessage e)}})))))
+                  (recur (inc total))))
+            (a/>!! done-ch {:line-count total}))))
 
       (a/pipeline-blocking
         conc
@@ -190,11 +211,11 @@
 
 (defn process-file
   "Runs process-record-f function on all records in file."
-  [full-import-ctx job in-f out-f]
+  [full-import-ctx job in-f out-f label]
   (log/info (str "Generating entity data from '" in-f "' to output file '" out-f "':"))
   (let [process-ctx {:job job :in-filename in-f :out-filename out-f}
         conc (threads-per-file)
-        result (process-file-async full-import-ctx job in-f out-f conc)]
+        result (process-file-async full-import-ctx job in-f out-f conc label)]
     (if (::anom/category result)
       (do (log/error :engine/process-file "\n" "Error processing record")
           (throw (ex-info (str "Error processing file: " in-f)
@@ -223,10 +244,23 @@
            :in-filename         in-f-name
            :out-filename        out-f-path
            :prepare.resume/skip true})
-      (process-file full-import-ctx job in-file out-f-path))))
+      (do
+        (progress/register! in-f-name (progress/fast-line-count in-file))
+        (try
+          (let [result (process-file full-import-ctx job in-file out-f-path in-f-name)]
+            (progress/complete! in-f-name)
+            result)
+          (catch Exception e
+            (progress/fail! in-f-name)
+            (throw e)))))))
 
 
 (defn run-jobs!
+  "Runs exec-job (job->file) for each job, with file-concurrency files in flight at
+  once. Each file already internally fans out across threads-per-file workers for row
+  processing, but small files (or the last few large files once the rest have
+  finished) can't keep threads-per-file workers busy on their own -- running a few
+  files concurrently fills that gap."
   [target-dir full-import-ctx jobs continue-on-error?]
   (let [exec-job (fn exec-job [job]
                    (try
@@ -238,7 +272,12 @@
                               {::anom/category ::anom/fault
                                :async/file     (or (:unify/input-tsv-file job)
                                                    (:unify/input-csv-file job))}))))
-        results (doall (map exec-job jobs))]
+        results (if (seq jobs)
+                  (let [input-ch (a/to-chan!! jobs)
+                        result-ch (a/chan (count jobs))]
+                    (a/pipeline-blocking (file-concurrency) result-ch (map exec-job) input-ch)
+                    (a/<!! (a/into [] result-ch)))
+                  [])]
     (if-let [errors (seq (filter ::anom/category results))]
       (let [errored-file (:async/file (first errors))]
         (if continue-on-error?
@@ -322,6 +361,13 @@
 (defn create-entity-data
   "Given a schema and a config map, generate entity map files and write to target-dir."
   [schema cfg-map cfg-root-dir target-dir resume? continue-on-error?]
+  ;; parse.data and db.metamodel memoize some hot-path fns (e.g. UID resolution) keyed
+  ;; on the parsed config tree / schema. Those are rebuilt fresh (structurally equal,
+  ;; but not identical?) on every prepare run, so their caches must be cleared at the
+  ;; start of each run -- left unreset, later runs in the same process pay for full
+  ;; structural equality checks against the prior run's stale cache entries. See
+  ;; com.vendekagonlabs.unify.util.memo for the measured impact.
+  (memo/reset-all-caches!)
   (try
     (let [start (System/currentTimeMillis)
           raw-mapping-file-path (get-in cfg-map [:unify/import :mappings])
@@ -356,12 +402,12 @@
                           ref-only-cfg-map
                           cfg-root-dir)
           _ (println "\nUsing" (threads-per-file) " threads.")
-          ref-data-results (run-jobs! target-dir full-import-ctx ref-data-jobs continue-on-error?)
-          matrix-results (run-matrix-jobs! target-dir full-import-ctx matrix-jobs continue-on-error?)
-          dataset-results (run-jobs! target-dir full-import-ctx jobs continue-on-error?)
-          results (vec (concat ref-data-results matrix-results dataset-results))]
+          results (progress/with-stage "Preparing import data"
+                    (let [ref-data-results (run-jobs! target-dir full-import-ctx ref-data-jobs continue-on-error?)
+                          matrix-results (run-matrix-jobs! target-dir full-import-ctx matrix-jobs continue-on-error?)
+                          dataset-results (run-jobs! target-dir full-import-ctx jobs continue-on-error?)]
+                      (vec (concat ref-data-results matrix-results dataset-results))))]
       (io/write-edn-file (str target-dir "/import-summary.edn") (text/->pretty-string results))
-      (println "\n")
       (log/info (str "Entity generation elapsed time: " (/ (- (System/currentTimeMillis) start) 1000.0) "seconds."))
       results)
     (catch Exception e

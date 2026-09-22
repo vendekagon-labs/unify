@@ -17,7 +17,8 @@
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import.tx-data :as sut]
             [com.vendekagonlabs.unify.test-util :as util]
-            [com.vendekagonlabs.unify.util.uuid :as uuid]))
+            [com.vendekagonlabs.unify.util.uuid :as uuid]
+            [com.vendekagonlabs.unify.db.metamodel :as metamodel]))
 
 (def flat-measurement-entity-maps-path "test/resources/flat_measurement_entity_data.edn")
 
@@ -32,7 +33,9 @@
           import-config
           flat-measurement-entity-maps-path
           (util/ensure-filepath! out-filepath)
-          3)
+          3
+          (metamodel/all-uids (util/get-candel-schema))
+          "measurement-txes")
         (let [results (util/file->edn-seq out-filepath)
               metadata (map first results)]
           (is (every? (partial s/valid? ::sut/valid-tx-data) results))

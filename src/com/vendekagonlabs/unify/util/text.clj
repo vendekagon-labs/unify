@@ -40,7 +40,7 @@
   [f]
   (if (string? f)
     f
-    (.getAbsolutePath f)))
+    (.getAbsolutePath ^java.io.File f)))
 
 (def windows-absolute-path-start-re #"(?i)^(\w)\:.*")
 

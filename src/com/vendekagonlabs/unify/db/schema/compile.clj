@@ -23,7 +23,7 @@
 (s/def ::tuple-type-def
   (s/keys :req-un [::tuple-of]))
 
-(s/keys ::ref-to unnamespaced-keyword?)
+(s/def ::ref-to unnamespaced-keyword?)
 (s/def ::ref-type-def
   (s/keys :req-un [::ref-to]))
 (s/def ::enum-of
