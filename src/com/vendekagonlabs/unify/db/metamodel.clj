@@ -19,7 +19,8 @@
   Note that this includes as the first element indexes for O(1)
   access (hash-map lookup) for common queries."
   (:require [clojure.string :as str]
-            [com.vendekagonlabs.unify.db.schema :as db.schema]))
+            [com.vendekagonlabs.unify.db.schema :as db.schema]
+            [com.vendekagonlabs.unify.util.memo :as memo]))
 
 (defn kind-by-name
   "Return all data for any kinds that match provided kind-name.
@@ -207,7 +208,7 @@
        (map :db/ident)
        (first)))
 
-(def eid->ident (memoize eid->ident*))
+(def eid->ident (memo/resettable-memoize eid->ident*))
 
 (defn kind->attr*
   "For a given kind name (non-ns keyword form), returns an attr present on that kind definition."
@@ -218,7 +219,7 @@
                              (attr-kw))]
     (eid->ident schema id)))
 
-(def kind->attr (memoize kind->attr*))
+(def kind->attr (memo/resettable-memoize kind->attr*))
 
 (defn attr->db-type
   "Given an attribute specified by ident, returns the db/valueType for that attribute."

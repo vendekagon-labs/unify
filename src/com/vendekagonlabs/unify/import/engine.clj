@@ -32,6 +32,7 @@
             [com.vendekagonlabs.unify.util.io :as io]
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
+            [com.vendekagonlabs.unify.util.memo :as memo]
             [com.vendekagonlabs.unify.validation.record :as record]
             [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.util.collection :as coll]))
@@ -63,14 +64,19 @@
   [rdr sep]
   (let [ch (a/chan 10000 (map (fn trim-whitespace [[row line-no]]
                                 [(mapv str/trim row) line-no])))]
-    (a/go-loop [tsv-lines (csv/read-csv rdr :separator sep)
-                line-no 1]
-      (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
-        (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
-          (if (a/>! ch [this-line line-no])
-            (recur rest-lines (inc line-no))
-            (a/close! ch)))
-        (a/close! ch)))
+    ;; Uses a/thread (backed by core.async's blocking-op thread pool), not a/go-loop
+    ;; (backed by the small, fixed go-block dispatch pool): this loop does blocking
+    ;; file I/O (csv/read-csv realizing lines from rdr) on every iteration, which is
+    ;; exactly the pattern that starves the go-block dispatch pool if run inside go.
+    (a/thread
+      (loop [tsv-lines (csv/read-csv rdr :separator sep)
+             line-no 1]
+        (if-let [this-line (csv-throw->anomaly (first tsv-lines))]
+          (let [rest-lines (csv-throw->anomaly (next tsv-lines))]
+            (if (a/>!! ch [this-line line-no])
+              (recur rest-lines (inc line-no))
+              (a/close! ch)))
+          (a/close! ch))))
     {:header  (first (a/<!! ch))
      :channel ch}))
 
@@ -148,6 +154,7 @@
                        job
                        na-val-set)
           job+ (update-in job [:unify/precomputed] merge const-data)
+          in-f-str (text/file->str in-f)
           xf (comp->anomalies
                (map (fn parse-data-transducer-fn [[record line-n]]
                       (parse.data/record->entity
@@ -158,27 +165,31 @@
                         na-val-set
                         {:line-number line-n
                          :line        record
-                         :filename    (text/file->str in-f)})))
+                         :filename    in-f-str})))
                (remove #(= % :unify/omit))
                (map record/validate))]
       (ensure-job+header! job header channel)
-      (a/go-loop [total 0]
-        (when (zero? (mod total 1000))
-          (print ".") (flush))
-        (if-let [result (a/<! out-ch)]
-          (if (::anom/category result)
-            (a/<! (exit+cleanup result))
-            (do (try
-                  (binding [*out* writer]
-                    (prn result))
-                  (catch Exception e
-                    (a/<!
-                      (exit+cleanup (merge (ex-data e)
-                                           {::anom/category            ::anom/fault
-                                            :engine/output-file-closed {:out-file out-f
-                                                                        :message  (.getMessage e)}})))))
-                (recur (inc total))))
-          (a/>! done-ch {:line-count total})))
+      ;; Same reasoning as record-stream->chan above: (prn result) writes to the output
+      ;; file on every record, which is blocking I/O and starves the go dispatch pool
+      ;; if run inside go-loop, so this runs on the blocking-op thread pool via a/thread.
+      (a/thread
+        (loop [total 0]
+          (when (zero? (mod total 1000))
+            (print ".") (flush))
+          (if-let [result (a/<!! out-ch)]
+            (if (::anom/category result)
+              (a/<!! (exit+cleanup result))
+              (do (try
+                    (binding [*out* writer]
+                      (prn result))
+                    (catch Exception e
+                      (a/<!!
+                        (exit+cleanup (merge (ex-data e)
+                                             {::anom/category            ::anom/fault
+                                              :engine/output-file-closed {:out-file out-f
+                                                                          :message  (.getMessage e)}})))))
+                  (recur (inc total))))
+            (a/>!! done-ch {:line-count total}))))
 
       (a/pipeline-blocking
         conc
@@ -322,6 +333,13 @@
 (defn create-entity-data
   "Given a schema and a config map, generate entity map files and write to target-dir."
   [schema cfg-map cfg-root-dir target-dir resume? continue-on-error?]
+  ;; parse.data and db.metamodel memoize some hot-path fns (e.g. UID resolution) keyed
+  ;; on the parsed config tree / schema. Those are rebuilt fresh (structurally equal,
+  ;; but not identical?) on every prepare run, so their caches must be cleared at the
+  ;; start of each run -- left unreset, later runs in the same process pay for full
+  ;; structural equality checks against the prior run's stale cache entries. See
+  ;; com.vendekagonlabs.unify.util.memo for the measured impact.
+  (memo/reset-all-caches!)
   (try
     (let [start (System/currentTimeMillis)
           raw-mapping-file-path (get-in cfg-map [:unify/import :mappings])

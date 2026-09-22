@@ -21,6 +21,7 @@
             [cognitect.anomalies :as anom]
             [com.vendekagonlabs.unify.db.util :as db.util]
             [com.vendekagonlabs.unify.util.text :as text]
+            [com.vendekagonlabs.unify.util.memo :as memo]
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]))
 
 (set! *warn-on-reflection* true)
@@ -249,7 +250,7 @@
               (recur rem-path))))))))
 
 (def resolve-ref-uid-in-context
-  (memoize resolve-ref-uid-in-context-impl))
+  (memo/resettable-memoize resolve-ref-uid-in-context-impl))
 
 (defn ref-uid
   "Generates the uid of the target-kind for a reference, using the parsed config
@@ -427,12 +428,17 @@
     (not (str/starts-with? (namespace k) "unify"))
     (string? v)))
 
+(def ^:private tidy-entries-of
+  "Memoized: `job` is the same value for every record processed from a given
+  file, so the tidy-shaped subset of its entries is fixed per-job. Avoids
+  re-filtering the whole job map on every single record."
+  (memo/resettable-memoize (fn [job] (vec (filter tidy-entry? job)))))
+
 (defn extract-tidy-data
   "Extracts tidy explicit attribute data for record given context, schema, job,
   and raw entity map."
   [parsed-cfg schema mapping job raw-entity na-val-set]
-  (->> job
-       (filter tidy-entry?)
+  (->> (tidy-entries-of job)
        (map (fn extract-tidy-value [[attr col-name]]
               (let [raw-value (get raw-entity col-name)
                     resolved-value (resolve-value parsed-cfg
@@ -451,9 +457,13 @@
     (not= "unify" (namespace k))
     (vector? v)))
 
+(def ^:private tuple-entries-of
+  "Memoized per-job, for the same reason as tidy-entries-of above."
+  (memo/resettable-memoize (fn [job] (seq (filter tuple-entry? job)))))
+
 (defn extract-tuple-data
   [parsed-cfg schema mapping job raw-entity na-val-set]
-  (when-let [tuple-entries (seq (filter tuple-entry? job))]
+  (when-let [tuple-entries (tuple-entries-of job)]
     (->> tuple-entries
          (map (fn [[attr col-names]]
                 (let [tuple-types (get-in schema [0 :index/idents attr :unify.ref/tuple-types])
@@ -486,19 +496,22 @@
                     [attr resolved-values]))))
          (into {}))))
 
-(defn- synthetic-column-mapping
+(def ^:private synthetic-column-mapping
   "Returns all keys from the job that map to columns of the raw entity
-   data. This includes reverse reference columns."
-  [job]
-  (->> job
-       seq
-       (keep
-         (fn [[k v]]
-           (cond
-             (tidy-entry? [k v]) [k v]
-             (= :unify/reverse k) [(:unify/rev-attr v)
-                                   (:unify/rev-variable v)])))
-       (into {})))
+   data. This includes reverse reference columns.
+
+  Memoized per-job, for the same reason as tidy-entries-of above."
+  (memo/resettable-memoize
+    (fn [job]
+      (->> job
+           seq
+           (keep
+             (fn [[k v]]
+               (cond
+                 (tidy-entry? [k v]) [k v]
+                 (= :unify/reverse k) [(:unify/rev-attr v)
+                                       (:unify/rev-variable v)])))
+           (into {})))))
 
 
 (defn create-synthetic-attr
@@ -553,21 +566,35 @@
         {attribute (resolve-value parsed-cfg schema mapping job attribute value na-val-set)}))))
 
 
+(def ^:private many-delim-entries-of
+  "Memoized per-job, for the same reason as tidy-entries-of above."
+  (memo/resettable-memoize
+    (fn [job]
+      (filter (fn [[k v]]
+                (and (map? v)
+                     (:unify/many-delimiter v)))
+              job))))
+
+(def ^:private delimiter-regex
+  "Compiling a Pattern from a delimiter string is pure given the string, and
+  the same handful of delimiters recur across every record of a job, so this
+  avoids recompiling the same regex on every single record."
+  (memo/resettable-memoize
+    (fn [many-delimiter]
+      (re-pattern (if (regex-escape many-delimiter)
+                    (str "\\" many-delimiter)
+                    many-delimiter)))))
+
 (defn extract-card-many-data
   "Extracts card many data when delimited in a single value in a record by a delimiter, and
   when unify directive in job specifies to do so."
   [parsed-cfg schema mapping job raw-entity na-val-set]
-  (let [many-att-val-pairs (filter (fn [[k v]]
-                                     (and (map? v)
-                                          (:unify/many-delimiter v)))
-                                   job)]
+  (let [many-att-val-pairs (many-delim-entries-of job)]
     (when (seq many-att-val-pairs)
       (->> (for [[attr {:keys [unify/many-delimiter
                                unify/many-variable]}] many-att-val-pairs]
              (when-let [pre-vals (get raw-entity many-variable)]
-               (let [delim-regex (re-pattern (if (regex-escape many-delimiter)
-                                               (str "\\" many-delimiter)
-                                               many-delimiter))
+               (let [delim-regex (delimiter-regex many-delimiter)
                      vals (mapv #(resolve-value parsed-cfg schema mapping job attr % na-val-set)
                                 (str/split pre-vals delim-regex))]
                  {attr vals})))
@@ -624,7 +651,6 @@
   (let [kind (keyword (namespace (first (keys e))))]
     (metamodel/ref-data? schema kind)))
 
-
 (defn record->entity
   "For each record from a file being processed as a job, performs all munging and remapping steps
   necessary to create a valid entity from that record."
@@ -635,8 +661,7 @@
             :data-file/process-record ::header-record-mismatch}
            import-ctx)
     ;; nothing bound in this let should throw due to file content issues
-    (let [;; start-time (System/nanoTime)  ; part of per-record perf logging
-          raw-entity (zipmap header record)
+    (let [raw-entity (zipmap header record)
           omit-on (:unify/omit-if-na job)
           {:keys [filename line-number]} import-ctx
           annotation {:unify/annotations {:unify.annotation/filename    (text/file->str filename)
@@ -671,9 +696,6 @@
               import-metadata (if (reference-data-entity? schema base-entity)
                                 {:unify.import/most-recent [:unify.import/name import-name]}
                                 {})]
-          ;; uncomment this and start-time to log per-record nanosec record perf
-          ;;(log/debug ::record (:unify/node-kind job) "computed in "
-          ;;           (- (System/nanoTime) start-time) " nanosec."
           (-> base-entity
               (collection/remove-keys-by-ns "unify")
               (merge annotation)
