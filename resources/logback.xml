@@ -1,15 +1,18 @@
 <configuration>
   <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>log/pret.log</file>
+    <file>log/unify.log</file>
     <encoder>
       <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %-5level %msg [logger=%logger] [thread=%thread]%n</pattern>
     </encoder>
   </appender>
 
+  <!-- %highlight colors the level (ERROR=red, WARN=amber/red, INFO=blue, DEBUG/TRACE=grey) on
+       the console only, never on FILE, since that log is read later (grep, tail -f from a
+       non-terminal, etc.) and raw ANSI codes would just corrupt it. -->
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %-5level %msg [logger=%logger] [thread=%thread]%n</pattern>
+      <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %highlight(%-5level) %msg [logger=%logger] [thread=%thread]%n</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>

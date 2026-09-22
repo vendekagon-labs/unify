@@ -23,20 +23,40 @@
             [com.vendekagonlabs.unify.cli.error-handling :as cli.error-handling :refer [exit]]
             [com.vendekagonlabs.unify.db :as db]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
-            [com.vendekagonlabs.unify.util.release :as release])
+            [com.vendekagonlabs.unify.util.release :as release]
+            [com.vendekagonlabs.unify.util.term :as term])
   (:gen-class)
   (:import (java.util Date)))
 
 
-(def unify-ascii "
-==================================================
-   __    __  .__   __.  __   ___________    ____
-  |  |  |  | |  \\ |  | |  | |   ____\\   \\  /   /
-  |  |  |  | |   \\|  | |  | |  |__   \\   \\/   /
-  |  |  |  | |  . `  | |  | |   __|   \\_    _/
-  |  `--'  | |  |\\   | |  | |  |        |  |
-   \\______/  |__| \\__| |__| |__|        |__|
-==================================================")
+(def unify-ascii-bar
+  "==================================================")
+
+(def unify-ascii-lines
+  [" ██╗   ██╗███╗   ██╗██╗███████╗██╗   ██╗"
+   " ██║   ██║████╗  ██║██║██╔════╝╚██╗ ██╔╝"
+   " ██║   ██║██╔██╗ ██║██║█████╗   ╚████╔╝ "
+   " ██║   ██║██║╚██╗██║██║██╔══╝    ╚██╔╝  "
+   " ╚██████╔╝██║ ╚████║██║██║        ██║   "
+   "  ╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝        ╚═╝   "])
+
+(def unify-ascii
+  (str "\n" unify-ascii-bar "\n"
+       (str/join "\n" unify-ascii-lines) "\n"
+       unify-ascii-bar))
+
+(defn unify-banner
+  "Renders the startup banner, in Vendekagon Labs brand-ish colors (white on
+  teal, copper accent bars) when stdout is a color-capable terminal;
+  otherwise plain, identical to the old unify-ascii text."
+  []
+  (if (term/color-enabled?)
+    (let [bar (term/paint true [(term/fg term/copper)] unify-ascii-bar)
+          art (->> unify-ascii-lines
+                   (map #(term/paint true [(term/bg term/teal) (term/fg term/white)] %))
+                   (str/join "\n"))]
+      (str "\n" bar "\n" art "\n" bar))
+    unify-ascii))
 
 ;; this handles case when pmap, etc. cause exceptions outside main
 ;; thread that don't hit normal exception handling.
@@ -372,7 +392,7 @@
 
 
 (defn -main [& args]
-  (println unify-ascii)
+  (println (unify-banner))
   (try
     (println "version:" (release/version))
     (println "--------------------------------------")

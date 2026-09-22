@@ -34,7 +34,8 @@
           flat-measurement-entity-maps-path
           (util/ensure-filepath! out-filepath)
           3
-          (metamodel/all-uids (util/get-candel-schema)))
+          (metamodel/all-uids (util/get-candel-schema))
+          "measurement-txes")
         (let [results (util/file->edn-seq out-filepath)
               metadata (map first results)]
           (is (every? (partial s/valid? ::sut/valid-tx-data) results))

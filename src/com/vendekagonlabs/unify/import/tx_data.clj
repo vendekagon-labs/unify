@@ -29,6 +29,7 @@
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
+            [com.vendekagonlabs.unify.util.progress :as progress]
             [com.vendekagonlabs.unify.db.schema :as db.schema])
   (:import (java.io PushbackReader)
            (java.util UUID)))
@@ -102,8 +103,10 @@
   'batch' is the number of entities per transaction
   'all-uids' is the set of all UID attributes in the schema (see metamodel/all-uids),
   passed in rather than recomputed here since it's the same for every file in a run and
-  computing it means reading and parsing the whole cached schema file from disk."
-  [import-job-name filename-in filename-out batch all-uids]
+  computing it means reading and parsing the whole cached schema file from disk.
+  'label' identifies this file in the progress display (see
+  com.vendekagonlabs.unify.util.progress), ticked once per batch."
+  [import-job-name filename-in filename-out batch all-uids label]
   (with-open [in (PushbackReader. (io/reader filename-in))
               out (io/writer filename-out)]
     (let [input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
@@ -115,13 +118,13 @@
       (doseq [data (->> input-seq
                         (partition-all batch)
                         (pmap (fn [tx-batch]
-                               (conj (hash-uids tx-batch all-uids)
-                                     (create-txn-metadata
-                                       import-job-name)))))]
+                               (let [result (conj (hash-uids tx-batch all-uids)
+                                                   (create-txn-metadata
+                                                     import-job-name))]
+                                 (progress/tick! label (count tx-batch))
+                                 result))))]
         (binding [*out* out]
           (prn data)))))
-  ;; print one dot per file.
-  (do (print ".") (flush))
   (log/info "Generated tx-data for: " filename-out)
   [:completed filename-out])
 
@@ -141,12 +144,21 @@
   (let [workers 40
         all-fnames (conventions/all-entity-filenames ent-file-path)
         tx-data-gen (fn [abs-filepath]
-                      (process-one-file!
-                        import-job-name
-                        abs-filepath
-                        (conventions/in-tx-data-dir ent-file-path (text/filename abs-filepath))
-                        batch
-                        all-uids))
+                      (let [label (text/filename abs-filepath)]
+                        (progress/register! label (progress/fast-line-count abs-filepath))
+                        (try
+                          (let [result (process-one-file!
+                                         import-job-name
+                                         abs-filepath
+                                         (conventions/in-tx-data-dir ent-file-path label)
+                                         batch
+                                         all-uids
+                                         label)]
+                            (progress/complete! label)
+                            result)
+                          (catch Exception e
+                            (progress/fail! label)
+                            (throw e)))))
         input-ch (a/to-chan!! all-fnames)
         result-ch (a/chan workers)]
     (a/pipeline-blocking workers result-ch (map tx-data-gen) input-ch)
@@ -185,9 +197,8 @@
   (let [start (System/currentTimeMillis)
         all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
         import-job-name (process-import-cfg-file! target-dir all-uids)
-        process-result (make-transaction-data*! import-job-name target-dir batch all-uids)]
-    ;; end .... tx-data progress reporting with newline
-    (println)
+        process-result (progress/with-stage "Generating transaction data"
+                          (make-transaction-data*! import-job-name target-dir batch all-uids))]
     (log/info (str "Transaction data generated from entity data in: "
                    (/ (- (System/currentTimeMillis) start)
                       1000.0) " seconds."))

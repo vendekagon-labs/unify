@@ -33,6 +33,7 @@
             [com.vendekagonlabs.unify.util.text :as text]
             [com.vendekagonlabs.unify.util.uuid :as uuid]
             [com.vendekagonlabs.unify.util.memo :as memo]
+            [com.vendekagonlabs.unify.util.progress :as progress]
             [com.vendekagonlabs.unify.validation.record :as record]
             [com.vendekagonlabs.unify.db.schema :as schema]
             [com.vendekagonlabs.unify.util.collection :as coll]))
@@ -140,8 +141,10 @@
                        (apply f args)))))))
 
 (defn process-file-async
-  "Runs process-fn on all records in file with concurrency of conc."
-  [full-import-ctx job in-f out-f conc]
+  "Runs process-fn on all records in file with concurrency of conc. `label`
+  identifies this file in the progress display (see
+  com.vendekagonlabs.unify.util.progress), ticked once per record."
+  [full-import-ctx job in-f out-f conc label]
   (with-open [rdr (jio/reader in-f)
               writer (clojure.java.io/writer out-f)]
     (let [out-ch (a/chan 10000)
@@ -182,14 +185,13 @@
       ;; if run inside go-loop, so this runs on the blocking-op thread pool via a/thread.
       (a/thread
         (loop [total 0]
-          (when (zero? (mod total 1000))
-            (print ".") (flush))
           (if-let [result (a/<!! out-ch)]
             (if (::anom/category result)
               (a/<!! (exit+cleanup result))
               (do (try
                     (binding [*out* writer]
                       (prn result))
+                    (progress/tick! label)
                     (catch Exception e
                       (a/<!!
                         (exit+cleanup (merge (ex-data e)
@@ -209,11 +211,11 @@
 
 (defn process-file
   "Runs process-record-f function on all records in file."
-  [full-import-ctx job in-f out-f]
+  [full-import-ctx job in-f out-f label]
   (log/info (str "Generating entity data from '" in-f "' to output file '" out-f "':"))
   (let [process-ctx {:job job :in-filename in-f :out-filename out-f}
         conc (threads-per-file)
-        result (process-file-async full-import-ctx job in-f out-f conc)]
+        result (process-file-async full-import-ctx job in-f out-f conc label)]
     (if (::anom/category result)
       (do (log/error :engine/process-file "\n" "Error processing record")
           (throw (ex-info (str "Error processing file: " in-f)
@@ -242,7 +244,15 @@
            :in-filename         in-f-name
            :out-filename        out-f-path
            :prepare.resume/skip true})
-      (process-file full-import-ctx job in-file out-f-path))))
+      (do
+        (progress/register! in-f-name (progress/fast-line-count in-file))
+        (try
+          (let [result (process-file full-import-ctx job in-file out-f-path in-f-name)]
+            (progress/complete! in-f-name)
+            result)
+          (catch Exception e
+            (progress/fail! in-f-name)
+            (throw e)))))))
 
 
 (defn run-jobs!
@@ -392,12 +402,12 @@
                           ref-only-cfg-map
                           cfg-root-dir)
           _ (println "\nUsing" (threads-per-file) " threads.")
-          ref-data-results (run-jobs! target-dir full-import-ctx ref-data-jobs continue-on-error?)
-          matrix-results (run-matrix-jobs! target-dir full-import-ctx matrix-jobs continue-on-error?)
-          dataset-results (run-jobs! target-dir full-import-ctx jobs continue-on-error?)
-          results (vec (concat ref-data-results matrix-results dataset-results))]
+          results (progress/with-stage "Preparing import data"
+                    (let [ref-data-results (run-jobs! target-dir full-import-ctx ref-data-jobs continue-on-error?)
+                          matrix-results (run-matrix-jobs! target-dir full-import-ctx matrix-jobs continue-on-error?)
+                          dataset-results (run-jobs! target-dir full-import-ctx jobs continue-on-error?)]
+                      (vec (concat ref-data-results matrix-results dataset-results))))]
       (io/write-edn-file (str target-dir "/import-summary.edn") (text/->pretty-string results))
-      (println "\n")
       (log/info (str "Entity generation elapsed time: " (/ (- (System/currentTimeMillis) start) 1000.0) "seconds."))
       results)
     (catch Exception e
