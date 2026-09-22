@@ -29,9 +29,6 @@
   (:import (java.util Date)))
 
 
-(def unify-ascii-bar
-  "==================================================")
-
 (def unify-ascii-lines
   [" ██╗   ██╗███╗   ██╗██╗███████╗██╗   ██╗"
    " ██║   ██║████╗  ██║██║██╔════╝╚██╗ ██╔╝"
@@ -41,21 +38,16 @@
    "  ╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝        ╚═╝   "])
 
 (def unify-ascii
-  (str "\n" unify-ascii-bar "\n"
-       (str/join "\n" unify-ascii-lines) "\n"
-       unify-ascii-bar))
+  (str "\n" (str/join "\n" unify-ascii-lines)))
 
 (defn unify-banner
-  "Renders the startup banner, in Vendekagon Labs brand-ish colors (white on
-  teal, copper accent bars) when stdout is a color-capable terminal;
-  otherwise plain, identical to the old unify-ascii text."
+  "Renders the startup banner, teal letters (no background fill) when stdout
+  is a color-capable terminal; otherwise plain, identical to unify-ascii."
   []
   (if (term/color-enabled?)
-    (let [bar (term/paint true [(term/fg term/copper)] unify-ascii-bar)
-          art (->> unify-ascii-lines
-                   (map #(term/paint true [(term/bg term/teal) (term/fg term/white)] %))
-                   (str/join "\n"))]
-      (str "\n" bar "\n" art "\n" bar))
+    (str "\n" (->> unify-ascii-lines
+                   (map #(term/paint true [(term/fg term/teal)] %))
+                   (str/join "\n")))
     unify-ascii))
 
 ;; this handles case when pmap, etc. cause exceptions outside main

@@ -1,12 +1,10 @@
-VERSION = "$(shell clj -X:version)"
-
 version-info:
-	echo "{:unify/version \"${VERSION}\"}" > resources/info.edn
+	clj -X:build write-version-info!
 
 repl: version-info
 	clj -X:repl-server :port 5555
 
-uberjar: clean version-info
+uberjar: clean
 	clj -X:build
 
 clean:
