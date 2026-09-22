@@ -3,7 +3,7 @@
         com.cognitect/anomalies {:mvn/version "0.1.12"}
         com.cognitect.aws/endpoints {:mvn/version "1.1.11.969"}
         com.cognitect.aws/sns       {:mvn/version "697.2.391.0"}
-        com.datomic/peer {:mvn/version "1.0.6735"
+        com.datomic/peer {:mvn/version "1.0.7705"
                           :exclusions [org.slf4j/jul-to-slf4j org.slf4j/slf4j-nop]}
         com.cognitect.aws/api       {:mvn/version "0.8.505"}
         com.cognitect.aws/s3        {:mvn/version "811.2.858.0"}
