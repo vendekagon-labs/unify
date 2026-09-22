@@ -306,31 +306,34 @@
                                    (run-import-job-file! conn import-job-file-path read-opts)
                                    [{::skip true}])
 
-          ref-results (cond
-                        ;; if literal import did not succeed, log error (and implicit nil)
-                        (or (not import-literal-results)
-                            (seq (filter ::anom/category import-literal-results)))
-                        (log/error "Skipping reference data because import data literal tx failed.")
+          [ref-results data-results]
+          (progress/with-stage "Transacting data"
+            (let [ref-results (cond
+                                 ;; if literal import did not succeed, log error (and implicit nil)
+                                 (or (not import-literal-results)
+                                     (seq (filter ::anom/category import-literal-results)))
+                                 (log/error "Skipping reference data because import data literal tx failed.")
 
-                        ;; if no reference files, don't need to transact
-                        (empty? all-ref-fnames)
-                        (do
-                          (println "Skipping ref data")
-                          (log/info "No reference data to transact (skipping reference data step).")
-                          [{:completed 0}])
+                                 ;; if no reference files, don't need to transact
+                                 (empty? all-ref-fnames)
+                                 (do
+                                   (println "Skipping ref data")
+                                   (log/info "No reference data to transact (skipping reference data step).")
+                                   [{:completed 0}])
 
-                        ;; if no ref anomalies, proceed to transact import literal
-                        :else
-                        (do
-                          (log/info "Transacting reference data.")
-                          (run-ordered-file-imports! conn all-ref-fnames conc read-opts)))
+                                 ;; if no ref anomalies, proceed to transact import literal
+                                 :else
+                                 (do
+                                   (log/info "Transacting reference data.")
+                                   (run-ordered-file-imports! conn all-ref-fnames conc read-opts)))
 
-          data-results (if (and ref-results
-                                (not (seq (filter ::anom/category ref-results))))
-                         (do
-                           (log/info "Transacting normal data.")
-                           (run-ordered-file-imports! conn all-dataset-fnames conc read-opts))
-                         (log/error "Skipping normal data because all reference data did not transact."))]
+                  data-results (if (and ref-results
+                                        (not (seq (filter ::anom/category ref-results))))
+                                 (do
+                                   (log/info "Transacting normal data.")
+                                   (run-ordered-file-imports! conn all-dataset-fnames conc read-opts))
+                                 (log/error "Skipping normal data because all reference data did not transact."))]
+              [ref-results data-results]))]
       {:import-literal-result import-literal-results
        :ref-results           ref-results
        :matrix-results        [matrix-upload]

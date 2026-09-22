@@ -17,7 +17,8 @@
             [clojure.edn :as edn]
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
             [com.vendekagonlabs.unify.db.common :refer [retryable?]]
-            [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
+            [com.vendekagonlabs.unify.util.text :as text :refer [->pretty-string]]
+            [com.vendekagonlabs.unify.util.progress :as progress]
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.util.uuid :as util.uuid]
             [clojure.tools.logging :as log]
@@ -157,7 +158,7 @@
      :stop, a fn you can use to terminate early."
   [conn conc from-ch opts]
   ;; TODO: will other options (if any added) be wired in straight to async-transact-w-tretry?
-  (let [{:keys [skip-annotations transducer]} opts
+  (let [{:keys [skip-annotations transducer progress-label]} opts
         to-ch (a/chan (* 4 1024))
         done-ch (a/chan)
         transact-data (fn [data]
@@ -166,18 +167,21 @@
                             (do
                               (log/error "Anomaly encountered running transactions -- stopping."
                                          (->pretty-string result))
+                              (when progress-label (progress/fail! progress-label))
                               (a/close! from-ch)
                               (a/close! to-ch)
                               (a/>!! done-ch result))
                             result)))]
-    ; go block prints a '.' after every 10 transactions, puts completed
-    ; report on done channel when no value left to be taken.
+    ; go block ticks progress (see com.vendekagonlabs.unify.util.progress) after every
+    ; completed transaction, puts completed report on done channel when no value left to take.
     (a/go-loop [total 0]
-      (when (zero? (mod total 10))
-        (print ".") (flush))
       (if-let [_c (a/<! to-ch)]
-        (recur (inc total))
-        (a/>! done-ch {:completed total})))
+        (do
+          (when progress-label (progress/tick! progress-label))
+          (recur (inc total)))
+        (do
+          (when progress-label (progress/complete! progress-label))
+          (a/>! done-ch {:completed total}))))
 
     ; pipeline that uses transducer form of map to transact data taken from
     ; from-ch and puts results on to-ch
@@ -200,6 +204,17 @@
   their import supplied uuid."
   ([conn f-list conc opts]
    (let [{:keys [import-name skip-annotations]} opts
+         ;; f-list is always a single tx-data file in practice (both real callers loop one
+         ;; file at a time), so this label/total naturally describes "the file currently
+         ;; being transacted." Each line in a tx-data file is exactly one transact batch
+         ;; (see tx-data/process-one-file!), so this total is exact, not approximate like
+         ;; the row-count-based ones used during prepare.
+         progress-label (if (= 1 (count f-list))
+                          (text/filename (first f-list))
+                          (str (count f-list) " files"))
+         progress-total (let [counts (keep progress/fast-line-count f-list)]
+                          (when (seq counts) (reduce + counts)))
+         _ (progress/register! progress-label progress-total)
          input-chan (a/chan (* 4 1024))
          tx-xform (if-not import-name
                     (map identity)
@@ -216,7 +231,8 @@
                                     true))))))
          ;; don't just pass `opts` through here to make it clear import-name is not intended for pipeline
          result-map (pipeline conn conc input-chan {:skip-annotations skip-annotations
-                                                    :transducer       tx-xform})]
+                                                    :transducer       tx-xform
+                                                    :progress-label   progress-label})]
      (doseq [path f-list]
        (log/info "Transacting tx-data file into Datomic: " (str path))
        (log/debug "Starting transaction pipelining of file: " (str path))

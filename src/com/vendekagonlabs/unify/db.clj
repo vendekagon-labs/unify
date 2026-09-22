@@ -19,6 +19,7 @@
             [com.vendekagonlabs.unify.db.backend :as backend]
             [com.vendekagonlabs.unify.db.query :as dq]
             [com.vendekagonlabs.unify.db.transact :as db.tx]
+            [com.vendekagonlabs.unify.util.progress :as progress]
             [clojure.tools.logging :as log]
             [com.vendekagonlabs.unify.db.schema :as schema]
             [clojure.java.io :as io]
@@ -112,15 +113,26 @@
         index-data (util.io/read-edn-file index-file)
         seed-data-index (if-not include-proprietary
                           (remove :proprietary index-data)
-                          index-data)]
-    (doseq [dataset seed-data-index]
-      (if-not (fulfilled? (d/db conn) dataset)
-        (let [{:keys [name files]} dataset]
-          (log/info ::bootstrap-data "Dataset " name " not present, installing.")
+                          index-data)
+        ;; single pass: log presence/absence per dataset and collect the ones that
+        ;; actually need installing, so the progress stage below (each file in it gets
+        ;; its own bar via transact-bootstrap-data -> run-txns!) is only started when
+        ;; there's real work to show.
+        to-install (doall
+                     (keep (fn [dataset]
+                             (if-not (fulfilled? (d/db conn) dataset)
+                               (do
+                                 (log/info ::bootstrap-data "Dataset " (:name dataset) " not present, installing.")
+                                 dataset)
+                               (do
+                                 (log/info ::bootstrap-data "Dataset " (:name dataset) " already present, skipping.")
+                                 nil)))
+                           seed-data-index))]
+    (when (seq to-install)
+      (progress/with-stage "Installing reference data"
+        (doseq [{:keys [files]} to-install]
           (doseq [f files]
-            (println "\n" (.toString f) "\n")
-            (transact-bootstrap-data conn (io/file seed-data-dir f))))
-        (log/info ::bootstrap-data "Dataset " (:name dataset) " already present, skipping.")))))
+            (transact-bootstrap-data conn (io/file seed-data-dir f))))))))
 
 (defn init
   "Loads all base schema, enums, and metamodel into database if necessary."
