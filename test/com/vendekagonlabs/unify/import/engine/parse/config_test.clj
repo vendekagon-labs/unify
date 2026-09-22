@@ -14,7 +14,6 @@
 (ns com.vendekagonlabs.unify.import.engine.parse.config-test
   (:require [clojure.test :refer :all]
             [com.vendekagonlabs.unify.test-util :as tu]
-            [contextual.core :as c]
             [com.vendekagonlabs.unify.util.collection :as coll]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]
@@ -60,16 +59,16 @@
 (deftest namespace-config-test
   ;; this pathway is non-obvious and may be subject to cleanup:
   ;; - config file is one map wrapped in a vector, so first unwraps it
-  ;; - we need full context of config as per contextualize
+  ;; - we need the raw path from the root so namespace-config can resolve each
+  ;;   node's kind from the schema metamodel
   ;; - but for all follow on logic we only operate from :dataset node on
-  ;;   (but it _requires_ context from the parent for contextualize to know it
-  ;;    is the :dataset node)
+  ;;   (so the :dataset key is passed as the node's init-path, since it's no
+  ;;    longer implicit in a wrapping/contextualizing step)
   ;; - Note, that's not specific to dataset, but any key we want to namesapce
   ;;   in the map.
   (let [cfg good-config
-        ctx-cfg (c/contextualize cfg)
-        cfg-dataset-root-ctx (:dataset ctx-cfg)
-        ns-cfg (parse.config/namespace-config schema cfg-dataset-root-ctx)]
+        cfg-dataset-root (:dataset cfg)
+        ns-cfg (parse.config/namespace-config schema cfg-dataset-root [:dataset])]
     (testing "All keys have now been namespaced."
       (is (every? namespace (coll/nested->keyword-keys ns-cfg))))))
 
@@ -85,9 +84,8 @@
   [schema cfg-edn]
   (->> cfg-edn
        (parse.config/ensure-raw schema)
-       (c/contextualize)
        (:dataset)
-       (parse.config/namespace-config schema)
+       (#(parse.config/namespace-config schema % [:dataset]))
        (parse.config/remove-directives)
        (parse.config/ensure-ns schema)))
 
