@@ -99,16 +99,22 @@
   Each batch will also include a :unify.import.tx/id UUID and :unify.import.tx/import reference to the import entity
 
   'ctx' is a map containing at least the :unify.import/name for the current import job
-  'batch' is the number of entities per transaction"
-  [import-job-name filename-in filename-out batch]
+  'batch' is the number of entities per transaction
+  'all-uids' is the set of all UID attributes in the schema (see metamodel/all-uids),
+  passed in rather than recomputed here since it's the same for every file in a run and
+  computing it means reading and parsing the whole cached schema file from disk."
+  [import-job-name filename-in filename-out batch all-uids]
   (with-open [in (PushbackReader. (io/reader filename-in))
               out (io/writer filename-out)]
-    (let [all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
-          input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
+    (let [input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
                          (take-while #(not= % ::eof)))]
+      ;; pmap here since hash-uids (a full tree-walk to find and md5-hash UID tuples)
+      ;; is pure/CPU-only per batch: for a file with many batches, this lets the
+      ;; batches for that one file use multiple cores instead of running on a single
+      ;; thread while other (smaller, already-finished) files' cores sit idle.
       (doseq [data (->> input-seq
                         (partition-all batch)
-                        (map (fn [tx-batch]
+                        (pmap (fn [tx-batch]
                                (conj (hash-uids tx-batch all-uids)
                                      (create-txn-metadata
                                        import-job-name)))))]
@@ -130,7 +136,7 @@
   'tx-data-path' is output path for transaction data files
   'ctx' is a map containing at least :unify.import/name for the current import job
   'batch' is the size (# of entities) batches to create"
-  [import-job-name ent-file-path batch]
+  [import-job-name ent-file-path batch all-uids]
   (log/info "Generating transaction data from entity data.")
   (let [workers 40
         all-fnames (conventions/all-entity-filenames ent-file-path)
@@ -139,7 +145,8 @@
                         import-job-name
                         abs-filepath
                         (conventions/in-tx-data-dir ent-file-path (text/filename abs-filepath))
-                        batch))
+                        batch
+                        all-uids))
         input-ch (a/to-chan!! all-fnames)
         result-ch (a/chan workers)]
     (a/pipeline-blocking workers result-ch (map tx-data-gen) input-ch)
@@ -151,7 +158,7 @@
   import entity first as a single transaction, followed by a transaction for the annotated
   literal data map
   Return the :unify.import/name of the job"
-  [working-dir]
+  [working-dir all-uids]
   (let [in-file-path (conventions/import-cfg-job-path working-dir)
         out-file-path (conventions/tx-import-cfg-job-path working-dir)
         cfg-file-data (edn/read-string (str "[" (slurp in-file-path) "]"))
@@ -160,7 +167,6 @@
         processed-import-ent {:db/id         "datomic.tx"
                               :unify.import.tx/import (assoc import-ent :db/id "temp-import-ent")
                               :unify.import.tx/id (str (UUID/randomUUID))}
-        all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
         literal-data (conj (hash-uids (list (second cfg-file-data)) all-uids)
                            (create-txn-metadata import-job-name))]
     (do
@@ -177,8 +183,9 @@
   [target-dir batch]
   (println "Generating transaction data.")
   (let [start (System/currentTimeMillis)
-        import-job-name (process-import-cfg-file! target-dir)
-        process-result (make-transaction-data*! import-job-name target-dir batch)]
+        all-uids (metamodel/all-uids (db.schema/get-metamodel-and-schema))
+        import-job-name (process-import-cfg-file! target-dir all-uids)
+        process-result (make-transaction-data*! import-job-name target-dir batch all-uids)]
     ;; end .... tx-data progress reporting with newline
     (println)
     (log/info (str "Transaction data generated from entity data in: "

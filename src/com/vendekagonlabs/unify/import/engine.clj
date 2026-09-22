@@ -49,6 +49,14 @@
   (or (Long/getLong "com.vendekagonlabs.unify.prepare.threads")
       (+ 2 (available-processors))))
 
+(defn file-concurrency
+  "How many files run-jobs! processes concurrently. Kept modest (rather than, say,
+  available-processors) since each concurrently-running file also internally fans out
+  across threads-per-file workers of its own for row processing."
+  []
+  (or (Long/getLong "com.vendekagonlabs.unify.prepare.file-concurrency")
+      2))
+
 (defmacro csv-throw->anomaly
   [body]
   `(try
@@ -238,6 +246,11 @@
 
 
 (defn run-jobs!
+  "Runs exec-job (job->file) for each job, with file-concurrency files in flight at
+  once. Each file already internally fans out across threads-per-file workers for row
+  processing, but small files (or the last few large files once the rest have
+  finished) can't keep threads-per-file workers busy on their own -- running a few
+  files concurrently fills that gap."
   [target-dir full-import-ctx jobs continue-on-error?]
   (let [exec-job (fn exec-job [job]
                    (try
@@ -249,7 +262,12 @@
                               {::anom/category ::anom/fault
                                :async/file     (or (:unify/input-tsv-file job)
                                                    (:unify/input-csv-file job))}))))
-        results (doall (map exec-job jobs))]
+        results (if (seq jobs)
+                  (let [input-ch (a/to-chan!! jobs)
+                        result-ch (a/chan (count jobs))]
+                    (a/pipeline-blocking (file-concurrency) result-ch (map exec-job) input-ch)
+                    (a/<!! (a/into [] result-ch)))
+                  [])]
     (if-let [errors (seq (filter ::anom/category results))]
       (let [errored-file (:async/file (first errors))]
         (if continue-on-error?
