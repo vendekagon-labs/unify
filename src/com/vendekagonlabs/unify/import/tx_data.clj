@@ -25,7 +25,6 @@
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
             [com.vendekagonlabs.unify.db.transact :refer [run-txns!
                                                           sync+retry]]
-            [clojure.edn :as edn]
             [cognitect.anomalies :as anom]
             [clojure.core.async :as a]
             [com.vendekagonlabs.unify.import.file-conventions :as conventions]

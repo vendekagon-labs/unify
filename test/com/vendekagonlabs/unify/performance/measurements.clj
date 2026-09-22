@@ -14,8 +14,7 @@
 (ns com.vendekagonlabs.unify.performance.measurements
   (:require [com.vendekagonlabs.unify.import :as import]
             [clojure.test :refer :all]
-            [clojure.java.shell :refer [sh]]
-            [com.vendekagonlabs.unify.import :as import]))
+            [clojure.java.shell :refer [sh]]))
 
 
 (def tmp-dir "tmp-perf-output")
