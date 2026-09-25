@@ -19,10 +19,23 @@
             [clojure.edn :as edn]))
 
 (def ref-file-prefix "unify-ref-")
-(def import-cfg-job-file-name "import-job.edn")
-(def ignored-filenames #{"import-summary.edn" import-cfg-job-file-name})
+(def import-cfg-job-file-name "import-job.edn.gz")
+;; working directories prepared before data files were gzipped
+(def legacy-import-cfg-job-file-name "import-job.edn")
+(def ignored-filenames #{"import-summary.edn" import-cfg-job-file-name legacy-import-cfg-job-file-name})
 (def sep (java.io.File/separator))
 
+(defn edn-file?
+  "True for .edn files, gzipped (.edn.gz) or not."
+  [fname]
+  (or (str/ends-with? fname ".edn")
+      (str/ends-with? fname ".edn.gz")))
+
+(defn tsv-file?
+  "True for .tsv files, gzipped (.tsv.gz) or not."
+  [fname]
+  (or (str/ends-with? fname ".tsv")
+      (str/ends-with? fname ".tsv.gz")))
 (defn ->full-path [fname]
   (-> fname
       (io/file)
@@ -33,7 +46,7 @@
   (->> dir
        (io/file)
        (.list)
-       (filter #(str/ends-with? % ".edn"))
+       (filter edn-file?)
        (remove ignored-filenames)))
 
 (defn- tsv+file-filter
@@ -41,7 +54,7 @@
   (->> dir
        (io/file)
        (.list)
-       (filter #(str/ends-with? % ".tsv"))
+       (filter tsv-file?)
        (remove ignored-filenames)))
 
 (defn rm-edn-files
@@ -49,7 +62,7 @@
   (let [files (->> dir
                    (io/file)
                    (.list)
-                   (filter #(str/ends-with? % ".edn")))]
+                   (filter edn-file?))]
     (doseq [f files]
       (-> (io/file (str dir sep f))
           (.delete)))))
@@ -118,6 +131,20 @@
       (.getCanonicalPath)
       (str sep import-cfg-job-file-name)))
 
+(defn existing-import-cfg-job-path
+  "Path of the import job file to read in target-dir: the gzipped import job file,
+  falling back to the legacy uncompressed one if only that exists."
+  [target-dir]
+  (let [path (import-cfg-job-path target-dir)
+        legacy-path (-> target-dir
+                        (io/file)
+                        (.getCanonicalPath)
+                        (str sep legacy-import-cfg-job-file-name))]
+    (if (and (not (pio/exists? path))
+             (pio/exists? legacy-path))
+      legacy-path
+      path)))
+
 (defn tx-import-cfg-job-path
   [target-dir]
   (-> target-dir
@@ -170,8 +197,8 @@
        (tsv+file-filter)))
 
 (defn job-entity [target-dir]
-  (let [in-path (str target-dir sep "tx-data" sep import-cfg-job-file-name)]
-    (edn/read-string (str "[" (slurp in-path) "]"))))
+  (let [in-path (existing-import-cfg-job-path (tx-data-folder target-dir))]
+    (edn/read-string (str "[" (pio/slurp-file in-path) "]"))))
 
 (defn import-name
   "Return the import job name defined by the import job file in the tx-data
@@ -192,8 +219,8 @@
 (defn dataset-name
   "Return the dataset name (from the import entity tx-data file)"
   [target-dir]
-  (let [in-path (str target-dir sep "tx-data" sep import-cfg-job-file-name)
-        cfg-file-data (edn/read-string (str "[" (slurp in-path) "]"))]
+  (let [in-path (existing-import-cfg-job-path (tx-data-folder target-dir))
+        cfg-file-data (edn/read-string (str "[" (pio/slurp-file in-path) "]"))]
     (->> cfg-file-data
          (second)
          (filter :dataset/name)

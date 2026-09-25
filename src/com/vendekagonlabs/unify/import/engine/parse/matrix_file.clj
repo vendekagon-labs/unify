@@ -14,7 +14,7 @@
 (ns com.vendekagonlabs.unify.import.engine.parse.matrix-file
   (:require [charred.api :as csv]
             [clojure.spec-alpha2 :as s]
-            [clojure.java.io :as jio]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import.engine.parse.data :as parse.data]))
 
 (defn- only
@@ -43,7 +43,7 @@
               to non-index column names.
   "
   [file-path {:keys [indexed-by data-spec data-type sparse? target] :as matrix-job}]
-  (with-open [rdr (jio/reader file-path)]
+  (with-open [rdr (util.io/reader file-path)]
     (let [csv-seq (csv/read-csv rdr :separator \tab)
           colnames (first csv-seq)
           indices (keys indexed-by)

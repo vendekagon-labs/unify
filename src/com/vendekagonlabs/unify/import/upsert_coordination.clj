@@ -13,6 +13,7 @@
 ;; limitations under the License.
 (ns com.vendekagonlabs.unify.import.upsert-coordination
   (:require [com.vendekagonlabs.unify.db.metamodel :as metamodel]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [datomic.api :as d]
@@ -95,7 +96,7 @@
   the same value(s)) if transacted against the database."
   [datomic-uri tx-data-file]
   (log/info "Checking for reference data conflicts with: " tx-data-file)
-  (with-open [in (java.io.PushbackReader. (io/reader tx-data-file))]
+  (with-open [in (java.io.PushbackReader. (util.io/reader tx-data-file))]
     (let [conn (d/connect datomic-uri)
           db (d/db conn)
           schema (db.schema/get-metamodel-and-schema)

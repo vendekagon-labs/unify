@@ -17,7 +17,70 @@
             [clojure.java.shell :refer [sh]]
             [clojure.string :as s]
             [com.vendekagonlabs.unify.util.text :refer [->pretty-string]]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io])
+  (:import (java.io InputStream)
+           (java.util.zip GZIPInputStream GZIPOutputStream)))
+
+(def ^:private gzip-buffer-size 65536)
+
+(defn gzip-path?
+  "True if path f (string or file) has a .gz extension, i.e. should be written gzipped."
+  [f]
+  (s/ends-with? (str f) ".gz"))
+
+(defn gzipped-stream?
+  "True if the next two bytes of `in` are the gzip magic bytes. `in` must support
+  mark/reset (e.g. a BufferedInputStream); the stream position is left unchanged."
+  [^InputStream in]
+  (.mark in 2)
+  (let [b1 (.read in)
+        b2 (.read in)]
+    (.reset in)
+    (and (= b1 0x1f) (= b2 0x8b))))
+
+(defn input-stream
+  "Opens f (anything clojure.java.io/input-stream accepts) as an input stream,
+  transparently decompressing it if its content is gzipped. Detection is by the
+  gzip magic bytes, not the file extension."
+  ^InputStream [f]
+  (let [in (io/input-stream f)
+        in (if (.markSupported ^InputStream in)
+             in
+             (java.io.BufferedInputStream. in))]
+    (try
+      (if (gzipped-stream? in)
+        (GZIPInputStream. in gzip-buffer-size)
+        in)
+      (catch Exception e
+        (.close ^InputStream in)
+        (throw e)))))
+
+(defn reader
+  "Returns a (UTF-8) BufferedReader over f, transparently decompressing gzipped
+  content. See `input-stream`."
+  ^java.io.BufferedReader [f]
+  (io/reader (input-stream f)))
+
+(defn writer
+  "Returns a (UTF-8) BufferedWriter to f, gzip-compressing output when f has a .gz
+  extension. Makes parent folders if necessary."
+  ^java.io.BufferedWriter [f]
+  (make-parents f)
+  (if (gzip-path? f)
+    (io/writer (GZIPOutputStream. (io/output-stream f) gzip-buffer-size))
+    (io/writer f)))
+
+(defn slurp-file
+  "Like slurp, but transparently decompresses gzipped content."
+  [f]
+  (with-open [rdr (reader f)]
+    (slurp rdr)))
+
+(defn spit-file
+  "Like spit (without append), but gzip-compresses when f has a .gz extension."
+  [f content]
+  (with-open [w (writer f)]
+    (.write w (str content))))
 
 (defn file-extension [file-path-str]
   (-> (re-find #"(\.[a-zA-Z0-9]+)$" file-path-str)
@@ -65,12 +128,11 @@
 
 (defn write-edn-file
   "Makes parent folders (if necessary) and spits directly into f is data is a string, otherwise writes
-   ->pretty-string of data."
+   ->pretty-string of data. Output is gzipped when f has a .gz extension."
   [f data]
-  (make-parents f)
-  (spit f (if (string? data)
-            data
-            (->pretty-string data))))
+  (spit-file f (if (string? data)
+                 data
+                 (->pretty-string data))))
 
 
 (defn glob
@@ -98,7 +160,7 @@
   "Reads EDN file, or throws ex-info with info on why EDN file can't be read."
   [f]
   (try
-    (let [f-text (slurp f)
+    (let [f-text (slurp-file f)
           f-edn (edn/read-string {:readers {'glob unrealized-glob}} f-text)]
       f-edn)
     (catch Exception e

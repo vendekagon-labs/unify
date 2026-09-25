@@ -19,7 +19,7 @@
             [com.vendekagonlabs.unify.db.metamodel :as metamodel]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
-            [com.vendekagonlabs.unify.util.text :as text]
+            [com.vendekagonlabs.unify.util.text :as text :refer [->pretty-string]]
             [com.vendekagonlabs.unify.matrix :as matrix]
             [com.vendekagonlabs.unify.util.io :as pio]
             [com.vendekagonlabs.unify.db.import-coordination :as ic]
@@ -107,8 +107,8 @@
   'label' identifies this file in the progress display (see
   com.vendekagonlabs.unify.util.progress), ticked once per batch."
   [import-job-name filename-in filename-out batch all-uids label]
-  (with-open [in (PushbackReader. (io/reader filename-in))
-              out (io/writer filename-out)]
+  (with-open [in (PushbackReader. (pio/reader filename-in))
+              out (pio/writer filename-out)]
     (let [input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
                          (take-while #(not= % ::eof)))]
       ;; pmap here since hash-uids (a full tree-walk to find and md5-hash UID tuples)
@@ -171,9 +171,9 @@
   literal data map
   Return the :unify.import/name of the job"
   [working-dir all-uids]
-  (let [in-file-path (conventions/import-cfg-job-path working-dir)
+  (let [in-file-path (conventions/existing-import-cfg-job-path working-dir)
         out-file-path (conventions/tx-import-cfg-job-path working-dir)
-        cfg-file-data (edn/read-string (str "[" (slurp in-file-path) "]"))
+        cfg-file-data (edn/read-string (str "[" (pio/slurp-file in-file-path) "]"))
         import-ent (first cfg-file-data)
         import-job-name (:unify.import/name import-ent)
         processed-import-ent {:db/id         "datomic.tx"
@@ -181,9 +181,8 @@
                               :unify.import.tx/id (str (UUID/randomUUID))}
         literal-data (conj (hash-uids (list (second cfg-file-data)) all-uids)
                            (create-txn-metadata import-job-name))]
-    (do
-      (pio/write-edn-file out-file-path (list processed-import-ent))
-      (spit out-file-path literal-data :append true))
+    (pio/write-edn-file out-file-path (str (->pretty-string (list processed-import-ent))
+                                           (pr-str literal-data)))
     import-job-name))
 
 
@@ -218,7 +217,7 @@
 (defn- transact-one-file-sync!
   "Synchronously transact a single file of transaction data."
   [conn f-path {:keys [import-name] :as _opts}]
-  (with-open [in (PushbackReader. (io/reader f-path))]
+  (with-open [in (PushbackReader. (pio/reader f-path))]
     (let [tx-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
                       (take-while #(not= % ::eof)))
           uuid-set (ic/successful-uuid-set (d/db conn) import-name {:invalidate false})]
@@ -286,7 +285,8 @@
         db (d/db conn)
         all-dataset-fnames (conventions/dataset-tx-data-filenames transact-dir)
         all-ref-fnames (conventions/ref-tx-data-filenames target-dir)
-        import-job-file-path (conventions/tx-import-cfg-job-path transact-dir)]
+        import-job-file-path (conventions/existing-import-cfg-job-path
+                               (conventions/tx-data-folder transact-dir))]
     (log/info "Running transactions for import: " import-job-name
               ::target-dir target-dir ", " ::update update)
     (when (and resume
