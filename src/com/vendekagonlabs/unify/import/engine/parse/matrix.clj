@@ -66,7 +66,7 @@
         resolved-refs (into {} (for [[ind vals] no-unify-parsed-mtx-file]
                                  [ind (map (partial resolve-fn ind) vals)]))
         key-pt1 (util.uuid/random)
-        key (str key-pt1 ".tsv")
+        key (str key-pt1 ".tsv.gz")
         key-attr (metamodel/matrix-key-attr schema node-kind)
         precomputed (:unify/precomputed mtx-directive)
         _ (when-not key-attr

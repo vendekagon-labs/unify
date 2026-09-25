@@ -29,8 +29,11 @@
                           (db.config/matrix-bucket) matrix-key
                           ;; this content type must be put on s3 object or
                           ;; pre-signed url will be a pain to deal with
-                          ;; from httr, possibly other clients.
-                          {:ContentType "text/tab-separated-values"})))
+                          ;; from httr, possibly other clients. Matrix files are
+                          ;; gzipped, so also mark the encoding so http clients
+                          ;; transparently decompress.
+                          {:ContentType     "text/tab-separated-values"
+                           :ContentEncoding "gzip"})))
     true))
 
 (defn noop [_working-dir] true)

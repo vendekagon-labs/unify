@@ -28,6 +28,7 @@
             [com.vendekagonlabs.unify.import.engine.parse.mapping :as parse.mapping]
             [com.vendekagonlabs.unify.import.engine.parse.matrix :as parse.matrix]
             [com.vendekagonlabs.unify.import.engine.parse.data :as parse.data]
+            [com.vendekagonlabs.unify.import.file-conventions :as conventions]
             [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.util.io :as io]
             [com.vendekagonlabs.unify.util.text :as text]
@@ -145,8 +146,8 @@
   identifies this file in the progress display (see
   com.vendekagonlabs.unify.util.progress), ticked once per record."
   [full-import-ctx job in-f out-f conc label]
-  (with-open [rdr (jio/reader in-f)
-              writer (clojure.java.io/writer out-f)]
+  (with-open [rdr (util.io/reader in-f)
+              writer (util.io/writer out-f)]
     (let [out-ch (a/chan 10000)
           done-ch (a/chan)
           sep (if (:unify/input-csv-file job) \, \tab)
@@ -236,7 +237,7 @@
                         outfile-prefix
                         in-f-name
                         "-"
-                        (uuid/v5 :unify/job job) ".edn")]
+                        (uuid/v5 :unify/job job) ".edn.gz")]
     (if (and (:resume full-import-ctx)
              (io/exists? out-f-path))
       (do (log/info "Prepare is in [resume] mode, skipping existing entity file: " out-f-path)
@@ -326,7 +327,7 @@
         out-f-path (str target-dir
                         (when-not (clojure.string/ends-with? target-dir "/") "/")
                         out-f-prefix "-"
-                        out-f-name ".edn")
+                        out-f-name ".edn.gz")
         cleaned-entity-data (coll/remove-keys-by-ns entity-data "unify")]
     (io/write-edn-file out-f-path cleaned-entity-data)
     entity-data))
@@ -390,10 +391,9 @@
                            :resume      resume?
                            :import-name (:unify.import/name import-entity)}
 
-          _ (io/write-edn-file (str target-dir "/import-job.edn") import-entity)
-          import-file (str target-dir "/import-job.edn")
-          _ (pp/pprint dataset-entity
-                       (clojure.java.io/writer import-file :append true))
+          _ (io/write-edn-file (str target-dir "/" conventions/import-cfg-job-file-name)
+                               (str (text/->pretty-string import-entity)
+                                    (text/->pretty-string dataset-entity)))
 
           _ (ensure-import-files-exist cfg-root-dir (concat matrix-jobs jobs))
           ref-only-cfg-map (select-keys cfg-map (metamodel/allowed-ref-data schema))

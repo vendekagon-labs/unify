@@ -23,6 +23,7 @@
             [com.vendekagonlabs.unify.util.uuid :as util.uuid]
             [clojure.tools.logging :as log]
             [cognitect.anomalies :as anom]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.java.io :as io])
   (:import (java.io PushbackReader)))
 
@@ -236,7 +237,7 @@
      (doseq [path f-list]
        (log/info "Transacting tx-data file into Datomic: " (str path))
        (log/debug "Starting transaction pipelining of file: " (str path))
-       (with-open [in (PushbackReader. (io/reader path))]
+       (with-open [in (PushbackReader. (util.io/reader path))]
          (let [input-seq (->> (repeatedly #(edn/read {:eof ::eof} in))
                               (take-while #(not= % ::eof)))]
            (doseq [tx input-seq]

@@ -24,7 +24,7 @@
   processed, and `complete!`/`fail!` when a file finishes. See
   `fast-line-count` for how an approximate total is produced cheaply."
   (:require [com.vendekagonlabs.unify.util.term :as term]
-            [clojure.java.io :as io]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [clojure.string :as str])
   (:import (java.util.concurrent.atomic AtomicLong)))
 
@@ -35,7 +35,7 @@
   'unknown total') if the file can't be read for any reason."
   [path]
   (try
-    (with-open [rdr (io/reader (str path))]
+    (with-open [rdr (util.io/reader (str path))]
       (let [buf (char-array 65536)]
         (loop [total (long 0)]
           (let [n (.read rdr buf)]

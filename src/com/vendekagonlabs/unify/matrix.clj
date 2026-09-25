@@ -15,6 +15,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [com.vendekagonlabs.unify.db.matrix :as db.matrix]
+            [com.vendekagonlabs.unify.util.io :as util.io]
             [com.vendekagonlabs.unify.import.file-conventions :as file-conventions]))
 
 
@@ -22,10 +23,11 @@
   "Copies matrix file at `src-path` to `dest-path` with col names in headers
   replaced by substitution map `smap` which should define a lookup from user provided
   column names to schema defined column names. Returns `true` if matrix file
-  copy succeeds, otherwise throws."
+  copy succeeds, otherwise throws. Source may be gzipped or not, destination is
+  gzipped when `dest-path` has a .gz extension."
   [src-path dest-path hdr-smap constant-columns]
-  (with-open [src-rdr (io/reader src-path)
-              writer (io/writer dest-path)]
+  (with-open [src-rdr (util.io/reader src-path)
+              writer (util.io/writer dest-path)]
     (let [in-lines (line-seq src-rdr)
           hdr-str (first in-lines)
           new-hdr (loop [hdr-so-far hdr-str
